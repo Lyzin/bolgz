@@ -1,0 +1,1100 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.3">
+    
+    
+      
+        <title>Python - 笔记屋</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.1655a90d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#009485">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#django" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="笔记屋" class="md-header__button md-logo" aria-label="笔记屋">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            笔记屋
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Python
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="md-header__options">
+      
+    </div>
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      首页
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Python
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="笔记屋" class="md-nav__button md-logo" aria-label="笔记屋">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    笔记屋
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        首页
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Python
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Python
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1django" class="md-nav__link">
+    1、django下载安装
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2、两个框架模式
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h3 id="django">一、Django安装</h3>
+<h4 id="1django">1、django下载安装</h4>
+<pre><code class="language-python">下载:pip install django==1.11.9
+
+创建项目
+    django-admin startproject qingqing
+    cd qingqing 
+启动项目:python manage.py runserver 127.0.0.1:8001
+    cd qingqing 
+创建app:python manage.py startapp xiaoqing
+
+需要在项目的配置文件settings.py中添加一个app的配置
+INSTALL_APPS = [
+
+    'xiaoqing', app名称
+]
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # 以下两种写法都可以
+    'app01.apps.App01Config',
+    #'app01',
+]
+
+</code></pre>
+<h4 id="2">2、两个框架模式</h4>
+<pre><code class="language-python">MVC  
+    M:models数据库相关
+    V:views 视图逻辑相关
+    C:controller控制器 url分发 不同的路径找到不同的视图函数
+MTV
+    M:models数据库相关
+    T:templates模板 ,HTML文件
+    V:views 视图逻辑相关
+    + url控制器 不同的路径找到不同的视图函数
+MVVM 后面介绍
+</code></pre>
+<h3 id="url">二、路由（URL）</h3>
+<h4 id="1url">1、url配置文件</h4>
+<blockquote>
+<p>urls.py文件中写在urlpatterns = []中</p>
+</blockquote>
+<pre><code class="language-python"># 简单的路由
+    from app01 import views
+    url(r'^index/',views.index),
+</code></pre>
+<h4 id="2_1">2、无名分组</h4>
+<pre><code class="language-python"># 无名分组格式
+url(r'^index/(\d+)/(\d+)/',views.index)
+
+# 对应到views.py中的视图函数位置参数
+# 位置参数，第一个参数接收的是无名分组路径中匹配到的第一个分组的数据，第二个参数接收的是无名分组路径中匹配到的第二个分组的数据
+def books(request,year,month):
+    return HttpResponse(f&quot;{year} + {month} = {int(year) + int(month)}&quot;)
+</code></pre>
+<h4 id="3">3、有名分组</h4>
+<pre><code class="language-python"># 有名分组格式
+url(r'^index/(?P&lt;year&gt;\d+)/(?P&lt;month&gt;\d+)/',views.index)  
+
+# 对应到views.py中的视图函数位置参数，不过形参名要和url中的分组名对应好，参数位置没有要求
+def books(request,year,month):
+    return HttpResponse(f&quot;{year} + {month} = {int(year) + int(month)}&quot;)
+</code></pre>
+<h4 id="4">4、视图函数参数有默认值</h4>
+<pre><code class="language-python">url(r'^index/$',views.index),  #当不传num的时候，默认是1
+url(r'^index/(?P&lt;num&gt;\d+)/,views.index), #当传num的时候，传什么num就是什么
+视图函数参数默认值,
+    def index(request,num='1'):
+        print(num)
+</code></pre>
+<h4 id="5urlinclude">5、url路由分发之include</h4>
+<blockquote>
+<p>主要是将主urls.py里的url分发到不同app的urls.py中</p>
+</blockquote>
+<pre><code class="language-python">项目文件夹下的urls.py文件中的url写法:
+    from django.conf.urls import url,include
+    from django.contrib import admin
+    from app01 import views
+    urlpatterns = [
+        # url(r'^admin/', admin.site.urls),
+        #首页
+        url(r'^$', views.base), # 项目主目录的视图函数，在app01里定义项目主视图函数
+
+        url(r'^app01/', include('app01.urls')),
+
+        url(r'^app02/', include('app02.urls')),
+
+    ]
+
+app01下urls.py内容写法
+    from django.conf.urls import url
+    from django.contrib import admin
+    from app01 import views
+    urlpatterns = [
+        # url(r'^admin/', admin.site.urls),
+        url(r'^$', views.app01base), # app01 的主页url
+        url(r'^index/', views.index),
+    ]
+
+app02下urls.py内容写法   
+    from django.conf.urls import url
+    from django.contrib import admin
+    from app02 import views
+
+    urlpatterns = [
+        # url(r'^admin/', admin.site.urls),
+        url(r'^$', views.app02base), # app02 的主页url
+        url(r'^home/', views.home),
+
+    ]
+</code></pre>
+<h3 id="views">三、视图（Views）</h3>
+<h4 id="1request">1、request请求相关的属性方法</h4>
+<blockquote>
+<p>request--HttpRequest对象</p>
+</blockquote>
+<pre><code class="language-python">def index(request): #http相关请求信息---封装--HttpRequest对象
+
+    if request.method == 'GET':
+        print(request.body)  #获取post请求提交过来的原始数据
+        print(request.GET)   #获取GET请求提交的数据
+        print(request.META)  # 请求头相关信息,就是一个大字典
+        print(request.path) #/index/ 路径
+        print(request.path_info) #/index/ 路径
+        print(request.get_full_path())  #/index/?username=dazhuang&amp;password=123
+
+        return render(request,'index.html')
+    else:
+        print(request.body)  # b'username=dazhuang'，最原始的请求数据
+        print(request.POST) #获取POST请求提交的数据
+        return HttpResponse('男宾三位,拿好手牌!')
+
+</code></pre>
+<h4 id="2httpresponse">2、HttpResponse响应相关的方法</h4>
+<blockquote>
+<p>HttpResponse  --- 回复字符串的时候来使用
+render --- 回复一个html页面的时候使用
+redirect -- 重定向</p>
+</blockquote>
+<pre><code class="language-python">
+    def login(request):
+        if request.method == 'GET':
+            return render(request,'login.html')
+        else:
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            if username == 'taibai' and password == 'dsb':
+                # return render(request,'home.html')
+                return  redirect('/home/')  #重定向
+            else:
+                return HttpResponse('滚犊子,赶紧去充钱!!!')
+
+    #首页
+    def home(request):
+        return render(request,'home.html')
+
+</code></pre>
+<h4 id="3fbvcbv">3、FBV和CBV</h4>
+<p>1、FBV</p>
+<blockquote>
+<p>FBV -- function based view，就是在视图里使用函数处理请求</p>
+</blockquote>
+<pre><code class="language-python">def home(request):
+    print('home!!!')
+    return render(request,'home.html')
+</code></pre>
+<p>2、CBV</p>
+<blockquote>
+<p>CBV  -- class based view，就是在视图里使用类处理请求</p>
+<ol>
+<li>提高代码复用性，使用面向对象技术</li>
+<li>用不同函数针对不同HTTP方法处理，而不是通过if判断，提交可读性</li>
+</ol>
+</blockquote>
+<pre><code class="language-python"># views.py
+    from django.views import View
+    class LoginView(View):
+        # 通过请求方法找到自己写的视图类里面对应的方法
+        def get(self,request):
+
+            return render(request,'login2.html')
+        def post(self,request):
+            username = request.POST.get('uname')
+            password = request.POST.get('pwd')
+            print(username,password)
+
+            return HttpResponse('登录成功!')
+
+# urls.py
+    url(r'^login2/', views.LoginView.as_view())  # as_view() 固定写法
+</code></pre>
+<p>3.CBV通过不同的请求方法找到对应的试图类中的方法</p>
+<p>关键点,反射</p>
+<pre><code>    def dispatch(self, request, *args, **kwargs):
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)  #反射
+</code></pre>
+<p>4.CBV的dispatch方法</p>
+<pre><code class="language-python">from django.views import View
+class LoginView(View):
+    # GET 
+    def dispatch(self, request, *args, **kwargs):
+        print('请求来啦')
+        ret = super().dispatch(request, *args, **kwargs)
+        print('到点了,走人了')
+        return ret
+    def get(self,request):
+        print('get方法执行了')
+        return render(request,'login2.html')
+    def post(self,request):
+        username = request.POST.get('uname')
+        password = request.POST.get('pwd')
+        print(username,password)
+        return HttpResponse('登录成功!')
+</code></pre>
+<p>5.FBV加装饰器</p>
+<pre><code class="language-python">def n1(f):
+    def n2(*args,**kwargs):
+        print('请求之前')
+        ret = f(*args,**kwargs)
+        print('请求之后')
+        return ret
+    return n2
+@n1
+def home(request):
+    print('home!!!')
+    return render(request,'home.html')
+</code></pre>
+<p>6.CBV加装饰器</p>
+<pre><code class="language-python">from django.views import View
+from django.utils.decorators import method_decorator
+
+def n1(f):
+    def n2(*args,**kwargs):
+        print('请求之前')
+        ret = f(*args,**kwargs)
+        print('请求之后')
+        return ret
+    return n2
+
+# @method_decorator(n1,name='get') #方式三
+class LoginView(View):
+    # GET
+    # @method_decorator(n1)  #方式2 给所有方法加装饰器
+    def dispatch(self, request, *args, **kwargs):
+        # print('请求来啦')
+        ret = super().dispatch(request, *args, **kwargs)
+        # print('到点了,走人了')
+        return ret
+
+    # @method_decorator(n1)  #方式1
+    def get(self,request):
+        print('get方法执行了')
+        return render(request,'login2.html')
+    def post(self,request):
+        username = request.POST.get('uname')
+        password = request.POST.get('pwd')
+        print(username,password)
+        return HttpResponse('登录成功!')
+</code></pre>
+<h3 id="_1">四、模板</h3>
+<h4 id="1">1、模板语法</h4>
+<blockquote>
+<p>https://www.cnblogs.com/clschao/articles/10414811.html#part_3</p>
+<p>只记这两种语法</p>
+<ul>
+<li>
+<p>{{ 变量 }}</p>
+</li>
+<li>
+<p>{% 逻辑 %}</p>
+</li>
+</ul>
+</blockquote>
+<pre><code class="language-python"># index.html
+    &lt;!DOCTYPE html&gt;
+    &lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;meta charset=&quot;UTF-8&quot;&gt;
+        &lt;title&gt;Title&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+    &lt;p&gt; {{ num }}&lt;/p&gt;
+    &lt;p&gt; {{ name }}&lt;/p&gt;
+    &lt;p&gt; {{ namelist }}&lt;/p&gt;
+
+    {# namelist.1  表示取namelist列表的第二个元素 #}
+    &lt;p&gt; {{ namelist.1 }}&lt;/p&gt;
+
+    &lt;p&gt; {{ d1 }}&lt;/p&gt;
+
+    {# namelist.1  表示取d1字典key=age的值 #}
+    &lt;p&gt; {{ d1.age }}&lt;/p&gt;
+
+    &lt;/body&gt;
+    &lt;/html&gt;
+
+# views.py
+    def index(request):
+        num = 100
+        name = 'shige'
+        name_list = ['大壮', '小壮', '壮壮']
+        d1 = {'name': '大壮', 'age': 73, 'hobby': 'xuefei+xiangxi'}
+        return render(request, 'index.html', {'num': num, 'name': name, 'namelist': name_list, 'd1': d1})
+
+        # locals() 获取函数内部所有变量的值,并加工成{'变量名':'变量值'....}这样一个字典
+        return render(request,'index.html',locals()) 
+
+</code></pre>
+<h4 id="2_2">2、过滤器</h4>
+<pre><code class="language-html">&lt;!-- 过滤器 --&gt;
+&lt;!-- 获取数据长度,没参数 --&gt;
+&lt;p&gt;{{ name_list|length }}&lt;/p&gt;
+
+&lt;!-- 默认值,有参数,如果一个变量是false或者为空，使用给定的默认值。 否则，使用变量的值。--&gt;
+&lt;p&gt;{{ xx|default:'啥也没有' }}&lt;/p&gt;
+
+&lt;!-- 将值格式化为一个 “人类可读的” 文件尺寸 （例如 '13 KB', '4.1 MB', '102 bytes', 等等） 基本单位是bytes--&gt;
+&lt;p&gt;{{ movesize|filesizeformat }}&lt;/p&gt;
+
+&lt;!-- 和Python切片一样，顾头不顾尾--&gt;
+&lt;p&gt;{{ name|slice:':3' }}&lt;/p&gt;
+
+&lt;!--  时间格式化显示 --&gt;
+&lt;p&gt;{{ now|date:'Y-m-d' }}&lt;/p&gt;
+
+&lt;!--  字符截断 --&gt;
+&lt;p&gt;{{ words|truncatechars:'9' }}&lt;/p&gt;
+
+&lt;!--  单词截断 --&gt;
+&lt;p&gt;{{ words|truncatewords:'3' }}&lt;/p&gt;
+
+&lt;!-- 移除value中所有的与给出的变量相同的字符串 --&gt;
+&lt;p&gt;{{ words|cut:'i' }}&lt;/p&gt;
+
+&lt;!-- 使用字符串连接列表，{{ list|join:', ' }}，就像Python的str.join(list) --&gt;
+&lt;p&gt;{{ name_list|join:'+' }}&lt;/p&gt;
+
+&lt;!--将标签字符串识别成普通字符串--&gt;
+&lt;p&gt;{{ tag|safe }}&lt;/p&gt;
+
+&lt;!--将字符串识别成标签，也就是说传过来的字符串是html标签，不过是安全的，不会有xss攻击--&gt;
+&lt;p&gt;{{ tag|safe }}&lt;/p&gt;
+</code></pre>
+<h4 id="3_1">3、模板里的标签</h4>
+<blockquote>
+<p>{% 逻辑 %}</p>
+</blockquote>
+<pre><code class="language-python"># 一些标签需要开始和结束标签
+{% tag %}
+    标签内容
+{%  endfor %}
+</code></pre>
+<h5 id="31-for">3.1 for标签</h5>
+<pre><code class="language-python">{# for循环遍历列表list #}
+&lt;ul&gt;
+    {% for name in name_list %}
+        &lt;li&gt;{{ name }}&lt;/li&gt;
+    {% endfor %}
+&lt;/ul&gt;
+
+
+{# for循环遍历字典 #}
+&lt;ol&gt;
+    {% for key,value in d1.items %}
+        &lt;li&gt;{{ key }}--{{ value }}&lt;/li&gt;
+    {% endfor %}
+&lt;/ol&gt;
+
+{# for 标签带有一个可选的{% empty %} 从句，以便在给出的组是空的或者没有被找到时，可以有所操作。#}
+{% for person in person_list %}
+    &lt;p&gt;{{ person.name }}&lt;/p&gt;
+{% empty %}
+    &lt;p&gt;很抱歉，这里没有数据&lt;/p&gt;
+{% endfor %}
+</code></pre>
+<h5 id="32-if">3.2 if标签</h5>
+<blockquote>
+<p>1、{%  if  %}会对一个变量求值，如果它的值是“True”（存在、不为空、且不是boolean类型的false值），对应的内容块会输出</p>
+<p>2、变量值是views函数中的返回给页面的变量值，在html页面中判断时不需要添加双花括号</p>
+<p>```python</p>
+<h1 id="views_1">在views函数中的的变量</h1>
+<p>def androidPackageData(request):
+    info = [
+        {
+            'no':1,
+            'status': 1,
+            'builder':'limimg',
+            'branch':'2.2.0',
+            'qrcode':'http://www.baidu.com'
+        },
+        {
+            'no': 2,
+            'status': 0,
+            'builder': 'limimg',
+            'branch': '2.3.0',
+            'qrcode': 'http://www.baidu.com'
+        },
+        {
+            'no': 3,
+            'status': 1,
+            'builder': 'limimg',
+            'branch': '2.4.0',
+            'qrcode': 'http://www.baidu.com'
+        },
+    ]
+    ph = "android测试包主页面"
+    return render(request,"testpackages.html",locals())</p>
+<h1 id="htmlifkey">html页面中if判断使用，直接通过列表循环取里面字典的key进行判断，不需要加{{ }}符号</h1>
+<p>{% for i in info %}
+  <tr>
+      <td>{{ i.no }}</td>
+      {% if i.status == 1 %}
+          <td style="color: green">成功</td>
+    {% elif i.status == 0 %}
+        <td style="color: red">失败</td>
+    {% else %}
+        <td style="color: darkorange">打包状态异常</td>
+    {% endif %}
+     <td>{{ i.builder }}</td>
+     <td>{{ i.branch }}</td>
+     <td>{{ i.qrcode }}</td>
+  </tr>
+{% endfor %}
+```</p>
+<p>3、if  num  &gt; 10 的例子</p>
+<ul>
+<li>num和10之间的大于号要有空格否则报错</li>
+</ul>
+</blockquote>
+<pre><code class="language-python">{% if num &gt; 100 or num &lt; 0 %}
+    &lt;p&gt;无效&lt;/p&gt;  &lt;!--不满足条件，不会生成这个标签--&gt;
+{% elif num &gt; 80 and num &lt; 100 %}
+    &lt;p&gt;优秀&lt;/p&gt;
+{% else %}  &lt;!--也是在if标签结构里面的--&gt;
+    &lt;p&gt;凑活吧&lt;/p&gt;
+{% endif %}
+复制代码
+　　　　当然也可以只有if和else
+
+{% if user_list|length &gt; 5 %}  &lt;!--结合过滤器来使用--&gt;
+  七座豪华SUV
+{% else %}
+    黄包车
+{% endif %}
+　　　　if语句支持 and 、or、==、&gt;、&lt;、!=、&lt;=、&gt;=、in、not in、is、is not判断，注意条件两边都有空格。
+</code></pre>
+<h5 id="33-with">3.3 with标签</h5>
+<blockquote>
+<p>使用一个简单地名字缓存一个复杂的变量，多用于给一个复杂的变量起别名，当你需要使用一个“昂贵的”方法（比如访问数据库）很多次的时候是非常有用的</p>
+<ul>
+<li>例如：</li>
+<li>注意等号左右不要加空格。</li>
+</ul>
+</blockquote>
+<pre><code class="language-python">{% with total=business.employees.count %}
+    {{ total }} &lt;!--只能在with语句体内用--&gt;
+{% endwith %}
+
+# 或者如下语法
+{% with business.employees.count as total %}
+    {{ total }}
+{% endwith %}
+</code></pre>
+<h5 id="34-csrf_token">3.4 csrf_token标签</h5>
+<blockquote>
+<p>安全认证机制<br />
+  我们以post方式提交表单的时候，会报错，还记得我们在settings里面的中间件配置里面把一个csrf的防御机制给注销了啊，本身不应该注销的，而是应该学会怎么使用它，并且不让自己的操作被forbiden，通过这个东西就能搞定。</p>
+<p>这个标签用于跨站请求伪造保护，
+  在页面的form表单里面（注意是在form表单里面）任何位置写上{% csrf_token %}，这个东西模板渲染的时候替换成了<input type="hidden" name="csrfmiddlewaretoken" value="8J4z1wiUEXt0gJSN59dLMnktrXFW0hv7m4d40Mtl37D7vJZfrxLir9L3jSTDjtG8">，隐藏的，这个标签的值是个随机字符串，提交的时候，这个东西也被提交了，首先这个东西是我们后端渲染的时候给页面加上的，那么当你通过我给你的form表单提交数据的时候，你带着这个内容我就认识你，不带着，我就禁止你，因为后台我们django也存着这个东西，和你这个值相同的一个值，可以做对应验证是不是我给你的token，存储这个值的东西我们后面再学，你先知道一下就行了，就像一个我们后台给这个用户的一个通行证，如果你用户没有按照我给你的这个正常的页面来post提交表单数据，或者说你没有先去请求我这个登陆页面，而是直接模拟请求来提交数据，那么我就能知道，你这个请求是非法的，反爬虫或者恶意攻击我的网站，以后将中间件的时候我们在细说这个东西，但是现在你要明白怎么回事，明白为什么django会加这一套防御。</p>
+</blockquote>
+<h4 id="4_1">4、模板继承</h4>
+<blockquote>
+<p>https://www.cnblogs.com/clschao/articles/10414811.html#part_7</p>
+<ol>
+<li>
+<p>如果base页面的内容不想让别的页面也能继承到，那就写到钩子里，但是其他页面可以通过{{  block.super }} 看到</p>
+</li>
+<li>
+<p>如果base页面的内容想让其他页面看到，就写到钩子外层</p>
+</li>
+</ol>
+</blockquote>
+<h5 id="41">4.1 模板钩子的作用</h5>
+<blockquote>
+<p>孩子页面可以继承这个钩子，并对钩子的内容重写成自己的内容，继承过来的钩子父类的内容就会被覆盖掉，如果不想覆盖掉钩子里父类的内容，就需要再钩子里写上{{ block.super }}</p>
+</blockquote>
+<h5 id="42">4.2 添加钩子</h5>
+<blockquote>
+<p>注意在base.html页面可以添加很多</p>
+</blockquote>
+<pre><code class="language-python">{% block 钩名 %}
+        模板
+{% endblock 钩名 %}
+</code></pre>
+<h5 id="43-html">4.3 孩子html使用模板钩子</h5>
+<pre><code class="language-python">    # 开头 
+  {% extends 'Muban.html' %}
+
+  # 页面其他部分
+  {% block 钩名 %}
+        {{ block.super }} # 将父类的钩子内容也展示过来
+        # 不同的部分
+    {% endblock 钩名 %}
+</code></pre>
+<h5 id="44-base">4.4 孩子页面都要展示base页面某部分内容</h5>
+<p>4.4.1 如果哪一部分内容需要所有页面都展示，比如导航条、底部footer等，目前可以有两种方式</p>
+<p>4.4.2 在base.html的body标签下写这部分内容，其他孩子页面因为都继承了base.html页面，所以孩子页面都会显示这部分内容</p>
+<p>4.4.3 在base.html的body标签下写这部分内容，不过是用block钩子包住，然后再其他孩子页面使用下面代码就会有所页面都展示了，这样会比较麻烦一点，还是直接在base.html页面写即可，其他孩子页面都会继承，代码示例：</p>
+<pre><code class="language-python">{% block 钩名 %}
+    {{ block.super }}
+        # 孩子页面的不同的部分
+{% endblock 钩名 %}
+</code></pre>
+<h5 id="45">4.5 孩子页面继承示例</h5>
+<pre><code class="language-python"># 继承base.html页面
+{% extends &quot;base.html&quot; %}
+
+# 钩子
+{% block title %}
+     xxx  # 孩子页面的内容
+{% endblock %}
+
+# 钩子
+{% block title %}
+     {{ block.super }}  # 显示钩子里模板的内容
+     xxx   # 孩子页面的内容
+{% endblock title %}
+</code></pre>
+<h4 id="5">5、组件</h4>
+<pre><code>zujian.html -- html内容
+qita.html -- {% include 'zujian.html' %}
+
+组件是提供某一完整功能的模块，如：编辑器组件，QQ空间提供的关注组件等。
+而插件更倾向封闭某一功能方法的函数。
+这两者的区别在 Javascript 里区别很小，组件这个名词用得不多，一般统称插件。
+</code></pre>
+<h4 id="6">6、静态文件配置</h4>
+<blockquote>
+<p>js、css、img等都叫做静态文件，那么关于django中静态文件的配置，我们就需要在settings配置文件里面写上这写内容：
+</p>
+</blockquote>
+<pre><code>1 在项目中创建一个文件夹,比如叫jingtaiwenjian
+
+# STATIC_URL = '/xxx/' #别名,随便写名字，但是如果你改名字，别忘了前面页面里面如果你是通过/xxx/bootstrap.css的时候，如果这里的别名你改成了/static/的话，你前端页面的路径要改成/static/bootstrap.css。所以我们都是用下面的load static的方式来使用静态文件路径
+2 STATIC_URL = '/static/' #别名
+
+3 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,'jingtaiwenjian'), #注意别忘了写逗号,第二个参数就是项目中你存放静态文件的文件夹名称
+]
+</code></pre>
+<blockquote>
+<p>目录：别名也是一种安全机制，浏览器上通过调试台你能够看到的是别名的名字，这样别人就不能知道你静态文件夹的名字了，不然别人就能通过这个文件夹路径进行攻击。</p>
+</blockquote>
+<p><img alt="img" src="https://img2018.cnblogs.com/blog/988061/201902/988061-20190228171000665-346174028.png" /></p>
+<blockquote>
+<p>前端页面引入静态文件的写法，因为别名也可能会修改，所以使用路径的时候通过load static来找到别名，通过别名映射路径的方式来获取静态文件</p>
+<p>在页面底部可以写上下面的一句话</p>
+<p>{% load static %}</p>
+</blockquote>
+<p><img alt="img" src="https://img2018.cnblogs.com/blog/988061/201902/988061-20190228171108673-525833512.png" /></p>
+<blockquote>
+<p>引用img文件代码示例</p>
+</blockquote>
+<pre><code>{% load static %}
+&lt;img src=&quot;{% static &quot;images/hi.jpg&quot; %}&quot; alt=&quot;Hi!&quot; /&gt;
+</code></pre>
+<blockquote>
+<p>引用JS文件时使用：
+</p>
+</blockquote>
+<pre><code>{% load static %}
+&lt;script src=&quot;{% static &quot;mytest.js&quot; %}&quot;&gt;&lt;/script&gt;
+</code></pre>
+<blockquote>
+<p>某个文件多处被用到可以存为一个变量
+</p>
+</blockquote>
+<pre><code>{% load static %}
+{% static &quot;images/hi.jpg&quot; as myphoto %}
+&lt;img src=&quot;{{ myphoto }}&quot;&gt;&lt;/img&gt;
+</code></pre>
+<blockquote>
+<p>{% get_static_prefix %}</p>
+</blockquote>
+<pre><code>{% load static %}
+
+&lt;img src=&quot;{% get_static_prefix %}images/hi.jpg&quot; alt=&quot;Hi!&quot; /&gt;
+</code></pre>
+<h3 id="orm">五、ORM</h3>
+<blockquote>
+<p>ORM是“对象-关系-映射”的简称。（Object Relational Mapping，简称ORM）</p>
+<p>https://www.cnblogs.com/clschao/articles/10427807.html#part_1</p>
+<ul>
+<li>MVC或者MVC框架中包括一个重要的部分，就是ORM，它实现了数据模型与数据库的解耦，即数据模型的设计不需要依赖于特定的数据库，通过简单的配置就可以轻松更换数据库，这极大的减轻了开发人员的工作量，不需要面对因数据库变更而导致的无效劳动</li>
+<li>ORM是“对象-关系-映射”的简称。（Object Relational Mapping，简称ORM）(将来会学一个sqlalchemy，是和他很像的，但是django的orm没有独立出来让别人去使用，虽然功能比sqlalchemy更强大，但是别人用不了)</li>
+<li>类对象---&gt;sql---&gt;pymysql---&gt;mysql服务端---&gt;磁盘，orm其实就是将类对象的语法翻译成sql语句的一个引擎，明白orm是什么了，剩下的就是怎么使用orm，怎么来写类对象关系语句</li>
+</ul>
+</blockquote>
+<h4 id="1orm">1、orm创建表</h4>
+<blockquote>
+<p>创建名为app01的app，在app01下的models.py中创建模型：</p>
+</blockquote>
+<pre><code class="language-python">from django.db import models
+
+# Create your models here.
+
+
+class UserInfo(models.Model):
+     id=models.AutoField(primary_key=True) #如果表里面没有写主键，表里面会自动生成一个自增主键字段，叫做id字段，orm要求每个表里面必须要写一个主键
+     title=models.CharField(max_length=32)  #和varchar(32)是一样的，32个字符
+     state=models.BooleanField()
+     pub_date=models.DateField() #必须存这种格式&quot;2018-12-12&quot;
+     price=models.DecimalField(max_digits=8,decimal_places=2) #max_digits最大位数，decimal_places小数部分占多少位
+     publish=models.CharField(max_length=32)
+</code></pre>
+<h4 id="2_3">2、向数据库中生成表</h4>
+<blockquote>
+<p>需要在项目的setting目录中的INSTALLED_APPS中添加创建的app应用，再去执行创建表</p>
+<p><code>python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'testpackages',  # 新创建的app
+    'releasepackages', # 新创建的app
+    'home' # 新创建的app
+]</code></p>
+</blockquote>
+<p>2.1 通过两条数据库迁移命令即可在指定的数据库中创建表 ：</p>
+<blockquote>
+<p>接下来要创建对应的数据，连接上对应的数据库，然后执行创建表的命令，翻译成相应的sql，然后到数据库里面执行，从而创建对应的表</p>
+<ol>
+<li>生成记录，每次修改了models里面的内容或者添加了新的app，新的app里面写了models里面的内容，都要执行这条</li>
+</ol>
+<p><code>shell
+   python manage.py makemigrations</code></p>
+<ol>
+<li>执行这个语句的记录来创建表，生成的表名字前面会自带应用的名字，例如：你的UserInfo表在mysql里面叫做app01_book表</li>
+</ol>
+<p><code>shell
+   python manage.py migrate</code></p>
+</blockquote>
+<p>2.2 关于同步指令的执行简单原理：</p>
+<blockquote>
+<ol>
+<li>在执行 python manager.py magrations 时django 会在相应的 app 的migration文件夹下面生成 一个python脚本文件</li>
+<li>在执行 python manager.py migrte 时 django才会生成数据库表，那么django是如何生成数据库表的呢</li>
+<li>django是根据 migration下面的脚本文件来生成数据表的</li>
+<li>每个migration文件夹下面有多个脚本，那么django是如何知道该执行那个文件的呢，django有一张django-migrations表，表中记录了已经执行的脚本，那么表中没有的就是还没执行的脚本，则 执行migrate的时候就只执行表中没有记录的那些脚本。</li>
+<li>有时在执行 migrate 的时候如果发现没有生成相应的表，可以看看在 django-migrations表中看看 脚本是否已经执行了，可以删除 django-migrations 表中的记录 和 数据库中相应的 表 ， 然后重新执行</li>
+</ol>
+</blockquote>
+<p>2.3 pychram中要是用sqlite，需要下载sqlite驱动才可以正常使用</p>
+<h4 id="3mysql">3、更换数据库引擎（mysql）</h4>
+<blockquote>
+<p>若想将模型转为mysql数据库中的表，需要在settings中配置：</p>
+</blockquote>
+<pre><code>DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'bms',     　　 　  # 要连接的数据库，连接前需要创建好
+        'USER':'root',　　　　　　  # 连接数据库的用户名
+        'PASSWORD':'',　　　　　　  # 连接数据库的密码
+        'HOST':'127.0.0.1',       # 连接主机，默认本级
+        'PORT'：3306    　　　     #  端口 默认3306
+    }
+}
+</code></pre>
+<blockquote>
+<p>可以为每个app单独配置数据库</p>
+</blockquote>
+<pre><code>DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'bms',     　　 　  # 要连接的数据库，连接前需要创建好
+        'USER':'root',　　　　　　  # 连接数据库的用户名
+        'PASSWORD':'',　　　　　　  # 连接数据库的密码
+        'HOST':'127.0.0.1',       # 连接主机，默认本级
+        'PORT'：3306    　　　     #  端口 默认3306
+    }，
+    'app01': { #可以为每个app都配置自己的数据，并且数据库还可以指定别的，也就是不一定就是mysql，也可以指定sqlite等其他的数据库
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'bms',     　　 　  # 要连接的数据库，连接前需要创建好
+        'USER':'root',　　　　　　  # 连接数据库的用户名
+        'PASSWORD':'',　　　　　　  # 连接数据库的密码
+        'HOST':'127.0.0.1',       # 连接主机，默认本级
+        'PORT'：3306    　　　     #  端口 默认3306
+    }
+}
+</code></pre>
+<blockquote>
+<p>注意：</p>
+<ol>
+<li>NAME即数据库的名字，在mysql连接前该数据库必须已经创建，而上面的sqlite数据库下的<code>db.sqlite3</code>则是项目自动创建 </li>
+<li>USER和PASSWORD分别是数据库的用户名和密码。</li>
+<li>设置完后，在启动我们的Django项目前，我们需要先激活我们的mysql。然后启动项目，此时仍会报错会报错：<code>no module named MySQLdb</code></li>
+<li>这是因为django默认你导入的驱动是MySQLdb，可是MySQLdb 对于py3有很大问题，所以我们需要的驱动是PyMySQL 所以，我们只需要找到项目名(包含setting的文件夹)文件下的<code>__init__.py</code>在里面写入</li>
+</ol>
+</blockquote>
+<pre><code>import pymysql
+pymysql.install_as_MySQLdb()
+</code></pre>
+<blockquote>
+<p>ORM的models下的各种字段与数据库实际字段的对应关系:</p>
+</blockquote>
+<pre><code>        'AutoField': 'integer AUTO_INCREMENT',
+    'BigAutoField': 'bigint AUTO_INCREMENT',
+    'BinaryField': 'longblob',
+    'BooleanField': 'bool',
+    'CharField': 'varchar(%(max_length)s)',
+    'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+    'DateField': 'date',
+    'DateTimeField': 'datetime',
+    'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+    'DurationField': 'bigint',
+    'FileField': 'varchar(%(max_length)s)',
+    'FilePathField': 'varchar(%(max_length)s)',
+    'FloatField': 'double precision',
+    'IntegerField': 'integer',
+    'BigIntegerField': 'bigint',
+    'IPAddressField': 'char(15)',
+    'GenericIPAddressField': 'char(39)',
+    'NullBooleanField': 'bool',
+    'OneToOneField': 'integer',
+    'PositiveIntegerField': 'integer UNSIGNED',
+    'PositiveSmallIntegerField': 'smallint UNSIGNED',
+    'SlugField': 'varchar(%(max_length)s)',
+    'SmallIntegerField': 'smallint',
+    'TextField': 'longtext',
+    'TimeField': 'time',
+    'UUIDField': 'char(32)',
+</code></pre>
+<h4 id="4orm">4、ORM的增删改查</h4>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../.." class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              首页
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.top", "toc.integrate"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ca5457b8.min.js"></script>
+      
+    
+  </body>
+</html>
