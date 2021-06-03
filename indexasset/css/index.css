@@ -11,6 +11,7 @@ li {
     float: left;
     width: 17%;
     border: 1px solid #cccccc;
+    border-bottom: none;
 }
 
 .sidebar li{
