@@ -10,7 +10,7 @@ li {
 .sidebar {
     float: left;
     width: 17%;
-    border: 1px solid pink;
+    border: 1px solid #cccccc;
 }
 
 .sidebar li{
