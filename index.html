@@ -4,52 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>笔记屋|刘阳</title>
-    <link rel="icon" href="fav.svg">
-    <base target="_blank" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        .content {
-            width: 70%;
-            margin: 0 auto;
-            margin-top: 40px;
-        }
-        .card {
-            width: 220px;
-            height: 400px;
-            background-color: #c99;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .card h3 {
-            border-bottom: 2px solid #000;
-        }
-
-        .card a{
-            display: block;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            font-size: 14px;
-            text-decoration: none;
-        }
-
-        .card a:hover {
-            color: burlywood;
-        }
-    </style>
+    <base target="_blank">
+    <link rel="icon" href="indexasset/images/fav.svg">
+    <link rel="stylesheet" href="indexasset/css/index.css">
 </head>
 <body>
+    <div class="sidebar">
+        <ul>
+            <li class="active">首页</li>
+            <li>Python</li>
+            <li>Linux</li>
+            <li>算法学习</li>
+            <li>数据库</li>
+        </ul>
+    </div>
     <div class="content">
+        <div class="card" style="display:block;">
+            <h3>笔记介绍</h3>
+            <p>这是我的笔记汇总页面，包含了前后端等需要用的笔记内容，还在不断补充更新中...</p>
+            <a href="https://github.com/Lyzin/bolgz">仓库地址</a>
+        </div>
         <div class="card">
             <h3>Python</h3>
-            <a href="#">Python基础语法</a>
-            <a href="#">Django开发</a>
-            <a href="#">Python网络编程</a>
+            <a href="python/python基础语法/python笔记.html">Python基础语法</a>
+            <a href="python/django开发/django笔记.html">Django开发</a>
+            <a href="python/python网络编程/python网络编程.html">Python网络编程</a>
+        </div>
+        <div class="card">
+            <h3>Linux笔记</h3>
+            <a href="Linux/Linux命令.html">Linux命令</a>
+            <a href="Linux/shell编程.html">Shell编程</a>
+        </div>
+        <div class="card">
+            <h3>算法学习</h3>
+            <a href="算法练习/数据结构和算法-python.html">Python算法基础</a>
+            <a href="算法练习/LeetCode算法题.html">LeetCode算法题</a>
+        </div>
+        <div class="card">
+            <h3>数据库</h3>
+            <a href="数据库/mysql笔记.html">Mysql数据库</a>
+            <a href="数据库/mongodb笔记.html">MongoDB数据库</a>
         </div>
     </div>
-
+    <script src="indexasset/js/index.js"></script>
 </body>
 </html>

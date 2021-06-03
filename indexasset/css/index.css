@@ -1,0 +1,81 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+}
+
+.sidebar {
+    float: left;
+    width: 17%;
+    border: 1px solid pink;
+}
+
+.sidebar li{
+    display: block;
+    height: 38px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+    line-height: 38px;
+    color: #000000;
+    border-bottom: 1px solid #cccccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.sidebar li:hover {
+    background-color: #2a9cf9;
+    color: #ffffff;
+}
+
+.sidebar .active {
+    background-color: #2a9cf9;
+    color: #ffffff;
+}
+
+.content {
+    float: left;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.content .card {
+    display: none;
+}
+
+.content .card h3,
+.content .card p,
+.content .card a {
+    margin-bottom: 18px;
+}
+
+
+.content .card h3 {
+    width: 100%;
+    font-size: 24px;
+    border-bottom: 1px solid #cccccc;
+}
+
+.content .card p {
+    font-size: 18px;
+}
+
+.content .card a {
+    height: 30px;
+    line-height: 20px;
+    margin-right: 14px;
+    color: #ffffff;
+    background-color: #2a9cf9;
+    padding: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 3px;
+}
+
+.content .card a:hover {
+    background-color: #36579a;
+}
+
