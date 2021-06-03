@@ -7,6 +7,10 @@ li {
     list-style: none;
 }
 
+body {
+    background-color: #f3f5f7;
+}
+
 .sidebar {
     float: left;
     width: 17%;
@@ -74,7 +78,8 @@ li {
     padding: 8px;
     text-decoration: none;
     font-size: 14px;
-    border-radius: 3px;
+    border-radius: 5px;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, .3);
 }
 
 .content .card a:hover {
