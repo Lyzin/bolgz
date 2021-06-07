@@ -8,12 +8,14 @@ li {
 }
 
 body {
+    height: 100%;
     background-color: #f3f5f7;
 }
 
 .sidebar {
-    float: left;
-    width: 17%;
+    position: fixed;
+    /* float: left; */
+    height: 100%;
     border: 1px solid #cccccc;
     border-bottom: none;
 }
@@ -21,6 +23,7 @@ body {
 .sidebar li{
     display: block;
     height: 38px;
+    width: 216px;
     text-decoration: none;
     text-align: center;
     font-size: 14px;
@@ -42,7 +45,6 @@ body {
 }
 
 .content {
-    float: left;
     width: 80%;
     margin-top: 10px;
     margin-left: 20px;
