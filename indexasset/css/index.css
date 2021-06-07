@@ -13,9 +13,7 @@ body {
 }
 
 .sidebar {
-    position: fixed;
-    /* float: left; */
-    height: 100%;
+    float: left;
     border: 1px solid #cccccc;
     border-bottom: none;
 }
@@ -45,6 +43,7 @@ body {
 }
 
 .content {
+    float: left;
     width: 80%;
     margin-top: 10px;
     margin-left: 20px;
