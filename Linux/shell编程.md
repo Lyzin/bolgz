@@ -137,9 +137,35 @@ graph TD
 
 #### 3.2 执行方式
 
-> 目前有三种方式执行shell脚本
+> 目前常见的有三种方式执行shell脚本
 
 3.2.1 方法1
 
-- 
+- <font color='green'>推荐这种方法</font>
 
+- 命令：`bash  scriptfile`或`sh  scriptfile`	
+  - 当前脚本没有执行权限，也就是文件权限的x位为 `-`号
+
+3.2.2 方法2
+
+- 命令：`path/scriptfile`或`./scriptfile`
+- 在当前路径下执行脚本，但是脚本必须要有执行权限，也就是文件权限的x位为`x`号
+- 设置权限：`chmod  +x  scriptfile`
+
+3.2.3 方法3
+
+- 命令：`source scriptfile`或`. scriptfile`
+- 这个命令主要是用来读取或加载指定的shell脚本文件，然后一次执行shell脚本文件中的内容
+- 这些语句是在当前父shell脚本进程中执行，所以可以吧shell脚本的变量名或函数传给当前父进程使用	
+
+
+
+## 二、Shell变量
+
+### 1、变量
+
+
+
+## 三、Shell变量数值计算
+
+### 1、算术运算
