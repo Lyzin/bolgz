@@ -28,7 +28,7 @@ function pushgitee(){
     echo
 
     # 推送到远程
-    echo "推送到远程"
+    echo "推送到远程:"
     git push origin master > /dev/null 2>&1
     runstatus
 }
