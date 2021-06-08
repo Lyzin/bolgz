@@ -6,7 +6,7 @@
 
 ## 一、搭建Redis环境
 
-### 1. Docker搭建
+### 1. 创建redis容器
 
 1.1 使用redis-cli客户端连接方式创建redis容器
 
@@ -24,11 +24,13 @@
 
 ![image-20210608132942146](redis笔记.assets/image-20210608132942146.png)
 
-1.3 宿主机连接redis
+### 2. 连接测试
+
+2.1 宿主机连接redis
 
 ![image-20210608133051787](redis笔记.assets/image-20210608133051787.png)
 
-1.4 登录创建的redis容器连接查看redis
+2.2 登录创建的redis容器连接查看redis
 
 > enter命令是自定义编写的快速进入docker容器的脚本命令
 >
@@ -36,7 +38,7 @@
 
 ![image-20210608133203186](redis笔记.assets/image-20210608133203186.png)
 
-1.5 python代码测试redis容器
+2.3 python代码测试redis容器
 
 ```python
 import redis
