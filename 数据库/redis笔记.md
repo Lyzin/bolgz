@@ -22,13 +22,13 @@
 
  1.2 创建redis容器，无密码
 
-![image-20210608132942146](redis笔记.assets/image-20210608132942146.png)
+![image-20210608132942146](../webresource/images/image-20210608132942146.png)
 
 ### 2. 连接测试
 
 2.1 宿主机连接redis
 
-![image-20210608133051787](redis笔记.assets/image-20210608133051787.png)
+![image-20210608133051787](../webresource/images/image-20210608133051787.png)
 
 2.2 登录创建的redis容器连接查看redis
 
@@ -36,7 +36,7 @@
 >
 > name这个键值对是测试数据
 
-![image-20210608133203186](redis笔记.assets/image-20210608133203186.png)
+![image-20210608133203186](../webresource/images/image-20210608133203186.png)
 
 2.3 python代码测试redis容器
 

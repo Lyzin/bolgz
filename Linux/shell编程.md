@@ -8,11 +8,11 @@
 
 #### 1.1 方法1
 
-![image-20210607143509105](shell编程.assets/image-20210607143509105.png)
+![image-20210607143509105](../webresource/images/image-20210607143509105.png)
 
 #### 1.2 方法2
 
-![image-20210607143536952](shell编程.assets/image-20210607143536952.png)
+![image-20210607143536952](../webresource/images/image-20210607143536952.png)
 
 #### 1.3 修改脚本注释样式
 
@@ -44,7 +44,7 @@
 
 1.3.4 选择6的注释颜色样式
 
-![image-20210607144910720](shell编程.assets/image-20210607144910720.png)
+![image-20210607144910720](../webresource/images/image-20210607144910720.png)
 
 
 
@@ -125,11 +125,11 @@ graph TD
 
 - 运行前查看系统进程列表
 
-  ![image-20210607153410182](shell编程.assets/image-20210607153410182.png)
+  ![image-20210607153410182](../webresource/images/image-20210607153410182.png)
 
 - 运行后查看系统进程列表，可以看到新开了一个子进程执行脚本内容，至于为什么sleep 10也开了一个子进程执行，后面再解释
 
-  ![image-20210607153523778](shell编程.assets/image-20210607153523778.png)
+  ![image-20210607153523778](../webresource/images/image-20210607153523778.png)
 
 
 
