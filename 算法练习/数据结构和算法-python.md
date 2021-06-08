@@ -72,13 +72,13 @@ print(binarySearch(testlist,13))  # True
 >
 > 2.每次比对后剩余数据项如下表所示
 >
-> | 比对次数 |                       查找后的剩余数据                       |
-> | :------: | :----------------------------------------------------------: |
-> |    1     |                             n/2                              |
-> |    2     |                             n/4                              |
-> |    3     |                             n/8                              |
-> |   ...    |                             ...                              |
-> |    i     | ![image-20200515141539104](C:\Users\zyb\AppData\Roaming\Typora\typora-user-images\image-20200515141539104.png) |
+> | 比对次数 | 查找后的剩余数据 |
+> | :------: | :--------------: |
+> |    1     |       n/2        |
+> |    2     |       n/4        |
+> |    3     |       n/8        |
+> |   ...    |       ...        |
+> |    i     |                  |
 >
 > 3.当比对次数足够多以后，比对范围就会仅剩余一个数据项
 >
@@ -243,7 +243,6 @@ output:
 > 给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
 >
 > 你可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
->
 
 > 示例:
 >
@@ -254,13 +253,13 @@ output:
 
 思路：
 
-![img](https://pic.leetcode-cn.com/e6c5428c477ba81f0e139a81ae970413615e8ec2c6d684833eb6c550606dd545-%E5%B9%BB%E7%81%AF%E7%89%871.JPG)
+![img](数据结构和算法-python.assets/e6c5428c477ba81f0e139a81ae970413615e8ec2c6d684833eb6c550606dd545-幻灯片1.JPG)
 
-![img](https://pic.leetcode-cn.com/c60fa8e8788ca780afedef31b38535c1d91d7e690d7aee5d892a1b0077db95af-%E5%B9%BB%E7%81%AF%E7%89%872.JPG)
+![img](数据结构和算法-python.assets/c60fa8e8788ca780afedef31b38535c1d91d7e690d7aee5d892a1b0077db95af-幻灯片2.JPG)
 
-![img](https://pic.leetcode-cn.com/27437b90a95fcf0544018e69af70f4888698b745ceefa7606a7c8ea0136da68c-%E5%B9%BB%E7%81%AF%E7%89%873.JPG)
+![img](数据结构和算法-python.assets/27437b90a95fcf0544018e69af70f4888698b745ceefa7606a7c8ea0136da68c-幻灯片3.JPG)
 
-![img](https://pic.leetcode-cn.com/47a33154b3ed1c4e1d7340e6e14543d9cca73504cffd3ef49ecb81fa2b1f82b8-%E5%B9%BB%E7%81%AF%E7%89%874.JPG)
+![img](数据结构和算法-python.assets/47a33154b3ed1c4e1d7340e6e14543d9cca73504cffd3ef49ecb81fa2b1f82b8-幻灯片4.JPG)
 
 1.1.1 代码-两个for循环
 
@@ -331,7 +330,6 @@ print(twosum(t,9))
 > 注意:
 >
 > 假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−231,  231 − 1]。请根据这个假设，如果反转后整数溢出那么就返回 0。
->
 
 
 
