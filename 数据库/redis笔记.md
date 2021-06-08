@@ -48,9 +48,16 @@ conn_dict = {
 
 r = redis.Redis(**conn_dict)
 
+# 获取所有数据，返回值是一个List，每个元素都是bytes类型
+all_data = r.keys('*')
+
+# 结果是: [b'name']
+print(all_data) 
+
 # get方法是返回结果是bytes类型数据，需要解码
 data = r.get('name').decode('utf-8')
 
-print(data) # 结果是: alex
+# 结果是: alex
+print(data)
 ```
 
