@@ -18,21 +18,21 @@ function pushgitee(){
     # 添加文件，默认添加所有文件
     echo "\033[1;36m添加上传文件\033[0m"
     git add . 
-    printf "\033[1;36m添加上传文件:\033[0m"
+    printf "\033[1;36m添加上传文件: \033[0m"
     runstatus
     echo
 
     # 填写提交commit
     echo "\033[1;36m添加提交commit\033[0m"
     git commit -m "$*" 
-    echo "\033[1;36m添加提交commit:\033[0m"
+    printf "\033[1;36m添加提交commit: \033[0m"
     runstatus
     echo
 
     # 推送到远程
     echo "\033[1;36m推送到远程\033[0m"
     git push origin master
-    echo "\033[1;36m推送到远程:\033[0m"
+    printf "\033[1;36m推送到远程: \033[0m"
     runstatus
     echo
 }
