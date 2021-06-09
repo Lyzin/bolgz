@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # Author: 刘阳
 #   Date: 2021-06-02
 #   Desc: 便捷推送文件到gitee仓库
@@ -16,9 +16,9 @@ function runstatus(){
 
 function pushgitee(){
     # 添加文件，默认添加所有文件
-    echo -e "\033[1;36m添加上传文件\033[0m"
+    echo "\033[1;36m添加上传文件\033[0m"
     git add . 
-    echo -ne "\033[1;36m添加上传文件:\033[0m"
+    echo -n "\033[1;36m添加上传文件:\033[0m"
     runstatus
     echo
 
