@@ -16,9 +16,9 @@ function runstatus(){
 
 function pushgitee(){
     # 添加文件，默认添加所有文件
-    echo "\033[1;36m添加上传文件\033[0m"
+    echo -e "\033[1;36m添加上传文件\033[0m"
     git add . 
-    echo -n "\033[1;36m添加上传文件:\033[0m"
+    echo -ne "\033[1;36m添加上传文件:\033[0m"
     runstatus
     echo
 
