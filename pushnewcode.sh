@@ -17,19 +17,19 @@ function runstatus(){
 function pushgitee(){
     # 添加文件，默认添加所有文件
     echo "添加文件:"
-    git add . > /dev/null 2>&1
+    git add . 
     runstatus
     echo
 
     # 填写提交commit
     echo "填写提交commit:"
-    git commit -m "$*" > /dev/null 2>&1
+    git commit -m "$*" 
     runstatus
     echo
 
     # 推送到远程
     echo "推送到远程:"
-    git push origin master > /dev/null 2>&1
+    git push origin master 
     runstatus
 }
 
