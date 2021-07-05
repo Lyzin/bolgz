@@ -81,6 +81,34 @@
 >
 > `src`是`img`标签的必须属性，用来指定图像的路径和文件名
 
+> <font style='color:green'>alt: 图片显示不出来，用文字显示</font>
+>
+> 格式：`<img  src='xxx.jpg' alt='这是一个图'/>`
+
+> <font style='color:green'>title: 鼠标放到图像上，提示文字</font>
+>
+> 格式：`<img  src='xxx.jpg' alt='这是一个图' title='我是鼠标显示的图'/>`
+
+> <font style='color: green'>width: 给图像设置宽度，不需要写px像素单位</font>
+>
+> 格式：`<img  src='xxx.jpg' alt='这是一个图' title='我是鼠标显示的图' width='100'/>`
+
+> <font style='color: green'>height: 给图像设置高度，不需要写px像素单位</font>
+>
+> 格式：`<img  src='xxx.jpg' alt='这是一个图' title='我是鼠标显示的图' height='100'/>`
+
+> <font style='color: green'>border: 给图像设置边框，不需要写px像素单位</font>
+>
+> 格式：`<img  src='xxx.jpg' alt='这是一个图' title='我是鼠标显示的图' border='10'/>`
+
+- 图像的样式后面由css来设置，很少用行内样式设置图像的样式
+
+#### 7、超链接标签
+
+
+
+
+
 
 
 ### 二、CSS学习
