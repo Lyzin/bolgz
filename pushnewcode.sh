@@ -42,7 +42,7 @@ function main(){
     then
         pushgitee $*
     else
-        echo "USAGE: $0 'commit message'"
+        echo "USAGE: sh $0 'commit message'"
         echo "example: sh $0 'first subimt'"
     fi
 }
