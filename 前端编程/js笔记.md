@@ -242,3 +242,30 @@ console.log(age + 'ko'); // 输出: nullko
 console.log(age + 1); // 输出 1
 ```
 
+
+
+##### 2.6 检测数据类型
+
+```js
+var age = 10;
+console.log(typeof age); // 输出: number
+
+var age_1 = 'this is js';
+console.log(typeof age_1); // 输出: string
+
+var age_2 = true;
+console.log(typeof age_2); // 输出: Boolean
+
+var age_3;
+console.log(typeof age_3); // 输出: undefined
+
+var age_4 = null;
+console.log(typeof age_4); // 输出: object (后面再学对象时有用)
+```
+
+#### 3、数据类型转换
+
+##### 3.1 转换为字符型
+
+
+
