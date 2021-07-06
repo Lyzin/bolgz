@@ -129,12 +129,12 @@ console.log(num2); // 10
 >
 > js数据类型分类：
 >
-> - 简单数据类型：Number、String、Boolean、Null、Undefined
-> - 复杂数据类型：Object
+> - 简单数据类型：`Number`、`String`、`Boolean`、`Null`、`Undefined`
+> - 复杂数据类型：`Object`
 
 ##### 2.1 数值型number
 
-> 包含整型和浮点型，默认值是0
+> 包含整型和浮点型，默认值是`0`
 
 ```js
 var num = 10;
@@ -164,7 +164,7 @@ console.log(isNaN('test nova')); // 输出true
 
 ##### 2.2 布尔类型boolean
 
-> 布尔类型，结果为true、false对应数字1和0，课用来加法运算
+> 布尔类型，结果为`true`、`false`对应数字`1`和`0`，课用来加法运算
 
 
 
@@ -179,9 +179,22 @@ var str = '这是一个字符串\n变量'
 console.log(str); // 输出: 这是一个字符串变量
 ```
 
+```js
+// 字符串的长度
+var str = '我是谁';
+console.log(str.length); // 3
+```
 
+```js
+// 字符串的拼接
+var str1 = 'harry';
+var str2 = 'potter'
+var str3 = str1 + str2;
+console.log(str3); // 输出：harrypotter
 
-
+// 字符串的拼接，只要有字符串和其他类型拼接，都会展示为字符串类型
+console.log(12 + 'jim'); // 输出: 12jim
+```
 
 ##### 2.4 undefined
 
@@ -191,4 +204,4 @@ console.log(str); // 输出: 这是一个字符串变量
 
 2.5 null类型
 
-> `var age=null;`声明变量是一个空值，默认值是null
+> `var age=null;`声明变量是一个空值，默认值是`null`
