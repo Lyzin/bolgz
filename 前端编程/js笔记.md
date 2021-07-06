@@ -284,7 +284,7 @@ var age_1 = 18;
 console.log(String(age_1));  // 18
 console.log(typeof age_1.toString());  // string
 
-// +号拼接,数字加一个空字符串，就可以变为字符串类型（<font style="color: red">常用</font>）
+// +号拼接,数字加一个空字符串，就可以变为字符串类型
 var age_2 = 18
 var age_3 = age + '';
 console.log(age_3);  // 18
@@ -315,8 +315,49 @@ console.log(parseInt(sex_3)); // 314
 console.log(parseInt(sex_4)); // NaN
 ```
 
-- parseFloat(string) 转换为浮点型
+- `parseFloat(string)`转换为浮点型
 
 ```js
+// parseFloat(string) 转换为浮点型，得到的是一个整数
+var sex = '123';
+var sex_int= parseFloat(sex);
+console.log(sex_int);  // 123
+console.log(typeof sex_int); // number
+
+// parseFloat(string) 转换为浮点型，不会走四舍五入
+var sex_1 = '3.14'
+var sex_2 = '3.94'
+console.log(parseFloat(sex_1)); // 3.14
+console.log(parseFloat(sex_2)); // 3.94
+
+// parseFloat(string) 可以用来取像素整数，只会取到数字部分，但是开头是非数字的取时会显示为非数字，结果为NaN
+var sex_3 = '314.34px'
+var sex_4 = 'rem314.34px'
+console.log(parseFloat(sex_3)); // 314.34
+console.log(parseFloat(sex_4)); // NaN
 ```
 
+- 隐式转换为数字，支持 `-`、`*`、`/`
+
+```js
+var age = '12';
+var age_int = age - 0;
+console.log(age_int); // 12
+console.log(typeof age_int); // number 
+```
+
+##### 3.3 转换为布尔类型
+
+```js
+console.log(Boolean('')); // false
+console.log(Boolean(0)); // false
+console.log(Boolean(null)); // false
+console.log(Boolean(undefined)); // false
+console.log(Boolean(NaN)); // false
+console.log(Boolean('this is js')); // true
+console.log(Boolean(13)); // true
+```
+
+
+
+#### 4、运算符
