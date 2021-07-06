@@ -125,9 +125,70 @@ console.log(num2); // 10
 
 #### 2、数据类型
 
+> js的数据类型是在程序运行时自动判断的，也就是自动推导数据类型
+>
+> js数据类型分类：
+>
+> - 简单数据类型：Number、String、Boolean、Null、Undefined
+> - 复杂数据类型：Object
+
 ##### 2.1 数值型number
 
+> 包含整型和浮点型，默认值是0
+
+```js
+var num = 10;
+console.log(num); // 10
+
+// 数字型最大值
+console.log(Number.MAX_VALUE);
+
+// 数字型最小值
+console.log(Number.MIN_VALUE);
+```
+
+```js
+// 下面内容作为了解
+alert(Infinity);  // 无穷大
+alert(-Infinity);  // 无穷小
+alert(NaN);  // 非数字，Not a Number
+```
+
+```js
+// isNaN(variable) 这个方法用来判断非数字，并且返回一个值，如果是数字，返回false，不是数字，返回的是true
+console.log(isNaN(123)) // 输出false
+console.log(isNaN('test nova')); // 输出true
+```
 
 
-##### 2.2 字符串型String
 
+##### 2.2 布尔类型boolean
+
+> 布尔类型，结果为true、false对应数字1和0，课用来加法运算
+
+
+
+##### 2.3 字符串型String
+
+> 字符串类型，需要带引号
+>
+> `\n` 表示换行
+
+```js
+var str = '这是一个字符串\n变量'
+console.log(str); // 输出: 这是一个字符串变量
+```
+
+
+
+
+
+##### 2.4 undefined
+
+> `var age;`只声明变量不赋值，就是未定义类型，此时`age`的值是`undefined`
+
+
+
+2.5 null类型
+
+> `var age=null;`声明变量是一个空值，默认值是null
