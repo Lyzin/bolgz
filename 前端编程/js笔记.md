@@ -61,7 +61,7 @@
 
 ### 二、js基础语法
 
-#### 1、变量定义
+#### 1、变量
 
 - 声明变量：  `var  age;`
 
@@ -95,7 +95,7 @@ qq = 123;
 console.log(qq);
 ```
 
-#### 2、更新变量
+- 更新变量
 
 ```js
 var  age;
@@ -104,5 +104,30 @@ age = 20;
 console.log(age) // 20
 ```
 
-#### 3、
+- 变量交换值
+
+```js
+var tmp; // 临时变量
+var num1 = 10;
+var num2 = 20;
+
+// 1.将tmp等于num1的值
+tmp = num1;
+// 2.将num1等于num2的值
+num1 = num2
+// 3.将num2等于tmp的值
+num2 = tmp
+
+// 输出num1、num2
+console.log(num1); // 20
+console.log(num2); // 10
+```
+
+#### 2、数据类型
+
+##### 2.1 数值型number
+
+
+
+##### 2.2 字符串型String
 
