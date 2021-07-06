@@ -267,5 +267,56 @@ console.log(typeof age_4); // 输出: object (后面再学对象时有用)
 
 ##### 3.1 转换为字符型
 
+> `age.toString()` 不常用
+>
+> `String(age)`不常用
+>
+>  `+`号拼接,数字加一个空字符串，就可以变为字符串类型（<font style="color: red">常用</font>）
 
+```js 
+// toString() 不常用
+var age = 18;
+console.log(age.toString());  // 18
+console.log(typeof age.toString());  // string
+
+// String() 不常用
+var age_1 = 18;
+console.log(String(age_1));  // 18
+console.log(typeof age_1.toString());  // string
+
+// +号拼接,数字加一个空字符串，就可以变为字符串类型（<font style="color: red">常用</font>）
+var age_2 = 18
+var age_3 = age + '';
+console.log(age_3);  // 18
+console.log(typeof age_3);  // string
+```
+
+##### 3.2 转换为数字
+
+- `parseInt(string)` 转换为整数型
+
+```js
+// parseInt(string) 转换为整数型，得到的是一个整数
+var sex = '123';
+var sex_int= parseInt(sex);
+console.log(sex_int);  // 123
+console.log(typeof sex_int); // number
+
+// parseInt(string) 只会取整数部分，不会走四舍五入
+var sex_1 = '3.14'
+var sex_2 = '3.94'
+console.log(parseInt(sex_1)); // 3
+console.log(parseInt(sex_2)); // 3
+
+// parseInt(string) 可以用来取像素整数，只会取到数字部分，但是开头是非数字的取时会显示为非数字，结果为NaN
+var sex_3 = '314px'
+var sex_4 = 'rem314px'
+console.log(parseInt(sex_3)); // 314
+console.log(parseInt(sex_4)); // NaN
+```
+
+- parseFloat(string) 转换为浮点型
+
+```js
+```
 
