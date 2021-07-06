@@ -65,7 +65,7 @@
 
 - 声明变量：  `var  age;`
 
-- `var`是js的一个关键字，用来声明变量（variable变量的意思），使用这个关键字，会自动分配内存空间
+- `var`是`js`的一个关键字，用来声明变量（`variable`变量的意思），使用这个关键字，会自动分配内存空间
 
 - 变量初始化：先声明再赋值
 
@@ -88,7 +88,7 @@ console.log(age) // undefined
 console.log(tr); // 提示 tr没有被定义的报错
 ```
 
-- 变量直接赋值使用不声明，可以使用，不过不推荐该方法，应该要用关键字var来声明变量
+- 变量直接赋值使用不声明，可以使用，不过不推荐该方法，应该要用关键字`var`来声明变量
 
 ```js
 qq = 123;
@@ -164,7 +164,21 @@ console.log(isNaN('test nova')); // 输出true
 
 ##### 2.2 布尔类型boolean
 
-> 布尔类型，结果为`true`、`false`对应数字`1`和`0`，课用来加法运算
+> 布尔类型，结果为`true`、`false`对应数字`1`和`0`，可以用来加法运算
+
+```js
+// true  表示真
+var flag_t = true;
+console.log(flag_t); // true
+
+// false 表示假
+var flag_f = false;
+console.log(flag_f); // false
+
+// 布尔类型参与运算，true = 1，false = 0
+console.log(true + 1); // 输出 2
+console.log(false + 1); // 输出 1
+```
 
 
 
@@ -196,12 +210,35 @@ console.log(str3); // 输出：harrypotter
 console.log(12 + 'jim'); // 输出: 12jim
 ```
 
+
+
 ##### 2.4 undefined
 
 > `var age;`只声明变量不赋值，就是未定义类型，此时`age`的值是`undefined`
 
+```js
+var age;
+console.log(age); // 输出: undefined
+
+console.log(age + 'ko'); // 输出: undefinedko
+
+// undefined和数字相加，不是一个数字
+console.log(age + 1); // 输出 NaN
+```
 
 
-2.5 null类型
+
+##### 2.5 null类型
 
 > `var age=null;`声明变量是一个空值，默认值是`null`
+
+```js
+var age = null;
+console.log(age); // 输出: null
+
+console.log(age + 'ko'); // 输出: nullko
+
+// null和数字相加，输出数字，空值表示完全是空的
+console.log(age + 1); // 输出 1
+```
+
