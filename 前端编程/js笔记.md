@@ -493,6 +493,26 @@ console.log(13 === '13'); //false
 
 ##### 4.5 逻辑运算符
 
+> 逻辑与：代码符号`&&`，表示and的意思
+>
+> 逻辑或：代码符号`||`，表示or的意思
+>
+> 逻辑非：代码符号`!`，表示not的意思
+
+```js
+// 逻辑与：代码符号 && ，表示and的意思，两侧都为true，结果才是true，只要有一侧为false，结果为false
+console.log( 3 < 5 && 4 > 5); // false
+console.log( 3 < 5 && 4 < 5); // true
+
+// 逻辑或：代码符号 ||，表示or的意思，两侧都为false，结果才是false，只要有一侧为true，结果为true
+console.log( 3 < 5 || 4 > 5); // false
+console.log( 3 < 5 || 4 < 5); // true
+
+// 逻辑非：代码符号 ！，表示not的意思，表示非的意思，会将true的变为false，然后把false变为true
+console.log( !(4 > 5) ); // true  4大于5 是false，然后逻辑非加上，就变成了true
+console.log( !(4 < 5) ); // false 4小于5 是true，然后逻辑非加上，就变成了false
+```
+
 
 
 
