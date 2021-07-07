@@ -439,7 +439,63 @@ console.log(num); // 11
 console.log(num++ + 2); // 13
 ```
 
- 
+#####  4.4 比较运算符
+
+> 大于： `>`
+>
+> 小于： `>`
+>
+> 大于等于： `>=`
+>
+> 小于等于： `<=`
+>
+> 等于2个等于号： `==` ，默认会进行数据类型转换，会把字符串类型转换为数字型
+>
+> 不等于： `!=`
+>
+> 全等：`===`，两个比较的值和数据类型一样，才是true
+
+```js
+// 大于 >
+console.log(3 > 4); //false  
+
+// 小于 >
+console.log(3 < 4); // true
+
+// 大于等于 >=
+console.log(3 >= 4); //false  
+
+// 小于等于 <=
+console.log(3 <= 4); //true
+
+// 等于2个等于号 == ，默认会进行数据类型转换，会把字符串类型转换为数字型，属于隐式转换
+console.log(3 == 5); //false 
+console.log('sum' == 'bob'); //false 
+console.log(13 == 13); //true
+console.log(13 == '13'); //true
+console.log(13 == '13px'); // false
+console.log(13 == 'rem13px'); // false
+
+// 不等于 !=
+console.log(3 != 5); // true 
+console.log('sum' != 'bob'); // true 
+console.log(13 != 13); // false
+console.log(13 != '13'); // false
+console.log(13 != '13px'); // true
+console.log(13 != 'rem13px'); // true
+
+// 全等 ===
+console.log(3 === 5); //false 
+console.log('sum' === 'bob'); //false 
+console.log(13 === 13); // true 
+console.log(13 === '13'); //false 
+```
+
+##### 4.5 逻辑运算符
+
+
+
+
 
 
 
