@@ -519,10 +519,10 @@ console.log( !(4 < 5) ); // false 4小于5 是true，然后逻辑非加上，就
 
 ```js
 // 因为是中断，所以逻辑运算符后面的不再进行计算
-// 如果表达式1为假，则返回表达式2   如果表达式1为假，则返回表达式1
+// 如果表达式1为真，则返回表达式2   如果表达式1为假，则返回表达式1
 console.log(123 && 456); // 456
-console.log(0 && 456); // 0
-console.log(0 && 1 + 2 && 456 + 789); // 0
+console.log(0 && 456); // 0在js中表示false
+console.log(0 && 1 + 2 && 456 + 789); // 0在js中表示false
 ```
 
 - 逻辑或运算符号的中断/短路逻辑
@@ -657,7 +657,112 @@ console.log(ret);
 
 // output
 // 大于6
+
+// 数字补0,大于10不用补0.小于10需要补0
+var num = '9';
+var ret = num < 10 ? '0' + num : num;
+
+console.log(ret);  // 09
+console.log(typeof ret); // string
 ```
+
+#### 4、switch语句
+
+> 解释：多个值来匹配`case`
+>
+> 语法格式：
+>
+> ```js
+> switch (表达式) {
+>   case va1ue1:
+>     statement;
+>     break;
+>   case va1ue2:
+>     statement;
+>     break;
+>   ...
+>   default:
+>   	statement;
+>     break;
+> }
+> ```
+>
+> `switch`语法注意事项：
+>
+> - `switch`语句里的表达式是一个准确的值，经常是一个变量
+> - 与`case`后面的值匹配时是全等匹配，既需要判断值是否相等，还要看数据类型是否相等
+
+```js
+var num = 9;
+
+switch (num) {
+    case 1:
+        console.log('>>1');
+        break;
+    case 2:
+        console.log('>>2');
+        break;
+    case 9:
+        console.log('>>9');
+        break;
+    default:
+        console.log('not found!');
+        break;
+}
+```
+
+- `switch`和`if - else`的区别
+  - `switch`语句处理`case`比较确定的情况，`if else `更灵活，用于处理判断(大于、小于等判断条件)
+  - `switch`语句进行条件判断后直接执行程序的语句，效率高，`if else`语句条件的判断条件比较多，需要不断进行匹配
+  - `switch`语句适用于分支比较多的情况，`if-else`适用于分支较少的情况
+
+#### 5、循环语句
+
+##### 5.1 for 循环
+
+> `for`循环语句格式
+>
+> for循环的里条件表达式条件走完以后，就会退出循环
+
+```js
+for (var i = 0; i <= 10; i++){
+    console.log('i = ' + i);
+}
+// ouput:
+// i = 0
+// i = 1
+// i = 2
+// i = 3
+// i = 4
+// i = 5
+// i = 6
+// i = 7
+// i = 8
+// i = 9
+// i = 10
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
