@@ -986,9 +986,38 @@ do {
 } while (num > 0);
 ```
 
+##### 5.5 break关键字
+
+> `break`用于退出循环
+
+```js
+
+for (var i = 0; i < 3; i++){
+    if (i == 2){
+        console.log('i == 3');
+        break;
+    }
+}
+```
+
+##### 5.6 continue关键字
+
+> `continue`跳出本次循环
+
+```js
+for (var i = 0; i < 3; i++){
+    if (i % 2 === 0){
+        continue;
+    }
+    console.log('i = ' + i);
+}
+```
 
 
 
+#### 四、数组
+
+1、
 
 
 
