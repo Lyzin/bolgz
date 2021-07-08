@@ -927,9 +927,23 @@ console.log(exper);
 
 ![image-20210708142344674](../webresource/images/image-20210708142344674.png)
 
+- 打印倒三角
 
+```js
+var exper = '';
+for (var i = 0; i <= 9; i++){
+    for (var j = i; j <= 9; j++){
+        exper += '🌹';
+    }
+    exper += '\n';
+}
+console.log(exper);
 
+```
 
+![image-20210708162648053](../webresource/images/image-20210708162648053.png)
+
+##### 5.3 while循环
 
 
 
