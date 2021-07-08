@@ -1017,9 +1017,90 @@ for (var i = 0; i < 3; i++){
 
 #### 四、数组
 
-1、
+##### 1、数组创建
+
+> - 两种方式：
+>   - 利用`new`创建数组，学习面向对象再使用
+>   - 利用数组字面量创建数组，字面量意思是看到符号就可以知道是什么意思，数组字面量是符号`[]`
+> - 数组特点：
+>   - 数组元素可以是任意类型，但是需要以`逗号`隔开
+
+```js
+// 创建了一个空数组
+var arr = [];
+
+// 创建了一个数组
+var nameArr = ['sam', 'bob', 'john'];
 
 
+```
+
+##### 2、访问元素
+
+> - 格式：
+>
+> ```js
+> 数组名[索引值]
+> ```
+>
+> - 索引值从`0`开始，访问超过索引值的元素，结果是`undefined`，因为数组元素不存在，访问就是undefined
+
+```js
+// 访问元素使用 nameArr[索引号]，索引号从0开始
+var nameArr = ['sam', 'bob', 'john'];
+console.log(nameArr);  // ['sam', 'bob', 'john']
+console.log(nameArr[0]); // sam
+console.log(nameArr[1]); // bob 
+console.log(nameArr[2]); // john
+console.log(nameArr[3]); // undefined
+```
+
+##### 3、遍历数组
+
+> 使用`for`循环遍历数组
+>
+> 获取数组的长度：`Arr.length`
+
+```js
+// 创建了一个数组
+var nameArr = ['sam', 'bob', 'john'];
+
+// i < nameArr.length 不能设置等于，因为索引值从0开始，数组长度总比索引值大于1，所以不能写等于
+for (var i = 0; i < nameArr.length; i++){
+    console.log('元素值:' + nameArr[i]);
+}
+```
+
+- 求数组的总和与平均值
+
+```js
+// 
+var sum = null;
+var numArr = [1, 2, 3, 4];
+
+for (var i = 0; i < numArr.length; i++) {
+    sum += numArr[i];
+}
+var avg = sum / numArr.length;
+console.log('1到4的总和:' + sum); // 10
+console.log('1到4的平均数:' + avg); // 2.5
+```
+
+- 求数组元素的最大值
+
+```js
+var numArr = [1, 2, 99, 35, 3, 4];
+
+var max_num = numArr[0];
+
+for (var i = 1; i < numArr.length; i++) {
+    if (max_num < numArr[i]) {
+        max_num = numArr[i];
+    }
+}
+
+console.log(max_num); // 99
+```
 
 
 
