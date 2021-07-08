@@ -945,6 +945,49 @@ console.log(exper);
 
 ##### 5.3 while循环
 
+> while 循环，条件表达式为true，则执行循环，否则退出循环
+>
+> 语法格式：
+>
+> ```js
+> while (条件表达式) {
+>     代码语句;
+> }
+> ```
+
+```js
+var num = 0;
+while (num < 3) {
+    console.log('内层while循环: num:' + num);
+    num++;
+}
+```
+
+##### 5.4 do while循环
+
+> `do...while`是`while`循环的变体，执行循环前先自己执行一次代码，然后对`while`中的条件判断语句判断，如果为`true`，则继续执行`while`循环，如果为`false`，则退出循环
+>
+> 语法格式:
+>
+> ```js
+> do {
+>   statement;
+> }while (条件表达式);
+> ```
+>
+> `do...while`语句会至少执行一次循环代码，再进行`while`的条件判断循环
+
+```js
+var num = 3;
+
+do {
+    console.log(num);
+    num--;
+} while (num > 0);
+```
+
+
+
 
 
 
