@@ -1017,7 +1017,7 @@ for (var i = 0; i < 3; i++){
 
 #### 四、数组
 
-##### 1、数组创建
+#### 1、数组创建
 
 > - 两种方式：
 >   - 利用`new`创建数组，学习面向对象再使用
@@ -1035,7 +1035,7 @@ var nameArr = ['sam', 'bob', 'john'];
 
 ```
 
-##### 2、访问元素
+#### 2、访问元素
 
 > - 格式：
 >
@@ -1055,7 +1055,7 @@ console.log(nameArr[2]); // john
 console.log(nameArr[3]); // undefined
 ```
 
-##### 3、遍历数组
+#### 3、遍历数组
 
 > 使用`for`循环遍历数组
 >
@@ -1101,6 +1101,60 @@ for (var i = 1; i < numArr.length; i++) {
 
 console.log(max_num); // 99
 ```
+
+- 数组元素变为字符串用分隔符连接
+
+```js
+var numArr = [1, 2, 99, 35, 3, 4];
+var strArr = '';
+var sep = '|'; // 连接符，可以设置任何连接符
+for (var i = 0; i < numArr.length; i++) {
+    strArr += numArr[i] + sep;
+}
+
+console.log(strArr); // 1|2|99|35|3|4|
+console.log(typeof strArr); // string
+```
+
+#### 4、数组新增元素
+
+> - 可通过修改数组的length属性来进行数组扩容
+>   - length属性是可以读写的，写的权限意思就是可以手动再进行赋值
+> - 对数组继续使用索引赋值
+>   - 数组元素的个数为3，想要新增元素，就可以从索引值4开始对数组进行新增赋值
+
+##### 4.1 修改数组的length属性
+
+```js
+var numArr = [1, 2, 3, 4];
+var numArr_len = numArr.length;
+
+console.log(numArr_len); // numArr的长度是4
+
+// 修改数组长度length属性值来进行修改
+// 将numArr的长度从4变为5
+// numArr的值是：[ 1, 2, 3, 4, <1 empty item> ]，可以看到长度变为5以后，最后一个元素为<1 empty item>，表示空的元素
+// 然后取一下numArr的最后一个的值和类型都为：undefined
+numArr.length = 5;
+console.log(numArr); // [ 1, 2, 3, 4, <1 empty item> ]
+console.log(numArr[4]); // undefined
+console.log(typeof numArr[4]); // undefined
+
+// 将numArr的长度从4变为4，numArr的元素不变
+numArr.length = 4;
+console.log(numArr); // [1, 2, 3, 4]
+
+// 将numArr的长度从4变为3，numArr的原来元素个数会从4个变为3个，因为长度变小了，所以丢弃了最后一个元素
+numArr.length = 3;
+console.log(numArr); // [ 1, 2, 3 ]
+```
+
+##### 4.2 修改索引号赋值
+
+```js
+```
+
+
 
 
 
