@@ -1506,3 +1506,29 @@ fu('sam');
 > 块级作用域：`{}`、`if {}`、`for {}`
 >
 > 也就是说`js`在块级作用域外面也能访问块级作用域内部的变量
+
+#### 10、作用域链
+
+> 内部函数访问外部函数的变量，使用链式查找来决定取值，称为就近原则
+
+```js
+var num = 10;
+
+function fn() {
+    var num = 20;
+    function bu() {
+        console.log(num);
+    }
+    bu();
+}
+
+// 输出num先从bu函数里面找，没找到就去上层函数fn里去找，如果还没有，就去上层函数fn外部去找，如果仍未找到
+// 会报错： ReferenceError: num is not defined
+fn(); // 20
+```
+
+```js
+
+```
+
+![image-20210711223224612](D:\notely\bolgz\webresource\images\image-20210711223224612.png)
