@@ -1015,7 +1015,7 @@ for (var i = 0; i < 3; i++){
 
 
 
-#### 四、数组
+### 四、数组
 
 #### 1、数组创建
 
@@ -1152,7 +1152,275 @@ console.log(numArr); // [ 1, 2, 3 ]
 ##### 4.2 修改索引号赋值
 
 ```js
+var naArr = ['red', 'green', 'blue'];
+console.log(naArr); // [ 'red', 'green', 'blue' ]
+
+// 新增元素，也叫追加元素，给索引值增加
+naArr[3] = 'yellow';
+console.log(naArr); // [ 'red', 'green', 'blue', 'yellow' ]
+console.log(naArr[3]); // yellow
+
+// 给已有的索引值进行追加
+naArr[1] = 'pink';
+console.log(naArr); //  [ 'red', 'pink', 'blue', 'yellow' ]
+console.log(naArr[1]); // pink
+
+// 不要给数组名直接赋值，数组会被直接替换掉
+naArr = 'sun';
+console.log(naArr); //sun
 ```
+
+##### 4.3 筛选数组的元素
+
+```js
+// 筛选出大于等于3的元素
+// arr.length这个属性是自动变化的，当数组没有元素时为0，数组又元素时会自动计算数量
+var arr = [1,2,3,4,5];
+var newArr = [];
+for (var i=0; i < arr.length; i++) {
+    if (arr[i] >= 3){
+        newArr[newArr.length] = arr[i];
+    }
+}
+console.log(newArr); // [ 3, 4, 5 ]
+```
+
+##### 4.4 反转数组元素
+
+```js
+// 数组翻转
+// arr.length这个属性是自动变化的，当数组没有元素时为0，数组又元素时会自动计算数量
+// 将旧数组索引号最后一个给新元素的第一个，然后一次类推
+var arr = [1,2,3,4,5];
+var newArr = [];
+for (var i=arr.length - 1; i >= 0; i--) {
+    newArr[newArr.length] = arr[i];
+}
+console.log(newArr); // [ 5, 4, 3, 2, 1 ]
+```
+
+### 五、函数
+
+#### 1、函数格式
+
+> 函数格式:
+>
+> ```js
+> function  函数名() {
+>     // 函数体
+> }
+> ```
+>
+> 函数是做某件事情
+>
+> 切记：<font style='color: green'>函数只声明不调用是不会被执行的</font>
+
+```js
+// 函数定义
+function hello() {
+    console.log('hi, func');
+}
+
+// 函数调用
+hello(); // hi, func
+```
+
+- 函数求`1-100`的和
+
+```js
+// 函数定义
+function hello() {
+    var sum = 0;
+    for (var i = 0; i <= 100; i++){
+        sum += i;
+    }
+    console.log(sum);
+}
+
+// 函数调用
+hello();
+```
+
+#### 2、函数的参数
+
+> - 函数参数的形式
+> - `js`中函数不传值，默认的参数值时`undefined`
+>
+> ```js
+> function 函数名(形参1, 形参2...) {
+>     函数体;
+> }
+> 
+> 
+> ```
+>
+> - 函数参数的调用时规则，可以看出js的函数很不严谨，会出现形参和实参个数不匹配的问题
+>   - 调用函数传入的参数个数和函数定义时一致，正常输出
+>   - 调用函数传入的参数个数大于函数定义时的参数个数，会把多余传入的丢弃掉
+>   - 调用函数不传入的参数，函数里面的形参会变为`undefined`
+
+```js
+// 函数的参数
+function hello(name) {
+    console.log('Hi, ' + name);
+}
+
+// 带参数的函数调用
+// 调用函数传入的参数个数和函数定义时一致，正常输出
+hello('bob'); // Hi, bob
+
+// 调用函数传入的参数个数大于函数定义时的参数个数，会把多余传入的丢弃掉
+hello('sam', 'john'); // Hi, sam
+
+// 调用函数不传入的参数，函数执行里面的形参会变为undefined
+hello(); // Hi, undefined
+```
+
+- 函数的例子
+
+```js
+// 函数的参数
+function hello(a, b) {
+    var sum = a + b;
+    console.log('sum = ' + sum);
+}
+
+hello(3,4); // sum = 7
+```
+
+#### 3、函数的返回值
+
+> - `return`关键字是函数返回值
+>
+> - `return`可以接受三元运算符
+> - `return`表示函数被终止，遇到`return`后面的代码不会再被执行
+> - `return`只能返回一个值，有多个值以逗号隔开页只是以最后一个为准，不过我们可以把N个结果值包在一个数组里返回也可以
+> - 如果函数没有`return`关键字，则返回`undefined`值
+
+```js
+// 函数的参数
+function hello(a, b) {
+    var z = a + b;
+    return z;
+}
+
+var ret = hello(3,4);
+console.log(ret); // 7
+```
+
+#### 4、可变长参数`arguments`
+
+> 当我们不知道要传入的参数有多少个时，可以用`arguments`获取到
+>
+> 所有函数都有一个`arguments`属性，用来获取所有传入的参数，和`python`的`args`/`kwargs`作用一样
+>
+> - `arguments`是一个伪数组
+> - 伪数组
+>   - 不是真正的数组
+>   - 有`length`属性
+>   - 按索引的方式存储
+>   - 但是没有数组的`push()` 、`pop()` 等方法
+
+```js
+// 函数的参数
+function hello() {
+    console.log(arguments); // [Arguments] { '0': 1, '1': 2, '2': 3 }
+    console.log(arguments.length); // 3
+    console.log(typeof arguments); // object
+}
+
+hello(1,2,3);
+```
+
+- 求任意个数的最大值
+
+```js
+function  getMax() {
+    var maxVal = arguments[0];
+    for (var i = 1; i < arguments.length; i++ ){
+        if (maxVal < arguments[i]){
+            maxVal = arguments[i];
+        }
+    }
+    return maxVal;
+}
+
+var ret1 = getMax(1,2,3,4);
+console.log(ret1); // 4
+
+var ret2 = getMax(11,56,43,2);
+console.log(ret2); //56
+
+var ret3 = getMax(10,676,7,1);
+console.log(ret3); // 6676
+```
+
+- 函数反转任意数组
+
+```js
+function reverse(arr) {
+    var newArr = [];
+    for (var i = arr.length - 1; i >= 0; i--){
+        newArr[newArr.length] = arr[i];
+    }
+    return newArr;
+}
+
+var ret = reverse([1,2,3,4]);
+console.log(ret); // [ 4, 3, 2, 1 ]
+```
+
+#### 5、函数相互调用
+
+```js
+function foo(){
+    console.log('foo func');
+}
+
+function boo(){
+    foo();
+    console.log('boo func');
+}
+
+boo(); 
+// 输出: 
+// foo func
+// boo func
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
