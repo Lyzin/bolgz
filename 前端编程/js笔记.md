@@ -1526,15 +1526,91 @@ function fn() {
 fn(); // 20
 ```
 
-```js
-
-```
 
 
-
-
-
-### 六、js预解析
+### 六、代码预解析
 
 #### 1、预解析
+
+> `js`引擎运行`js`代码分为两步
+>
+> - 一是预解析
+>   - 表示`js`引擎会把js里所有的`var`、`function`提升到当前作用域
+>   - 分为变量预解析、函数预解析
+> - 二是代码执行
+>   - 按照代码书写的顺序从上往下依次执行
+
+##### 1.1 变量预解析
+
+> 把所有<font style='color: green'>变量声明</font>提升到当前作用域最前面，不提升<font style='color: green'>赋值操作</font>
+
+```js
+console.log(num); // undefined
+var num = 10;
+
+// 等价于下面代码
+// 会先上面声明的num提到前面，但是num不提升赋值，所以输出num是undefined
+var num;
+console.log(num); // undefined
+num = 10;
+```
+
+```js
+fu(); // 输出报错: TypeError: fu is not a function
+var fu = function () {
+    console.log('fu is func');
+};
+
+// 等价于如下代码
+var fu;
+fu(); // fu 声明下来是一个变量，不是一个函数，所以会报上面的错误TypeError: fu is not a function
+var fu = function () {
+    console.log('fu is func');
+};
+```
+
+##### 1.2 函数预解析
+
+> 把所有<font style='color: green'>函数声明</font>提升到当前作用域最前面，不<font style='color: green'>调用函数</font>
+
+```js
+foo();
+function foo() {
+    console.log('sam');
+}
+
+// 等价于如下代码
+// 也就是js预解析时会先把函数定义提升到当前作用域最前面，所以调用函数放到函数定义前面也可以执行
+function foo() {
+    console.log('sam');
+}
+foo();
+```
+
+- 这样定义函数预解析会出现错误
+
+  > 因为匿名函数的调用必须放在函数定义的下面
+
+```js
+// 等价于如下代码
+var fu;
+fu(); // fu 声明下来是一个变量，不是一个函数，所以会报上面的错误TypeError: fu is not a function
+var fu = function () {
+    console.log('fu is func');
+};
+```
+
+### 七、对象
+
+#### 1、对象定义
+
+
+
+
+
+
+
+
+
+
 
