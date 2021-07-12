@@ -1531,4 +1531,3 @@ fn(); // 20
 
 ```
 
-![image-20210711223224612](D:\notely\bolgz\webresource\images\image-20210711223224612.png)
