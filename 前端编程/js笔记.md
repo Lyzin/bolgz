@@ -1737,6 +1737,7 @@ console.log(objInfo_2['age']); // 18
 >   - 函数名首字母要大写
 >   - 构造函数不需要`return`就可以返回值
 >   - 构造函数返回对象时，会把构造函数名也返回，如下面代码里的`Star { name: 'sam', age: 20, sex: 'man' }`
+>   - `new Star()` 就表示创建了一个对象
 
 ```js
 function Star(name, age, sex) {
@@ -1753,6 +1754,20 @@ console.log(obj1.name); // sam
 console.log(obj1.age); // 20
 console.log(obj1.sex); // man
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
