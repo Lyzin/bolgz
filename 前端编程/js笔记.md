@@ -1612,25 +1612,147 @@ var fu = function () {
 >
 > `js`中的对象和`python`的字典类似，也是一个键值对的数据类型
 
-#### 2、创建对象
+#### 2、创建对象: 字面量
 
 > 创建对象有三种方式
 >
 > - 字面量，也就是花括号`{}`就表示是个对象
 
-- 字面量创建对象
+##### 2.1 字面量创建对象
+
+> 格式： `var objs = {}`
 
 ```js
+function fo (){
+    console.log('fo func');
+}
 
+var personInfo = {
+    'name': 'sam',
+    'age': 19,
+    'sex': 'man',
+    'fo': fo
+};
+
+console.log(personInfo); // { name: 'sam', age: 19, sex: 'man', fo: [Function: fo] }
+console.log(typeof personInfo); // object
 ```
 
+##### 2.2 调用对象的属性
 
+> - 两种调用方式
+>   - 使用点的方式，格式：`obj.name`
+>   - 使用中括号，格式：`obj['name']` 和python的字典取值一样
 
+```js
+function fo (){
+    console.log('fo func');
+}
 
+var personInfo = {
+    'name': 'sam',
+    'age': 19,
+    'sex': 'man',
+    'fo': fo
+};
 
+// 使用点的方法
+console.log(personInfo.name);  // sam
 
+// 使用中括号的方法
+console.log(personInfo['name']); // sam
 
+// 对象调用函数
+personInfo.fo(); // fo func
+```
 
+#### 3、创建对象: `new object`
+
+> 利用等号赋值的方式来进行填充数据
+>
+> 可以用点号或中括号来填充数据
+
+```js
+function fo() {
+    console.log('fo func');
+}
+
+// 创建空对象
+var objInfo_1 = new Object();
+var objInfo_2 = new Object();
+
+// 利用点的方式对空的对象进行填充数据
+objInfo_1.name = 'sam';
+objInfo_1.age = 18;
+objInfo_1.sex = 'man';
+objInfo_1.fo = fo;
+
+console.log(objInfo_1); // { name: 'sam', age: 18, sex: 'man', fo: [Function: fo] }
+console.log(typeof objInfo_1); // object
+console.log(objInfo_1.age); // 18
+
+// 利用中括号的方式对空的对象进行填充数据
+objInfo_2['name'] = 'sam';
+objInfo_2['age'] = 18;
+objInfo_2['sex'] = 'man';
+objInfo_2['fo'] = fo;
+
+console.log(objInfo_2); // { name: 'sam', age: 18, sex: 'man', fo: [Function: fo] }
+console.log(typeof objInfo_2); // object
+console.log(objInfo_2['age']); // 18
+```
+
+#### 4、创建对象：构造函数
+
+> - 构造函数创建对象的原因：
+>   - 上面两种方式只能依次创建一个对象，所以需要使用构造函数创建对象，类比python的面向对象编程，将创建对象里重复的动作抽离出来，变成一个模板来创建多个对象来使用
+>   - 利用函数创建对象，可以把重复的部分抽离出来，那这个函数就是构造函数
+>   - 但是这个函数不一样，里面封装的不是普通代码，而是对象
+>
+> - 构造函数定义：
+>
+>   - 将对象里面一些相同的属性和方法抽象出来封装到函数里面
+>
+> - 格式：
+>
+>   ```js
+>   // 创建构造函数
+>   function 构造函数(){
+>     this.属性 = 值;
+>     this.方法 = function (){
+>       // code;
+>     }
+>   }
+>   
+>   // 调用构造函数
+>   new 构造函数();
+>   ```
+>
+>   - 构造函数和普通函数在定义没区别
+>   - 构造函数里的`this`表示指向当前的对象
+>   - 调用时使用`new`关键字来调用
+>
+> - 构造函数的规范：
+>
+>   - 函数名首字母要大写
+>   - 构造函数不需要`return`就可以返回值
+>   - 构造函数返回对象时，会把构造函数名也返回，如下面代码里的`Star { name: 'sam', age: 20, sex: 'man' }`
+
+```js
+function Star(name, age, sex) {
+    this.name = name;
+    this.age = age;
+    this.sex = sex;
+}
+
+var obj1 = new Star('sam', 20, 'man');
+
+console.log(typeof obj1); // object
+console.log(obj1); // Star { name: 'sam', age: 20, sex: 'man' }
+console.log(obj1.name); // sam
+console.log(obj1.age); // 20
+console.log(obj1.sex); // man
+```
 
 
 
