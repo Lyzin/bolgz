@@ -1729,8 +1729,9 @@ console.log(objInfo_2['age']); // 18
 >   ```
 >
 >   - 构造函数和普通函数在定义没区别
->   - 构造函数里的`this`表示指向当前的对象
+>   - <font style='color: green'>构造函数里的`this`表示指向当前创建的空对象，和`python`里面向对象的`self`一个意思，表示当前创建的对象本身</font>
 >   - 调用时使用`new`关键字来调用声明
+>   - <font style='color: green'>相当于`python`面向对象的`_ _init_ _`方法</font>
 >
 > - 构造函数的规范：
 >
@@ -1759,9 +1760,45 @@ console.log(obj1.sex); // man
 obj1.sing('冰冰'); // sam唱了:冰冰
 ```
 
+##### 4.1 new执行时会做的什么？
 
+> 1. 在内存中创建一个空对象
+> 2. 让`this`指向这个新的对象
+> 3. 执行构造函数的代码，给这个对象添加属性和方法
+> 4. 返回这个对象，注：构造函数不需要`return`
 
+#### 5、遍历对象
 
+> - `for...in`用来遍历对象或数组，常用来遍历对象
+>
+> - 语法格式：
+>
+> ```js
+> var obj = {'name':'sam', 'age':18};
+> for (var k in obj){
+>   console.log(obj[k]);
+> }
+> ```
+>
+> - 注意：
+>   - `var k`输出的是对象的名，也就是`键`
+>   - 在`for..in`里面，输出值，必须使用中括号方法`[]`，如果使用点`.`会输出为`undefined`
+
+```js
+var obj = {
+    'name': 'sam',
+    'age': 19,
+    'sex': 'man'
+};
+
+for (var k in obj){
+    console.log(k); // name age sex
+    console.log(obj[k]); // 19 sex man
+    console.log(obj.k); // 不能用这个方法，会输出为undefined
+}
+```
+
+#### 6、内置对象
 
 
 
