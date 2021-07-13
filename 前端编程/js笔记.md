@@ -1798,19 +1798,172 @@ for (var k in obj){
 }
 ```
 
-#### 6、内置对象
+#### 6、内置对象:`Math`
 
+> 网址：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math
+>
+> **`Math`** 是一个内置对象，它拥有一些数学常数属性和数学函数方法。`Math` 不是一个函数对象。
+>
+> `Math` 用于 [`Number`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number) 类型。它不支持 [`BigInt`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt)。
 
+```js
+// Math 取圆周率
+console.log(Math.PI); // 3.141592653589793
 
+// Math 取最大值，取得是传入max的数组最大的那个
+// 如果传入max的数组里有字符串，则结果一定是NaN
+// 如果不给max传值，则输出负的无穷大
+console.log(Math.max(1,10,22,133)); // 133
+console.log(Math.max(1,10,'num')); // NaN
+console.log(Math.max()); // -Infinity 负的无穷大
+```
 
+##### 6.1 封装自己Math对象
 
+```js
+// 封装自己的Math对象
+var MyMath = {
+    PI: 3.1415,
+    max: function () {
+        var maxVal = arguments[0];
+        for (var i = 1; i < arguments.length; i++) {
+            if (arguments[i] > maxVal) {
+                maxVal = arguments[i];
+            }
+        }
+        return maxVal;
+    },
+    min: function () {
+        var minVal = arguments[0];
+        for (var i = 1; i < arguments.length; i++) {
+            if (arguments[i] < minVal) {
+                minVal = arguments[i];
+            }
+        }
+        return minVal;
+    }
+};
 
+console.log(MyMath.max(11,2,13)); // 13
+console.log(MyMath.min(-90,-1,1,2,3)); // -90
+```
 
+##### 6.2 Math取绝对值		
 
+```js
+// 取绝对值
+console.log(Math.abs(1)); // 1
+console.log(Math.abs(-1)); // -1
+console.log(Math.abs('-1')); // 1 隐式转换，会把字符串数字转换成数组
+console.log(Math.abs('num')); // NaN
+```
 
+##### 6.3 向下取整
 
+> 往小了取值
+>
+> `floor`：地板的意思，也就是在我们脚下，所以是取小值
 
+```js
+// 向下取整，取小数数值的最小值，也就是整数部分
+console.log(Math.floor(1.1)); // 1
+console.log(Math.floor(1.2)); // 1
+console.log(Math.floor('1.3')); // 1 隐式转换，会把字符串数字转换成数组
+console.log(Math.floor('num')); // NaN
+```
 
+##### 6.3 向上取整
+
+> 往大了取值
+>
+> `ceil`：天花板的意思，也就是在我们头上，也就是取大的值
+
+```js
+// 向上取整,相当于四舍五入的五入，
+console.log(Math.ceil(1.1)); // 2
+console.log(Math.ceil(1.2)); // 2
+console.log(Math.ceil('1.3')); // 2 隐式转换，会把字符串数字转换成数组
+console.log(Math.ceil('num')); // NaN
+```
+
+##### 6.5 四舍五入
+
+```js
+// 四舍五入，其他数字都是四舍五入，但是.5比较特殊，是往大了取
+// 负数的时候，比如-1.5，遇到.5也是往大了取，那就是-1比-2大，所以结果是-1
+console.log(Math.round(1.1)); // 1
+console.log(Math.round(1.5)); // 1
+console.log(Math.round(1.6)); // 2
+console.log(Math.round('1.8')); // 2 隐式转换，会把字符串数字转换成数组
+console.log(Math.round('num')); // NaN
+```
+
+##### 6.6 随机数
+
+> `Math.random()`
+>
+> - 取值范围是：`[0,1)`，取值范围在`0`到`1`之间的小数，可以取到`0`
+> - `random()`函数里面不跟参数
+>
+> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+```js
+// 得到一个两数之间的随机整数，包括两个数在内
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min; //含最大值，含最小值
+}
+
+console.log(getRandomIntInclusive(1,5));
+```
+
+```js
+// 随机取一个数组的值
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min; //含最大值，含最小值
+}
+
+var nameArr = ['花花','小明','sam','中队','小队'];
+nameIndex = getRandomIntInclusive(0, nameArr.length - 1);
+console.log(nameArr[nameIndex]);
+```
+
+- 猜数字
+
+> 需要在html页面中看到效果
+
+```js
+<script>
+    // 随机取一个数组的值
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min; //含最大值，含最小值
+    }
+
+    var randomInt = getRandomIntInclusive(1, 10);
+
+    function guessNum() {
+        while (true) {
+            var gueNum = prompt('输入数字:')
+            if (gueNum > randomInt) {
+                alert('猜大了');
+            } else if (gueNum < randomInt) {
+                alert('猜小了');
+            } else {
+                alert('猜对了:' + randomInt);
+                break;
+            }
+        }
+    }
+    guessNum();
+</script>
+```
+
+#### 7、Date对象
 
 
 
