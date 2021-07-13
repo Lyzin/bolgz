@@ -1744,6 +1744,9 @@ function Star(name, age, sex) {
     this.name = name;
     this.age = age;
     this.sex = sex;
+    this.sing = function (song) {
+        console.log(this.name + '唱了:' + song);
+    }
 }
 
 var obj1 = new Star('sam', 20, 'man');
@@ -1753,6 +1756,7 @@ console.log(obj1); // Star { name: 'sam', age: 20, sex: 'man' }
 console.log(obj1.name); // sam
 console.log(obj1.age); // 20
 console.log(obj1.sex); // man
+obj1.sing('冰冰'); // sam唱了:冰冰
 ```
 
 
