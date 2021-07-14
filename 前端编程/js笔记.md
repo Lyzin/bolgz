@@ -1965,5 +1965,79 @@ console.log(nameArr[nameIndex]);
 
 #### 7、Date对象
 
+```js
+// Date里面不跟参数，返回的是当前时间
+var tday = new Date();
+console.log(tday); // 2021-07-14T10:00:56.874Z
+
+// 字符串时间用的最多，返回输入的时间
+var birthday1 = new Date('2021-7-5 17:10:20');
+console.log(birthday1);
+
+// 数字型时间，返回输入的时间
+var birthday2 = new Date(2021, 7-1, 11-1);
+console.log(birthday2);
+```
+
+##### 7.1 年月日
+
+```js
+// 格式化年月日
+// 返回当前的年
+var date = new Date();
+console.log(date.getFullYear()); // 2021
+
+// 返回当前的月,注意得到的月份比当前月小一个月，因为月份范围是[0, 11]
+console.log(date.getMonth()); // 6月，但是当前月是7月
+
+// 返回的是几号
+console.log(date.getDate()); // 14号
+
+// 返回当前星期几,星期从0开始算，
+// 0表示星期天
+// 1表示星期一
+// 2表示星期二
+// 3表示星期三
+// 4表示星期四
+// 5表示星期五
+// 6表示星期六
+console.log(date.getDay()); // 3，表示是星期三
+
+// 返回格式: XXXX.XX.XX 星期X
+var year = date.getFullYear();
+var month = date.getMonth() + 1;
+var dates = date.getDate();
+var week = date.getDay();
+
+var weekArr = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+var data_str = '今天是: ' + year + '年' + month + '月' + dates + '日 ' + weekArr[week];
+
+console.log(data_str); // 今天是: 2021年7月14日 星期三
+```
+
+##### 7.2 时分秒
+
+```js
+// 格式化 时 分 秒
+var date = new Date();
+
+function getNowTime(){
+    var h = date.getHours(); // 返回当前的小时数，24小时制
+    h = h < 10 ? '0' + h : h;
+
+    var m = date.getMinutes(); // 返回当前的分钟数
+    m = m < 10 ? '0' + m : m;
+
+    var s = date.getSeconds(); // 返回当前的秒数
+    s = s < 10 ? '0' + s : s;
+
+    var now_time = "现在是:" + h + ":" + m + ":" + s;
+    console.log(now_time);
+}
+
+getNowTime();
+```
+
 
 
