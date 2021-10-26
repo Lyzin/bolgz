@@ -107,3 +107,21 @@ func main() {
 ![image-20211026115327001](go%E7%AC%94%E8%AE%B0.assets/image-20211026115327001.png)
 
 ## 二、变量
+
+### 1、第一行代码
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("hello world!")
+}
+```
+
+![image-20211026110718850](go%E7%AC%94%E8%AE%B0.assets/image-20211026110718850.png)
+
+### 2、编译运行命令
+
+- 
