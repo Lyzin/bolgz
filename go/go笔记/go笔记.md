@@ -59,7 +59,7 @@ func main() {
   >    3. `pkg`：存放编译后的库文件或缓存文件
   > 4. 最后把`/xx/go/bin`目录添加到`PATH`里即可
 
-### 7、配置自定义GOPATH
+### 7、MAC配置自定义GOPATH
 
 > 通过`go env`查看go的所有环境变量，包括`gopath`
 
@@ -100,7 +100,48 @@ func main() {
 
 ![image-20211026114200717](go%E7%AC%94%E8%AE%B0.assets/image-20211026114200717.png)
 
-### 8、创建代码目录
+### 8、Windows配置GOPATH
+
+> 在官网下载`GO`的安装包，默认安装完会配置默认的`GOROOT`和`GOPATH`
+
+- 默认的`GOPATH`
+
+  ![image-20211103003520566](go%E7%AC%94%E8%AE%B0.assets/image-20211103003520566.png)
+
+- 在环境变量中默认显示`GOPATH`和`GOPATH`下的`bin`
+
+  - 在环境变量里打开会显示成这样：`GOPATH=%USERPROFILE%\go`
+
+    ![image-20211103004055548](go%E7%AC%94%E8%AE%B0.assets/image-20211103004055548.png)
+
+  - 然后看到`%USERPROFILE%\go`解析出来就是`C:\User\XXX\go`
+
+  ![image-20211103003651813](go%E7%AC%94%E8%AE%B0.assets/image-20211103003651813.png)
+
+  - 打开PATH可以看到最后一条是：`%USERPROFILE%\go\bin`
+  - 所以需要修改为自己的`GOPATH`和`GOPATH\bin`
+
+  ![image-20211103003726031](go%E7%AC%94%E8%AE%B0.assets/image-20211103003726031.png)
+
+#### 8.1 修改自己的GOPATH值
+
+> 在存放`go`代码的位置创建目录，将对应的目录地址填写过来
+
+![image-20211103004455355](go%E7%AC%94%E8%AE%B0.assets/image-20211103004455355.png)
+
+#### 8.2 修改`GOPATH\bin`
+
+> 需要在`PATH`这个环境变量修改，修改成：`%GOPATH%\bin`，表示进到在上面设置的`GOPATH`的`bin`目录下
+
+![image-20211103004636063](go%E7%AC%94%E8%AE%B0.assets/image-20211103004636063.png)
+
+#### 8.3 检查`GOPATH`
+
+> 看到已经修改过来了
+
+![image-20211103004908553](go%E7%AC%94%E8%AE%B0.assets/image-20211103004908553.png)
+
+### 9、创建代码目录
 
 > 按照上述说明的进行创建目录
 
