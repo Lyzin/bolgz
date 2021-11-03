@@ -38,7 +38,7 @@ func main() {
 
 ![image-20211026110718850](go%E7%AC%94%E8%AE%B0.assets/image-20211026110718850.png)
 
-### 5、go版本
+### 5、GO版本
 
 ![image-20211026110955968](go%E7%AC%94%E8%AE%B0.assets/image-20211026110955968.png)
 
@@ -165,4 +165,23 @@ func main() {
 
 ### 2、编译运行命令
 
-- 
+> 构建`go`代码:`go build`
+>
+> 直接运行`go`代码: `go run`
+
+### 3、单引号双引号
+
+```json
+在go语法中，双引号是常用的来表达字符串，如果你使用了单引号，编译器会提示出错
+
+invalid character literal (more than one character)
+``
+单引号只能包含一个字符，例如’b’ ,程序会输出98表示字符b的ascii码。
+
+如果非要使用单引号输出必须使用string函数转换
+fmt.Println(string('b') )
+Printf 和 Println 的区别
+printf 输出后不换行， println输出后自动换行；
+printf格式化输出，println 直接输出内容
+```
+
