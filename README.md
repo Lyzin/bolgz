@@ -1,6 +1,6 @@
 ### 一. GitHub Pages
 
-https://lyzin.github.io/bolgz/
+https://www.lynote.top/
 
 
 
