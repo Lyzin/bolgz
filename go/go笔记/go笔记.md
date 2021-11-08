@@ -419,6 +419,27 @@ fmt.Printf("Hi，%d", age)
 fmt.Print("Hi，go")
 ```
 
+#### 3.8 查看变量类型
+
+> `%T`用来查看变量类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	name := "bob"
+	age := 19
+	isOk := true
+	fmt.Printf("%T", name) // string
+	fmt.Printf("%T", age) // int
+	fmt.Printf("%T", isOk) // bool
+}
+```
+
+
+
 ### 4、常量
 
 > 程序运行期间固定不变的值
@@ -551,6 +572,8 @@ func main() {
 
 #### 4.5 定义数量集
 
+> 这里的`<<`表示左移操作，`1<<10`表示将1的二进制表示向左移10位，也就是由`1`变成了`10000000000`，也就是十进制的1024。同理`2<<2`表示将2的二进制表示向左移2位，也就是由`10`变成了`1000`，也就是十进制的8。
+
 ```go
 package main
 
@@ -576,13 +599,362 @@ func main() {
 
 ### 1、整型
 
-> 
+> 整型分为以下两个大类，按长度分为：
+>
+> - 有符号整型：`int8、int16、int32、int64` 
+>
+> - 对应的无符号整型：`uint8、uint16、uint32、uint64`
+>
+> 其中，`uint8`就是我们熟知的`byte`型，`int16`对应C语言中的`short`型，`int64`对应C语言中的`long`型。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义整型变量
+	i1 := 101
+	fmt.Printf("%d\n", i1) // 表示输出10进制数, 101
+	fmt.Printf("%b\n", i1) // 10进制转换为2进制, 1100101
+	fmt.Printf("%o\n", i1) // 10进制转换为8进制, 145
+	fmt.Printf("%x\n", i1) // 10进制转换为16进制, 65
+
+	// 八进制,表示0-7的数字，一般以0开头，用于文件权限
+	i2 := 077
+	fmt.Printf("%d\n", i2) // 表示将8进制转换为10进制，63
+
+	// 十六进制，表示0-f的值，一般以0x开头,用于内存地址
+	i3 := 0x1234567
+	fmt.Printf("%d\n", i3) // 表示将16进制转换为10进制，19088743
+
+	// 声明int8的类型,指定数字为什么类型，否则就是int类型
+	i4 := int8(9)
+	fmt.Printf("%d\n", i4) // 9
+	fmt.Printf("%T\n", i4) // int8
+}
+```
+
+### 2、浮点数
+
+> 1、Go语言支持两种浮点型数：`float32`和`float64`
+>
+> 2、这两种浮点型数据格式遵循`IEEE 754`标准：
+>
+> -  `float32` 的浮点数的最大范围约为 `3.4e38`，可以使用常量定义：`math.MaxFloat32`
+> - `float64` 的浮点数的最大范围约为 `1.8e308`，可以使用一个常量定义：`math.MaxFloat64`
+>
+> 3、打印浮点数时，可以使用`fmt`包配合动词`%f`
+>
+> 4、默认`GO`语言的小数都是`float64`
+>
+> 5、`float32`的变量值不能赋值给`float64`位
+
+```go
+package main
+import (
+	"fmt"
+	"math"
+)
+
+func main() {
+	fmt.Printf("%f\n", math.Pi) // 3.141593
+	fmt.Printf("%.2f\n", math.Pi) // 3.14
+	fmt.Printf("%T\n", math.Pi) // float64
+	
+	// 定义float32类型
+	s2 := float32(1.3245)
+	fmt.Printf("%f\n", s2) // 1.324500
+	fmt.Printf("%T\n", s2) // float32
+}
+```
+
+### 3、布尔值
+
+> Go语言中以`bool`类型进行声明布尔型数据，布尔型数据只有`true（真）`和`false（假）`两个值。
+>
+> **注意：**
+>
+> 1. 布尔类型变量的默认值为`false`。
+> 2. Go 语言中不允许将整型强制转换为布尔型。
+> 3. 布尔型无法参与数值运算，也无法与其他类型进行转换。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var s1 bool // 只声明布尔值不赋值，默认值是false
+	s2 := true
+	fmt.Printf("%T\n", s1) // bool
+	fmt.Printf("%T\n", s1) // bool
+	fmt.Printf("%v\n", s1) // false
+	fmt.Printf("%v\n", s2) // true
+}
+```
+
+### 4、字符串
+
+> `Go`语言中的字符串以原生数据类型出现，使用字符串就像使用其他原生数据类型（int、bool、float32、float64 等）一样
+>
+> `Go`语言里的字符串的内部实现使用`UTF-8`编码
+>
+> 字符串的值为`双引号(")`中的内容
+>
+> `Go`语言中字符串必须是双引号`(")`，单引号`(‘)`表示字符
+
+#### 4.1 字符串
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+  // 字符串
+	s1 := "hello"
+	fmt.Printf("%T\n", s1) // string
+	fmt.Printf("%#v\n", s1) // hello
+	
+  // 单独的字母，汉字、符号表示一个字符
+	s2 := 'h'
+	s3 := 'e'
+	fmt.Printf("%T\n", s2) // int32
+	fmt.Printf("%v\n", s2) // 104
+	fmt.Printf("%v\n", s3) // 101
+  
+  // 字节: 1字节=8bit(8个二进制位)
+  // 1个字符'A'等于1个字节
+  // 1个utf8编码的汉字'沙' 一般占3个字节
+}
+```
+
+#### 4.2 转义符号
+
+```go
+`\r	回车符（返回行首）
+\n	换行符（直接跳到下一行的同列位置）
+\t	制表符
+\'	单引号
+\"	双引号
+\\	反斜杠`
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	path := "\"D:\\Go\\src\\code.xx.name\\day01\""
+	fmt.Printf("%v\n", path) // "D:\Go\src\code.xx.name\day01"
+}
+```
+
+#### 4.3 多行字符串
+
+> 输出多行字符串，需要使用反引号，在`esc`键位下方的按键
+>
+> 反引号的内容会原样输出，可以用来输出文件路径
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := `this is
+	a
+	good
+	day!
+	`
+	fmt.Printf("%v\n", s1)
+	fmt.Printf("%#v\n", s1)
+}
+```
+
+#### 4.4 字符串长度
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := "hi, go~"
+	fmt.Printf("%v\n", len(s1)) // 7
+}
+```
+
+#### 4.5 字符串拼接
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s2 := "good"
+	s3 := " day"
+	// 拼接法1： +号
+	s4 := s2 + s3
+	fmt.Printf("%v\n", s4) // good day
+	
+	// 拼接法2：使用fmt包的Sprintf接收两个变量值然后拼接后返回给一个变量
+	s5 := fmt.Sprintf("%s%s", s2, s3)
+	fmt.Printf("%v\n", s5) // good day
+}
+```
+
+#### 4.6 分割
+
+> 需要引入包`strings`
+>
+> 分割后返回值为一个`list`
+
+```go
+package main
+
+import "fmt"
+import "strings"
+
+func main() {
+	s1 := "hi\\go\\haha"
+	s2 := strings.Split(s1, "\\")
+	fmt.Printf("%v\n", s2) // [hi go haha]
+}
+```
+
+#### 4.7 包含
+
+> 返回值是`true/false`
+
+```go
+package main
+
+import "fmt"
+import "strings"
+
+func main() {
+	s1 := "hi\\go\\haha"
+	
+	// 包含
+	s2 := strings.Contains(s1, "go")
+	fmt.Printf("%v\n", s2) // true
+	
+	// 不包含
+	s3 := strings.Contains(s1, "gos")
+	fmt.Printf("%v\n", s3) // false
+}
+```
+
+#### 4.8 前缀/后缀
+
+> 返回值是`true/false`
+
+```go
+package main
+
+import "fmt"
+import "strings"
+
+func main() {
+	s1 := "hi\\go\\haha"
+
+	// 判断前缀是否是以hi开头
+	s2 := strings.HasPrefix(s1, "hi")
+	fmt.Printf("%v\n", s2) // true
+
+	// 判断后缀是否是以gos结尾
+	s3 := strings.HasSuffix(s1, "gos")
+	fmt.Printf("%v\n", s3) // false
+}
+```
+
+#### 4.9 子串位置
+
+```go
+package main
+
+import "fmt"
+import "strings"
+
+func main() {
+	s1 := "hi\\go\\haha"
+
+	// 判断前缀是否是以hi开头
+	s2 := strings.Index(s1, "h")
+	fmt.Printf("%v\n", s2) // 0
+
+	// 判断后缀是否是以gos结尾
+	s3 := strings.LastIndex(s1, "go")
+	fmt.Printf("%v\n", s3) // 3
+}
+```
+
+#### 4.10 join
+
+> `join`可以将数组以某个格式拼接起来
+
+```go
+package main
+
+import "fmt"
+import "strings"
+
+func main() {
+	// 先将字符串切割为数组
+	s1 := "hi\\go\\haha"
+	s2 := strings.Split(s1, "\\")
+	// 再将数组join成字符串
+	s3 := strings.Join(s2, "+")
+	fmt.Printf("%v\n", s3) // hi+go+haha
+}
+```
 
 
 
+### 5、fmt总结
+
+> `%v`是万能输出变量的值，任何类型变量都可以输出
+>
+> `%#v`输出变量并且与变量的类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := 100
+	// 查看变量的类型
+	fmt.Printf("%T\n", s1) // int
+
+	// 查看变量的值，任何类型都可以看
+	fmt.Printf("%v\n", s1) // 100
+
+	// 输出整型的值
+	fmt.Printf("%d\n", s1) // 100
+
+	// 将10进制转换为2进制
+	fmt.Printf("%b\n", s1) // 1100100
+
+	// 将10进制转换为8进制
+	fmt.Printf("%o\n", s1) // 144
+
+	// 将10进制转换为16进制
+	fmt.Printf("%x\n", s1) // 64
+
+	s2 := "bob"
+	// 输出字符串的值
+	fmt.Printf("%T\n", s2) // string
+	fmt.Printf("%s\n", s2) // bob
+	fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
 
 
-
+}
+```
 
 
 
