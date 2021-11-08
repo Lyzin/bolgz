@@ -986,6 +986,9 @@ func main() {
 
 	// 将10进制转换为16进制
 	fmt.Printf("%x\n", s1) // 64
+  
+  // 输出字符,常用与for循环内输出每个元素值
+  fmt.Printf("%c\n", s1)
 
 	s2 := "bob"
 	// 输出字符串的值
@@ -1178,26 +1181,69 @@ func main() {
 9
 ```
 
-
-
 #### 2.4 无限循环
 
 > 切记不要尝试，这是死循环，`go`性能很高，很容易将机器性能打满
+>
+> 格式
+>
+> ```go
+> for {
+>   循环语句
+> }
+> ```
 
 ```go
 for {
-  循环语句
+  fmt.Println("hello world")
 }
 ```
 
 ### 3、for range 循环
 
+> `for range`介绍
+>
+> ```go
+> Go语言中可以使用for range遍历数组、切片、字符串、map 及通道（channel）。 通过for range遍历的返回值有以下规律：
+> 
+> 数组、切片、字符串返回索引和值。
+> map返回键和值。
+> 通道（channel）只返回通道内的值。
+> ```
+>
+> `for`循环中输出每个字符，那必须使用`%c`来输出字符
+>
 > 格式
 >
 > ```go
-> ```
->
+> s := "Hello测几"
+> for i, v := range s {
+>   fmt.Printf("%d : %c",i, v)
+> } 
 > 
+> 这里面的i是循环的索引值
+> v是值
+> ```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// for range
+	s := "Hello悦悦"
+	for i, v := range s {
+		if i < 1 {
+			fmt.Printf("%d\n", i)  // 索引值 0
+			fmt.Printf("%T\n", v)  // int32 ,所以需要转换成字符类型
+			fmt.Printf("%c\n", v)  // H
+		}
+	}
+}
+```
+
+
 
 
 
