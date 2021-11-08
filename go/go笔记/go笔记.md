@@ -279,6 +279,9 @@ func main() {
 ```go
 // 格式
 var 变量名 变量类型
+
+// 变量声明推荐使用小驼峰
+var isMyName string
 ```
 
 #### 3.1 声明变量
@@ -347,17 +350,65 @@ func main() {
 }
 ```
 
-#### 3.4 注意
+#### 3.4 注意点
 
 > 需要注意的是`GO`语言中变量声明必须使用，不使用就编译不过去
+>
+> - 这里需要注意的是全局变量可以声明但不使用，在函数外面使用`var`声明的变量
+> - 非全局变量声明后赋值且必须使用，在函数内声明变量
 >
 > 因为编译器会减少编译后的体积，所以声明了变量但未使用就会编译不通过
 >
 > `GO`语言没有什么缩进格式要求，当然好的代码格式是比较方便阅读的
 
-#### 3.5 
+#### 3.5 三种声明方式
 
-### 4、打印变量
+> `var`  变量声明，可以适用于函数内外 
+>
+> `:=`  短变量声明，只能在函数内声明
+>
+> `_`  多用于占位，表示忽略某个值
+>
+> 同一个作用域不可重复声明同名的变量
+>
+> - 一个花括号就是一个作用域
+
+```GO
+package main
+
+import "fmt"
+
+// 函数声明外面属于全局变量
+var s1 string = "lolp"
+
+func main() {
+	// 方式一：声明变量同时赋值
+	var name string = "lily"
+	fmt.Println(name) // lily
+
+	// 方式二：类型推导: 根据值判断时什么类型
+	var s2 = "sam"
+	fmt.Println(s2) // sam
+
+	// 方式三：短变量声明：只能在函数内声明
+	s3 := "bob"
+	fmt.Println(s3) // bob
+  
+  // 重复声明s3就会报错
+  // no new variables on left side of :=
+  s3 := "alex" 
+}
+```
+
+#### 3.6 匿名变量
+
+> 如果想要忽略某个值，可以使用匿名变量，匿名变量使用一个下划线`_`表示
+>
+> 匿名变量不占用命名空间，不会分配内存，所以匿名变量之间不存在重复声明
+>
+> 匿名变量适用于批量声明变量
+
+#### 3.7 打印变量
 
 ```go
 // 输出变量自动换行
@@ -367,6 +418,193 @@ fmt.Printf("Hi，%d", age)
 // 输出变量但没有换行符
 fmt.Print("Hi，go")
 ```
+
+### 4、常量
+
+> 程序运行期间固定不变的值
+
+#### 4.1 常量声明
+
+```go
+package main
+
+import "fmt"
+
+// 常量是指程序运行期间永不变的值
+// 并且常量定义后不能重新赋值
+const pi = 3.1415926
+
+func main() {
+	fmt.Println(pi)
+}
+```
+
+#### 4.2 批量声明
+
+```go
+package main
+
+import "fmt"
+
+// 批量声明
+const (
+	CODE_OK = 200
+	CODE_NOT_FOUND = 404
+)
+
+// 批量声明变量，如果后面没写值就和上一行一样的值
+const (
+	n1 = 100
+	n2
+	n3
+)
+
+
+func main() {
+	fmt.Println(CODE_OK) // 200
+	fmt.Println(CODE_NOT_FOUND) // 404
+
+	// <--->
+	fmt.Println(n1) // 100
+	fmt.Println(n2) // 100
+	fmt.Println(n3) // 100
+}
+```
+
+#### 4.3 iota
+
+> `iota`是常量计数器
+>
+> `const`中每新增一行常量声明，将使`iota`的计数加一，初始的`iota`值为0
+
+```go
+package main
+
+import "fmt"
+
+//批量声明变量，如果后面没写值就和上一行一样的值
+const (
+	n1 = iota // 0
+	n2        // 1
+	n3        // 2
+)
+
+
+const (
+	b1 = iota // 0
+	b2        // 1
+	_         // 2 匿名变量表示不需要这个值，可以丢弃掉
+ 	b3        // 3
+)
+
+func main() {
+	fmt.Println(n1) // 0
+	fmt.Println(n2) // 1
+	fmt.Println(n3) // 2
+	// ----
+	fmt.Println(b1) // 0
+	fmt.Println(b2) // 1
+	fmt.Println(b3) // 3
+}
+```
+
+#### 4.4 iota的几种场景
+
+> `iota`的核心: 每新增一行常量声明，将使`iota`的计数加一
+>
+> 并且`const`重新出现`iota`才会置为0
+
+```go
+package main
+
+import "fmt"
+
+// iota插队: `const`中每新增一行常量声明，将使`iota`的计数加一，
+const (
+	b1 = iota
+	b2 = 100 // 表示在const中新增一行，并且是在同一个const中
+ 	b3 = iota
+)
+
+// 多个常量声明在一行
+const (
+	// d1和d2在同一行，所以iota是0，所以d1:0 + 1 = 1, d2: 0 + 2 = 2
+	d1, d2 = iota + 1, iota + 2
+
+	// d1和d2在同一行，所以iota是0，所以d3:1 + 1 = 2, d4: 1 + 2 = 3
+	d3, d4 = iota + 1, iota + 2
+)
+
+
+func main() {
+	fmt.Println(b1) // 0
+	fmt.Println(b2) // 1
+	fmt.Println(b3) // 2
+
+	// <--->
+	fmt.Println(d1) // 1
+	fmt.Println(d2) // 2
+	fmt.Println(d3) // 2
+	fmt.Println(d4) // 3
+}
+```
+
+#### 4.5 定义数量集
+
+```go
+package main
+
+import "fmt"
+
+// 定义数量集
+// << 表示左移符号，向左移动几位
+const (
+	_ = iota
+	KB = 1 << (10 * iota) // 表示向左移动10位，也就是2的10次方，转换为二进制就是1024
+	MB = 1 << (10 * iota)
+	GB = 1 << (10 * iota)
+	TB = 1 << (10 * iota)
+)
+
+func main() {
+	fmt.Println(KB) // 1024
+	fmt.Println(MB) // 1048576
+}
+```
+
+## 四、数据类型
+
+### 1、整型
+
+> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
