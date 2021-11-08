@@ -147,7 +147,7 @@ func main() {
 
 ![image-20211026115327001](go%E7%AC%94%E8%AE%B0.assets/image-20211026115327001.png)
 
-## 二、变量
+## 二、运行代码
 
 ### 1、第一行代码
 
@@ -163,13 +163,28 @@ func main() {
 
 ![image-20211026110718850](go%E7%AC%94%E8%AE%B0.assets/image-20211026110718850.png)
 
-### 2、编译运行命令
+### 2、编译build
 
 > 构建`go`代码:`go build`
 >
-> 直接运行`go`代码: `go run`
+> - 是通过`GOPATH`去找代码，`GOPATH`在哪，`GO BUILD`就执行在哪
+>
+> 通过`-o`可以指定编译的可执行程序的名字: `go build -o 'hello'`
 
-### 3、单引号双引号
+### 3、运行run
+
+> 直接运行代码
+>
+> `go run xxx.go`
+
+### 4、安装install
+
+> 分为两步
+>
+> - 先编译得到一个可执行编译文件
+> - 然后将可执行文件拷贝到`GOPATH/bin`目录
+
+### 5、单引号双引号
 
 ```json
 在go语法中，双引号是常用的来表达字符串，如果你使用了单引号，编译器会提示出错
@@ -184,4 +199,180 @@ Printf 和 Println 的区别
 printf 输出后不换行， println输出后自动换行；
 printf格式化输出，println 直接输出内容
 ```
+
+### 6、跨平台编译
+
+> `GO`代码可以跨平台编译
+>
+> 只需要指定对应目标操作系统的平台和处理器架构就可以了
+
+#### 6.1 mac编译linux程序
+
+```bash
+# 编译linux程序64位
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+
+# 编译windows程序64位
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
+```
+
+#### 6.2 linux编译mac和windows程序
+
+```bash
+# 编译mac程序64位
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
+
+# 编译windows程序64位
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
+```
+
+#### 6.3 windows下编译mac程序
+
+```bash
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
+```
+
+## 三、变量与常量
+
+### 1、第一行代码解释
+
+```go
+// 这里是指声明的包
+// main包表示可以编译执行的二进制文件
+// 非main包表示是给别人用的
+package main
+
+// 引入一个fmt包，用来提供打印功能
+// 引入的包必须是双引号
+import "fmt"
+
+// 在函数外只能放置标识符(变量、常量、函数、类型)的声明，不可以放语句
+// 语句比如: a + b = c
+
+// main包必须有一个main函数，是整个程序的入口，所有代码都从main函数里进行执行
+// main函数没有参数，也没有返回值
+func main() {
+	fmt.Println("hello, go!")
+}
+```
+
+### 2、标识符/关键字
+
+#### 2.1 标识符
+
+> 表示定义的具有特殊意义的单词，比如变量名、常量名、函数名等等
+>
+> `GO`中由字母、数字、下划线(_)组成
+
+#### 2.2 关键字
+
+> 编程语言内部定义好的关键字
+>
+> 比如：`import`、`break`等
+
+### 3、变量
+
+> `GO`语言中的需要先声明再使用
+>
+> `GO`语言的变量是静态类型，所以需要定义类型
+
+```go
+// 格式
+var 变量名 变量类型
+```
+
+#### 3.1 声明变量
+
+> 单独声明变量
+
+```go
+// 如下,声明一个保存字符串类型的变量
+var s1 string 
+
+// 整型
+var num int
+
+// 布尔类型
+var ret bool
+```
+
+#### 3.2 批量声明
+
+> 声明变量后会有一个初始值
+
+```go
+// go可以批量声明变量
+
+var (
+	name string // ”“
+  age int // 0
+  isOk bool // false
+)
+```
+
+#### 3.3 变量默认值
+
+> 字符串类型初始值为`""`
+>
+> 整型类型初始值为0
+>
+> 布尔类型初始值为`false`
+>
+> 
+
+```go
+package main
+
+import "fmt"
+
+var (
+	name string
+	age int
+	isOk bool
+)
+
+func main() {
+	// 先声明变量有一个默认值
+	fmt.Println(name) // ""
+	fmt.Println(age) // 0
+	fmt.Println(isOk) // false
+
+	// 重新初始化赋值变量
+	name = "sam"
+	age = 18
+	isOk = true
+	fmt.Println(name) // sam
+	fmt.Println(age) // 18
+	fmt.Println(isOk) // true
+}
+```
+
+#### 3.4 注意
+
+> 需要注意的是`GO`语言中变量声明必须使用，不使用就编译不过去
+>
+> 因为编译器会减少编译后的体积，所以声明了变量但未使用就会编译不通过
+>
+> `GO`语言没有什么缩进格式要求，当然好的代码格式是比较方便阅读的
+
+#### 3.5 
+
+### 4、打印变量
+
+```go
+// 输出变量自动换行
+fmt.Println("Hi，go")
+// 格式化输出变量
+fmt.Printf("Hi，%d", age)
+// 输出变量但没有换行符
+fmt.Print("Hi，go")
+```
+
+
+
+
+
+
+
+
 
