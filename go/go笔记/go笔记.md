@@ -913,7 +913,48 @@ func main() {
 }
 ```
 
+#### 4.11 字符串修改
 
+> 首先字符串不可以修改，不过可将字符串修改为其他类型再进行修改
+>
+> 将字符串先转换为一个切片，切片里保存的就是字符
+>
+> 然后对切换的字符进行重新赋值后再输出就达到了字符串修改
+>
+> `rune`类型是`int32`类型的
+>
+> `byte`是`uint8`类型的
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s2 := "白萝卜"
+	s3 := []rune(s2) // 把字符串强制转换成了一个rune切片,切换里保存的就是字符
+	s3[0] = '红'
+	s4 := string(s3)
+	fmt.Printf("%v\n", s4) // 红萝卜
+}
+```
+
+#### 4.12 强制类型转换
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 类型转换
+	// 整型和浮点型转换
+	s1 := 10
+	s2 := float64(s1)
+	fmt.Printf("%v\n", s2) // 10
+	fmt.Printf("%T\n", s2) // float64
+}
+```
 
 ### 5、fmt总结
 
@@ -951,18 +992,212 @@ func main() {
 	fmt.Printf("%T\n", s2) // string
 	fmt.Printf("%s\n", s2) // bob
 	fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
-
-
 }
+```
+
+## 五、流程控制
+
+### 1、if语句
+
+> 常见的`if`判断语句
+>
+> 格式：
+>
+> ```go
+> if 表达式 {
+>   语句1
+> } else {
+>   语句2
+> }
+> ```
+
+#### 1.1 单个if语句
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 类型转换
+	// 整型和浮点型转换
+	s1 := 10
+	if s1 == 10 {
+		fmt.Printf("s1 等于 %v\n", s1)
+	} else {
+		fmt.Printf("s1 不等于 %v\n", s1)
+	}
+}
+
+// 输出结果
+// s1 等于 10
+```
+
+#### 1.2 多个if语句
+
+> 格式：
+>
+> ```go
+> if 表达式 {
+>   语句1
+> } else if 表达式 {
+>   语句2
+> } else {
+>   语句3
+> }
+> ```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 类型转换
+	// 整型和浮点型转换
+	s1 := 10
+	if s1 > 10 {
+		fmt.Printf("s1 大于 %v\n", s1)
+	} else if s1 < 10 {
+		fmt.Printf("s1 小于 %v\n", s1)
+	} else {
+		fmt.Printf("s1 等于 %v\n", s1)
+	}
+}
+```
+
+#### 1.3 特殊写法
+
+> 可以将变量写到if判断里
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 将变量和if写在一行，这个s1变量的作用域只在if判断里生效，if判断外无法进行变量访问
+	// 这样可以减少内存占用
+	if s1 := 10; s1 == 10 {
+		fmt.Printf("s1 等于 %v\n", s1)
+	} else {
+		fmt.Printf("s1 不等于 %v\n", s1)
+	}
+	
+	// 在这里是没法访问到s1的，因为s1在if的作用域里
+	fmt.Printf("%v\n", s1) // undefined: s1
+}
+```
+
+### 2、for语句
+
+#### 2.1 基础格式
+
+> 格式：
+>
+> ```go
+> for 初始语句;条件表达式;结束语句{
+>     循环体语句
+> }
+> ```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	for i:= 0; i < 10; i++{
+		fmt.Printf("%v\n", i)
+	}
+}
+
+// 结果
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+```
+
+#### 2.2 变种1
+
+> 将初始值提到for循环外面
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	i := 5
+	for ;i < 10; i++{
+		fmt.Printf("%v\n", i)
+	}
+}
+
+// 结果
+5
+6
+7
+8
+9
 ```
 
 
 
+#### 2.3 变种2
+
+> 将初始值提到for循环外面
+>
+> 将结束语句放到for循环内部
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	i := 5
+	for i < 10{
+		fmt.Printf("%v\n", i)
+		i++
+	}
+}
+
+// 结果
+5
+6
+7
+8
+9
+```
 
 
 
+#### 2.4 无限循环
 
+> 切记不要尝试，这是死循环，`go`性能很高，很容易将机器性能打满
 
+```go
+for {
+  循环语句
+}
+```
+
+### 3、for range 循环
+
+> 格式
+>
+> ```go
+> ```
+>
+> 
 
 
 
