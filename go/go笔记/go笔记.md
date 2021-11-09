@@ -1293,6 +1293,151 @@ func main() {
 }
 ```
 
+### 5、break
+
+> 直接退出循环
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	for i := 1; i < 10; i++ {
+		if i == 5 {
+			break
+		} else {
+			fmt.Printf("i = %d\n", i)
+		}
+	}
+	fmt.Print("done")
+}
+
+// 结果
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+// 可以看到等于5就退出循环了
+```
+
+### 6、continue
+
+> 跳过这一次循环
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	for i := 1; i < 10; i++ {
+		if i == 5 {
+			continue
+		} else {
+			fmt.Printf("i = %d\n", i)
+		}
+	}
+	fmt.Print("done")
+}
+
+// 结果
+i = 1
+i = 2
+i = 3
+i = 4
+i = 6
+i = 7
+i = 8
+i = 9
+// 可以看到5被跳过不输出
+```
+
+### 7、switch
+
+> 简化大量判断
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 多个if判断可以使用switch语句
+	age := 18
+	if age == 1 {
+		fmt.Println("age = 1")
+	} else if age == 2 {
+		fmt.Println("age = 2")
+	} else {
+		fmt.Println("age = 3")
+	}
+
+	// switch简化大量判断
+	switch age {
+	case 1:
+		fmt.Println("age = 1")
+	case 2:
+		fmt.Println("age = 2")
+	default:
+		fmt.Println("age not found")
+	}
+}
+```
+
+#### 7.1 变种
+
+> 可以在`swicth`语句的`case`里放置多个值
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 多个if判断可以使用switch语句
+	age := 8
+
+	// switch的case可以放置多个值
+	switch age {
+	case 1, 3, 5, 7, 9:
+		fmt.Println("age = 1")
+	case 2, 4, 6, 8, 10:
+		fmt.Println("age = 2")
+	default:
+		fmt.Println("age not found")
+	}
+}
+
+```
+
+### 8、goto(了解)
+
+> `goto`表示跳到某个位置，在代码里可以指定对应标签
+>
+> 建议：`goto`尽量少用
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// goto 语句，表示调到这个位置
+	// goto 后面跟着标签Label，这可以直接跳出多个循环
+	for i := 0; i < 10; i++ {
+		if i == 3 {
+			fmt.Printf("i = %d\n", i)
+			goto LABEL_BREAK
+		}
+	}
+	LABEL_BREAK:
+	fmt.Println("done!")
+}
+
+```
+
 
 
 
