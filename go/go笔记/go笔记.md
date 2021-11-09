@@ -776,6 +776,8 @@ func main() {
 
 #### 4.4 字符串长度
 
+> `len(str)`返回一个`int`型
+
 ```go
 package main
 
@@ -788,6 +790,8 @@ func main() {
 ```
 
 #### 4.5 字符串拼接
+
+> 返回一个新的字符串变量
 
 ```go
 package main
@@ -874,6 +878,8 @@ func main() {
 
 #### 4.9 子串位置
 
+> 返回子串的索引位置
+
 ```go
 package main
 
@@ -895,7 +901,7 @@ func main() {
 
 #### 4.10 join
 
-> `join`可以将数组以某个格式拼接起来
+> `join`可以将数组以某个格式拼接起来，比如：`-`、`+`等
 
 ```go
 package main
