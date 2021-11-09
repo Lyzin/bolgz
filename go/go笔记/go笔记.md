@@ -1438,11 +1438,241 @@ func main() {
 
 ```
 
+## 六、运算符
+
+### 1、算数运算符
+
+> 常见的加减乘除
+
+```go
+package main
+
+import "fmt"
+
+var (
+	a int
+	b int
+	c int
+)
+
+func main() {
+	a = 4
+	b = 2
+	// 加法
+	fmt.Println(a + b) // 6
+
+	// 减法
+	fmt.Println(a - b) // 2
+
+	// 乘法
+	fmt.Println(a * b) // 8
+
+	// 除法
+	fmt.Println(a / b) // 2
+
+	// 取余
+	fmt.Println(a % b) // 0
+}
+```
+
+### 2、递减与递增
+
+```go
+	// 单独的语句， 不能放在=的右边赋值， 等价于：a = a + 1
+	a ++
+	fmt.Println(a) // 5
+
+	// 单独的语句， 不能放在=的右边赋值， 等价于：a = a - 1
+	a --
+	fmt.Println(a) // 4
+```
+
+### 3、关系运算符
+
+> 返回的一定是`bool`类型
+
+```go
+package main
+
+import "fmt"
+
+var (
+	a int
+	b int
+	c int
+)
 
 
+func main() {
+	a = 4
+	b = 2
+
+	// 关系运算符
+
+	// 等于
+	fmt.Println( a == b) // false
+
+	// 不等于
+	fmt.Println( a != b) // true
+	
+	// 大于等于
+	fmt.Println( a >= b) // true
+	
+	// 小于等于
+	fmt.Println( a <= b) // false
+	
+	// 大于
+	fmt.Println( a > b) // true
+	
+	// 小于
+	fmt.Println( a < b) // false
+}
+
+```
+
+### 4、逻辑运算符
+
+> 和其他语言一样，可以进行多个逻辑判断
+
+#### 4.1 与运算	
+
+> `&&`表示与
+
+```go
+package main
+
+import "fmt"
+
+var (
+	a int
+	b int
+	c int
+)
 
 
+func main() {
+	a = 4
+	b = 2
 
+	// 与运算符
+	if a > 3 && b < 3 {
+		fmt.Println("aaa")
+	} else {
+		fmt.Print("bbb")
+	}
+}
+
+```
+
+#### 4.2 或运算
+
+> `||`表示或运算
+
+```go
+package main
+
+import "fmt"
+
+var (
+	a int
+	b int
+	c int
+)
+
+
+func main() {
+	a = 4
+	b = 2
+
+	// 或运算符
+	if a > 3 || b < 3 {
+		fmt.Println("aaa")
+	} else {
+		fmt.Print("bbb")
+	}
+}
+
+```
+
+#### 4.3 非运算
+
+> `!`表示非，取反
+>
+> 需要注意非运算只能跟布尔类型的值，其他的类型会报错
+
+```go
+package main
+
+import "fmt"
+
+var (
+	a int
+	b bool
+)
+
+
+func main() {
+	a = 4
+	b = true
+
+	// 或运算符
+	if !b {
+		fmt.Println("aaa")
+	} else {
+		fmt.Print("bbb")
+	}
+}
+```
+
+### 5、位运算
+
+> 针对的是二进制数
+
+#### 5.1 按位与
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 5的二进制： 101
+	// 2的二进制：  10
+	
+	//按位与 (两位都为1才为1)
+	// 5的二进制数每一位和2的二进制的每一位进行运算
+	// 5    1 0 1
+	// 2      1 0
+	// --------------
+	//      0 0 0
+	// 结果是3个0，那么
+  // 0 X 2^2 + 0x2^1 + 0x2^0 = 0 + 0 + 0 = 0
+  // 所以 5 & 2就是0
+	fmt.Println(5 & 2) // 000
+}
+```
+
+#### 5.2 按位或
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 5的二进制： 101
+	// 2的二进制：  10
+
+	//按位与 (两位有一个为1就为1)
+	// 5的二进制数每一位和2的二进制的每一位进行运算
+	// 5    1 0 1
+	// 2      1 0
+	// --------------
+	//      1 1 1
+	// 1 X 2^2 + 1x2^1 + 1x2^0 = 4 + 2 + 1 = 7
+	fmt.Println(5 | 2) // 7
+}
+```
 
 
 
