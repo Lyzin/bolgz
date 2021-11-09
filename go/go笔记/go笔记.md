@@ -1201,6 +1201,8 @@ for {
 
 ### 3、for range 循环
 
+#### 3.1 基本格式
+
 > `for range`介绍
 >
 > ```go
@@ -1221,8 +1223,8 @@ for {
 >   fmt.Printf("%d : %c",i, v)
 > } 
 > 
-> 这里面的i是循环的索引值
-> v是值
+> // 这里面的i是循环的索引值
+> // v是值
 > ```
 
 ```go
@@ -1243,7 +1245,47 @@ func main() {
 }
 ```
 
+#### 3.1 只有一个变量
 
+> 当`for range`中只有一个变量时，那这个变量是索引值而不是元素值
+
+```go
+fmt.Println("for range 只有一个变量")
+	for v := range rangeNameStr {
+		fmt.Println(v)
+	}
+```
+
+#### 3.3 匿名变量接收索引值
+
+> 3.2 中描述只有一个变量时，这个变量是索引值而不是元素值，当不想要索引值时，可以使用匿名变量来接收索引值
+>
+> 这里就是匿名变量的用处，可以作为一个
+
+```go
+fmt.Println("for range 使用匿名变量接收索引")
+for _, v := range rangeNameStr {
+		fmt.Printf("%c", v)
+}
+```
+
+### 4、9x9乘法口诀
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	for i := 1; i < 10; i++ {
+		for j := 1; j <= i; j++ {
+			z := i * j
+			fmt.Printf("%d * %d = %d\t ", i, j, z)
+		}
+		fmt.Println()
+	}
+}
+```
 
 
 
