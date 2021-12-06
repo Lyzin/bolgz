@@ -21,6 +21,8 @@
 ### 3、学习记录
 
 > 使用`golang Idea`编辑器或`vs code`，但是不要开启自动提示功能，使用省电模式，因为一开始就自己手写所有语法才能记得住
+>
+> 本笔记代码建议是`缩进4个空格`，但笔记代码缩进有可能不是2格，写代码时需要注意！
 
 ### 4、第一个Go程序
 
@@ -150,6 +152,18 @@ func main() {
 ## 二、运行代码
 
 ### 1、第一行代码
+
+> 代码注释:
+>
+> ```go
+> // 单行注释
+> 
+> /*
+> 多行注释
+> 多行注释
+> 多行注释
+> */
+> ```
 
 ```go
 package main
@@ -387,21 +401,23 @@ sf := "sf"
 > - 变量声明注意点
 >   - `var`  变量声明，可以适用于函数内外 
 >   - `:=`  短变量声明，只能在函数内声明
->   - `_`  多用于占位，表示忽略某个值
+>   - `_`  匿名变量多用于占位，表示忽略某个值
 >   - 同一个作用域不可重复声明同名的变量
 >
 > - 一个花括号就是一个作用域
->   - 需要注意的是`GO`语言中变量声明必须使用，不使用就编译不过去
+>   - 需要注意的是`Go`语言中变量声明必须使用，不使用就编译不过去
 >   - 这里需要注意的是全局变量可以声明但不使用，在函数外面使用`var`声明的变量
 >   - 非全局变量声明后赋值且必须使用，在函数内声明变量
 >
 > - 因为编译器会减少编译后的体积，所以声明了变量但未使用就会编译不通过
 >
 >
-> - `GO`语言没有什么缩进格式要求，当然好的代码格式是比较方便阅读的
+> - `Go`语言没有什么缩进格式要求，当然好的代码格式是比较方便阅读的
 
 ### 4、匿名变量
 
+> 匿名变量可以想象成linux中的标准输入，表示我不需要查看该输出，相当于忽略
+>
 > 如果想要忽略某个值，可以使用匿名变量，匿名变量使用一个下划线`_`表示
 >
 > 匿名变量不占用命名空间，不会分配内存，所以匿名变量之间不存在重复声明
@@ -409,6 +425,23 @@ sf := "sf"
 > 匿名变量适用于批量声明变量
 
 ```go
+package main
+
+import "fmt"
+
+const (
+	a1 = 100
+	a2
+	_   // 这里就代表将这个值以匿名变量跳过
+	a3 = iota
+)
+
+func main() {
+	fmt.Println("第一个批量定义常量")
+	fmt.Printf("%v\n", a1)
+	fmt.Printf("%v\n", a2)
+	fmt.Printf("%v\n", a3)
+}
 ```
 
 ### 5、常量
@@ -455,6 +488,8 @@ func main() {
 #### 5.2 批量声明
 
 > 因式分解形式进行批量声明常量
+>
+> 批量声明变量，如果后面没写值就和上一行一样的值
 
 ```go
 package main
@@ -471,10 +506,9 @@ const (
 const (
 	n1 = 100
 	n2
-	n3
+	n3 = 300
+  n4
 )
-
-
 func main() {
 	fmt.Println(CODE_OK) // 200
 	fmt.Println(CODE_NOT_FOUND) // 404
@@ -482,15 +516,17 @@ func main() {
 	// <--->
 	fmt.Println(n1) // 100
 	fmt.Println(n2) // 100
-	fmt.Println(n3) // 100
+	fmt.Println(n3) // 300
+  fmt.Println(n4) // 300
 }
 ```
 
-#### 5.3 `iota`介绍
+#### 5.3 `iota`
 
-> `iota`是常量计数器
+> `iota`是常量计数器，只能在`conts`常量中使用
 >
-> `const`中每新增一行常量声明，将使`iota`的计数加一，初始的`iota`值为0
+> - `const`中每新增一行常量声明，将使`iota`的计数加一，初始的`iota`值为0
+>   - 这里要注意当批量声明`const`时，如果第一个常量没有显式的写值等于`iota`，当下面的`x`常量值写了等于`iota`,那么该x常量的值就是`iota`从`0`开始到这个`x`的值,而不是从`0`开始，因为`iota`也说明了只要`const`中新增一行，`iota`就会加一
 
 ```go
 package main
@@ -513,21 +549,21 @@ const (
 )
 
 func main() {
-	fmt.Println(n1) // 0
-	fmt.Println(n2) // 1
-	fmt.Println(n3) // 2
-	// ----
-	fmt.Println(b1) // 0
-	fmt.Println(b2) // 1
-	fmt.Println(b3) // 3
+    fmt.Println(n1) // 0
+    fmt.Println(n2) // 1
+    fmt.Println(n3) // 2
+    // ----
+    fmt.Println(b1) // 0
+    fmt.Println(b2) // 1
+    fmt.Println(b3) // 3
 }
 ```
 
 #### 5.4 iota的几种场景
 
-> `iota`的核心: 每新增一行常量声明，将使`iota`的计数加一
->
-> 并且`const`重新出现`iota`才会置为0
+> - `iota`的核心:
+>  - 每新增一行常量声明，将使`iota`的计数加一
+>   - 并且`const`重新出现`iota`才会置为0
 
 ```go
 package main
@@ -1018,9 +1054,9 @@ func main() {
 >
 > ```go
 > if 表达式 {
->   语句1
+>   		语句1
 > } else {
->   语句2
+>   		语句2
 > }
 > ```
 
@@ -1052,11 +1088,11 @@ func main() {
 >
 > ```go
 > if 表达式 {
->   语句1
+>   	语句1
 > } else if 表达式 {
->   语句2
+>   	语句2
 > } else {
->   语句3
+>   	语句3
 > }
 > ```
 
@@ -1070,11 +1106,11 @@ func main() {
 	// 整型和浮点型转换
 	s1 := 10
 	if s1 > 10 {
-		fmt.Printf("s1 大于 %v\n", s1)
+			fmt.Printf("s1 大于 %v\n", s1)
 	} else if s1 < 10 {
-		fmt.Printf("s1 小于 %v\n", s1)
+			fmt.Printf("s1 小于 %v\n", s1)
 	} else {
-		fmt.Printf("s1 等于 %v\n", s1)
+			fmt.Printf("s1 等于 %v\n", s1)
 	}
 }
 ```
@@ -1096,9 +1132,9 @@ func main() {
 	// 将变量和if写在一行，这个s1变量的作用域只在if判断里生效，if判断外无法进行变量访问
 	// 这样可以减少内存占用
 	if s1 := 10; s1 == 10 {
-		fmt.Printf("s1 等于 %v\n", s1)
+			fmt.Printf("s1 等于 %v\n", s1)
 	} else {
-		fmt.Printf("s1 不等于 %v\n", s1)
+			fmt.Printf("s1 不等于 %v\n", s1)
 	}
 	
 	// 在这里是没法访问到s1的，因为s1在if的作用域里
@@ -1114,7 +1150,7 @@ func main() {
 >
 > ```go
 > for 初始语句;条件表达式;结束语句{
->     循环体语句
+>     		循环体语句
 > }
 > ```
 
@@ -1125,7 +1161,7 @@ import "fmt"
 
 func main() {
 	for i:= 0; i < 10; i++{
-		fmt.Printf("%v\n", i)
+			fmt.Printf("%v\n", i)
 	}
 }
 
@@ -1142,9 +1178,9 @@ func main() {
 9
 ```
 
-#### 2.2 变种1
+#### 2.2 `for`变种1
 
-> 将初始值提到for循环外面
+> 将初始值提到`for`循环外面
 
 ```go
 package main
@@ -1154,7 +1190,7 @@ import "fmt"
 func main() {
 	i := 5
 	for ;i < 10; i++{
-		fmt.Printf("%v\n", i)
+			fmt.Printf("%v\n", i)
 	}
 }
 
@@ -1168,11 +1204,11 @@ func main() {
 
 
 
-#### 2.3 变种2
+#### 2.3 `for`变种2
 
-> 将初始值提到for循环外面
+> 将初始值提到`for`循环外面
 >
-> 将结束语句放到for循环内部
+> 将结束语句放到`for`循环内部
 
 ```go
 package main
@@ -1182,8 +1218,8 @@ import "fmt"
 func main() {
 	i := 5
 	for i < 10{
-		fmt.Printf("%v\n", i)
-		i++
+			fmt.Printf("%v\n", i)
+			i++
 	}
 }
 
@@ -1197,49 +1233,23 @@ func main() {
 
 #### 2.4 无限循环
 
-> 切记不要尝试，这是死循环，`go`性能很高，很容易将机器性能打满
+> 切记不要轻易尝试，这是死循环，`go`性能很高，很容易将机器性能打满
 >
-> 格式
+> 死循环代码格式
 >
 > ```go
 > for {
->   循环语句
+> 	循环语句
 > }
 > ```
 
 ```go
 for {
-  fmt.Println("hello world")
+		fmt.Println("hello world")
 }
 ```
 
-### 3、for range 循环
-
-#### 3.1 基本格式
-
-> `for range`介绍
->
-> ```go
-> Go语言中可以使用for range遍历数组、切片、字符串、map 及通道（channel）。 通过for range遍历的返回值有以下规律：
-> 
-> 数组、切片、字符串返回索引和值。
-> map返回键和值。
-> 通道（channel）只返回通道内的值。
-> ```
->
-> `for`循环中输出每个字符，那必须使用`%c`来输出字符
->
-> 格式
->
-> ```go
-> s := "Hello测几"
-> for i, v := range s {
->   fmt.Printf("%d : %c",i, v)
-> } 
-> 
-> // 这里面的i是循环的索引值
-> // v是值
-> ```
+> 当前也可以给`for`后面跟条件判断语句,有点类似于其他语言的`while`语句，达成某种条件后退出循环
 
 ```go
 package main
@@ -1247,13 +1257,59 @@ package main
 import "fmt"
 
 func main() {
-	// for range
+	s := 0
+	for s < 3 {
+		fmt.Printf("这是for循环\n")
+		s++
+	}
+}
+
+// 输出结果为三个for循环结果
+/*
+这是for循环
+这是for循环
+这是for循环
+*/
+```
+
+
+
+### 3、`for range`循环
+
+#### 3.1 基础格式
+
+> - `Go`语言中可以使用`for range`遍历数组、切片、字符串、`map`及通道（`channel`），通过`for range`遍历的返回值有以下规律：
+>   - 数组、切片、字符串返回索引和值
+>   - `map`返回键和值
+>   - 通道（`channel`）只返回通道内的值
+>
+> - `for`循环中输出每个字符，那必须使用`%c`来输出字符
+
+> 代码格式
+
+```go
+// 这里面的i是循环的索引值
+// v是值
+
+s := "Hello测几"
+for i, v := range s {
+	fmt.Printf("%d : %c",i, v)
+} 
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// for range 循环
 	s := "Hello悦悦"
 	for i, v := range s {
 		if i < 1 {
-			fmt.Printf("%d\n", i)  // 索引值 0
-			fmt.Printf("%T\n", v)  // int32 ,所以需要转换成字符类型
-			fmt.Printf("%c\n", v)  // H
+				fmt.Printf("%d\n", i)  // 索引值 0
+				fmt.Printf("%T\n", v)  // int32 ,所以需要转换成字符类型
+				fmt.Printf("%c\n", v)  // H
 		}
 	}
 }
@@ -1272,7 +1328,7 @@ fmt.Println("for range 只有一个变量")
 
 #### 3.3 匿名变量接收索引值
 
-> 3.2 中描述只有一个变量时，这个变量是索引值而不是元素值，当不想要索引值时，可以使用匿名变量来接收索引值
+> 在`3.2`中描述只有一个变量时，这个变量是索引值而不是元素值，当不想要索引值时，可以使用匿名变量来接收索引值
 >
 > 这里就是匿名变量的用处，可以作为一个
 
@@ -1283,7 +1339,9 @@ for _, v := range rangeNameStr {
 }
 ```
 
-### 4、9x9乘法口诀
+### 4、`for`循环例子
+
+> 9x9乘法口诀
 
 ```go
 package main
@@ -1303,7 +1361,7 @@ func main() {
 
 ### 5、break
 
-> 直接退出循环
+> `break`用来表示直接退出循环
 
 ```go
 package main
@@ -1365,6 +1423,8 @@ i = 9
 ### 7、switch
 
 > 简化大量判断
+>
+> 当大量`if`需要判断某个变量等于某个值，然后执行一些功能块时，就可用`switch`语句来简化代码
 
 ```go
 package main
@@ -1394,7 +1454,7 @@ func main() {
 }
 ```
 
-#### 7.1 变种
+#### 7.1 `switch`变种
 
 > 可以在`swicth`语句的`case`里放置多个值
 
@@ -1420,7 +1480,7 @@ func main() {
 
 ```
 
-### 8、goto(了解)
+### 8、`goto`(了解)
 
 > `goto`表示跳到某个位置，在代码里可以指定对应标签
 >
@@ -1485,19 +1545,33 @@ func main() {
 
 ### 2、递减与递增
 
-```go
-	// 单独的语句， 不能放在=的右边赋值， 等价于：a = a + 1
-	a ++
-	fmt.Println(a) // 5
+> - 变量递增：`a++`
+>   - 单独的语句， 不能放在=的右边赋值， 等价于：a = a + 1
+>
+> - 变量递减：`a--`
+>   - 单独的语句， 不能放在=的右边赋值， 等价于：a = a - 1
+>
+> - 注意：
+>   - 变量与`++`/`--`符号之间可以留一个空格，或者不留都可以进行递增或递减运算，个人建议可以不留空格
 
-	// 单独的语句， 不能放在=的右边赋值， 等价于：a = a - 1
-	a --
-	fmt.Println(a) // 4
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Printf("--->\n")
+	s1 := 10
+	s1++
+	fmt.Printf("%v\n", s1)
+}
 ```
 
 ### 3、关系运算符
 
-> 返回的一定是`bool`类型
+> 关系运算可以包含等于、不等于、大于等于、小于等于、大于、小于这几种关系
+>
+> 关系运算返回的一定是`bool`类型
 
 ```go
 package main
@@ -1540,16 +1614,18 @@ func main() {
 
 ### 4、逻辑运算符
 
-> 和其他语言一样，可以进行多个逻辑判断
+> 和其他语言一样，`go`语言可以进行多个逻辑判断
 
 #### 4.1 与运算	
 
-> `&&`表示与
+> `&& `表示与
+>
+> 两个条件都为真才为真
 
 ```go
 package main
 
-import "fmt"
+import "fmt"	
 
 var (
 	a int
@@ -1564,9 +1640,9 @@ func main() {
 
 	// 与运算符
 	if a > 3 && b < 3 {
-		fmt.Println("aaa")
+			fmt.Println("aaa")
 	} else {
-		fmt.Print("bbb")
+			fmt.Print("bbb")
 	}
 }
 
@@ -1575,6 +1651,8 @@ func main() {
 #### 4.2 或运算
 
 > `||`表示或运算
+>
+> 只要有一个条件为真则为真
 
 ```go
 package main
@@ -1605,8 +1683,6 @@ func main() {
 #### 4.3 非运算
 
 > `!`表示非，取反
->
-> 需要注意非运算只能跟布尔类型的值，其他的类型会报错
 
 ```go
 package main
@@ -1617,7 +1693,6 @@ var (
 	a int
 	b bool
 )
-
 
 func main() {
 	a = 4
@@ -1631,6 +1706,28 @@ func main() {
 	}
 }
 ```
+
+> 需要注意非运算只能跟布尔类型的值，其他的类型会报错
+>
+> 这个和其他语言是最不一样的地方，`python`中是可以对其他类型进行非运算判断
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := 10
+	s2 := "sam"
+	if !s1 {
+		fmt.Printf("不是10")
+	} else if !s2 {
+		fmt.Printf("不是10")
+	}
+}
+```
+
+![image-20211206161257244](go%E7%AC%94%E8%AE%B0.assets/image-20211206161257244.png)
 
 ### 5、位运算
 
@@ -1686,7 +1783,9 @@ func main() {
 }
 ```
 
+#### 5.3 按位非
 
+> 
 
 
 
