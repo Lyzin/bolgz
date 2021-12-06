@@ -1412,6 +1412,8 @@ i = 9
 > 简化大量判断
 >
 > 当大量`if`需要判断某个变量等于某个值，然后执行一些功能块时，就可用`switch`语句来简化代码
+>
+> `switch`和`case`两个关键字是同一列，不需要case在switch下缩进
 
 ```go
 package main
@@ -1419,25 +1421,25 @@ package main
 import "fmt"
 
 func main() {
-	// 多个if判断可以使用switch语句
-	age := 18
-	if age == 1 {
-		fmt.Println("age = 1")
-	} else if age == 2 {
-		fmt.Println("age = 2")
-	} else {
-		fmt.Println("age = 3")
-	}
+    // 多个if判断可以使用switch语句
+    age := 18
+    if age == 1 {
+      fmt.Println("age = 1")
+    } else if age == 2 {
+      fmt.Println("age = 2")
+    } else {
+      fmt.Println("age = 3")
+    }
 
-	// switch简化大量判断
-	switch age {
-	case 1:
-		fmt.Println("age = 1")
-	case 2:
-		fmt.Println("age = 2")
-	default:
-		fmt.Println("age not found")
-	}
+    // switch简化大量判断
+    switch age {
+    case 1:
+      fmt.Println("age = 1")
+    case 2:
+      fmt.Println("age = 2")
+    default:
+      fmt.Println("age not found")
+    }
 }
 ```
 
@@ -1451,18 +1453,18 @@ package main
 import "fmt"
 
 func main() {
-	// 多个if判断可以使用switch语句
-	age := 8
+    // 多个if判断可以使用switch语句
+    age := 8
 
-	// switch的case可以放置多个值
-	switch age {
-	case 1, 3, 5, 7, 9:
-		fmt.Println("age = 1")
-	case 2, 4, 6, 8, 10:
-		fmt.Println("age = 2")
-	default:
-		fmt.Println("age not found")
-	}
+    // switch的case可以放置多个值
+    switch age {
+    case 1, 3, 5, 7, 9:
+      fmt.Println("age = 1")
+    case 2, 4, 6, 8, 10:
+      fmt.Println("age = 2")
+    default:
+      fmt.Println("age not found")
+    }
 }
 
 ```
@@ -1479,16 +1481,16 @@ package main
 import "fmt"
 
 func main() {
-	// goto 语句，表示调到这个位置
-	// goto 后面跟着标签Label，这可以直接跳出多个循环
-	for i := 0; i < 10; i++ {
-		if i == 3 {
-			fmt.Printf("i = %d\n", i)
-			goto LABEL_BREAK
-		}
-	}
-	LABEL_BREAK:
-	fmt.Println("done!")
+    // goto 语句，表示调到这个位置
+    // goto 后面跟着标签Label，这可以直接跳出多个循环
+    for i := 0; i < 10; i++ {
+      if i == 3 {
+        fmt.Printf("i = %d\n", i)
+        goto LABEL_BREAK
+      }
+    }
+    LABEL_BREAK:
+    fmt.Println("done!")
 }
 
 ```
@@ -1505,28 +1507,28 @@ package main
 import "fmt"
 
 var (
-	a int
-	b int
-	c int
+    a int
+    b int
+    c int
 )
 
 func main() {
-	a = 4
-	b = 2
-	// 加法
-	fmt.Println(a + b) // 6
+    a = 4
+    b = 2
+    // 加法
+    fmt.Println(a + b) // 6
 
-	// 减法
-	fmt.Println(a - b) // 2
+    // 减法
+    fmt.Println(a - b) // 2
 
-	// 乘法
-	fmt.Println(a * b) // 8
+    // 乘法
+    fmt.Println(a * b) // 8
 
-	// 除法
-	fmt.Println(a / b) // 2
+    // 除法
+    fmt.Println(a / b) // 2
 
-	// 取余
-	fmt.Println(a % b) // 0
+    // 取余
+    fmt.Println(a % b) // 0
 }
 ```
 
@@ -1566,35 +1568,35 @@ package main
 import "fmt"
 
 var (
-	a int
-	b int
-	c int
+    a int
+    b int
+    c int
 )
 
 
 func main() {
-	a = 4
-	b = 2
+    a = 4
+    b = 2
 
-	// 关系运算符
+    // 关系运算符
 
-	// 等于
-	fmt.Println( a == b) // false
+    // 等于
+    fmt.Println( a == b) // false
 
-	// 不等于
-	fmt.Println( a != b) // true
-	
-	// 大于等于
-	fmt.Println( a >= b) // true
-	
-	// 小于等于
-	fmt.Println( a <= b) // false
-	
-	// 大于
-	fmt.Println( a > b) // true
-	
-	// 小于
-	fmt.Println( a < b) // false
+    // 不等于
+    fmt.Println( a != b) // true
+
+    // 大于等于
+    fmt.Println( a >= b) // true
+
+    // 小于等于
+    fmt.Println( a <= b) // false
+
+    // 大于
+    fmt.Println( a > b) // true
+
+    // 小于
+    fmt.Println( a < b) // false
 }
 
 ```
@@ -1615,22 +1617,22 @@ package main
 import "fmt"	
 
 var (
-	a int
-	b int
-	c int
+    a int
+    b int
+    c int
 )
 
 
 func main() {
-	a = 4
-	b = 2
+    a = 4
+    b = 2
 
-	// 与运算符
-	if a > 3 && b < 3 {
-			fmt.Println("aaa")
-	} else {
-			fmt.Print("bbb")
-	}
+    // 与运算符
+    if a > 3 && b < 3 {
+        fmt.Println("aaa")
+    } else {
+        fmt.Print("bbb")
+    }
 }
 
 ```
@@ -1647,22 +1649,22 @@ package main
 import "fmt"
 
 var (
-	a int
-	b int
-	c int
+    a int
+    b int
+    c int
 )
 
 
 func main() {
-	a = 4
-	b = 2
+    a = 4
+    b = 2
 
-	// 或运算符
-	if a > 3 || b < 3 {
-		fmt.Println("aaa")
-	} else {
-		fmt.Print("bbb")
-	}
+    // 或运算符
+    if a > 3 || b < 3 {
+      fmt.Println("aaa")
+    } else {
+      fmt.Print("bbb")
+    }
 }
 
 ```
@@ -1677,20 +1679,20 @@ package main
 import "fmt"
 
 var (
-	a int
-	b bool
+    a int
+    b bool
 )
 
 func main() {
-	a = 4
-	b = true
+    a = 4
+    b = true
 
-	// 或运算符
-	if !b {
-		fmt.Println("aaa")
-	} else {
-		fmt.Print("bbb")
-	}
+    // 或运算符
+    if !b {
+      fmt.Println("aaa")
+    } else {
+      fmt.Print("bbb")
+    }
 }
 ```
 
