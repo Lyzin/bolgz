@@ -18,33 +18,17 @@
 >
 > 使用`UTF-8`编码方式来存放代码
 
-### 3、学习记录
+### 3、学习心得
 
 > 使用`golang Idea`编辑器或`vs code`，但是不要开启自动提示功能，使用省电模式，因为一开始就自己手写所有语法才能记得住
 >
 > 本笔记代码建议是`缩进4个空格`，但笔记代码缩进有可能不是2格，写代码时需要注意！
 
-### 4、第一个Go程序
-
-```go
-package main
-
-import "fmt"
-
-func main() {
-  fmt.Println("Hello world!!!")
-}
-```
-
-- 执行结果
-
-![image-20211026110718850](go%E7%AC%94%E8%AE%B0.assets/image-20211026110718850.png)
-
-### 5、GO版本
+### 4、GO版本
 
 ![image-20211026110955968](go%E7%AC%94%E8%AE%B0.assets/image-20211026110955968.png)
 
-### 6、GOPATH
+### 5、GOPATH
 
 > `gopath`是环境变量，用来表明写的`go`项目的工作目录
 >
@@ -61,7 +45,7 @@ func main() {
   >    3. `pkg`：存放编译后的库文件或缓存文件
   > 4. 最后把`/xx/go/bin`目录添加到`PATH`里即可
 
-### 7、MAC配置自定义GOPATH
+### 6、MAC配置自定义GOPATH
 
 > 通过`go env`查看go的所有环境变量，包括`gopath`
 
@@ -77,13 +61,13 @@ func main() {
 >
 > - 接下来创建自己的`GOPATH`
 
-#### 7.1 创建目录
+#### 6.1 创建目录
 
 - 创建go目录以及那三个目录
 
 ![image-20211026113846716](go%E7%AC%94%E8%AE%B0.assets/image-20211026113846716.png)
 
-#### 7.2 添加环境变量
+#### 6.2 添加环境变量
 
 > 1. 编辑：`vim   ~/.zshrc`
 >
@@ -96,13 +80,13 @@ func main() {
 >
 > 3. 重新加载配置文件：`source  ~/.zshrc`
 
-#### 7.3 查看GOPATH
+#### 6.3 查看GOPATH
 
 > 1. 重新查看`GOPATH`，可以看到`GOPATH`已经修改过来了
 
 ![image-20211026114200717](go%E7%AC%94%E8%AE%B0.assets/image-20211026114200717.png)
 
-### 8、Windows配置GOPATH
+### 7、Windows配置GOPATH
 
 > 在官网下载`GO`的安装包，默认安装完会配置默认的`GOROOT`和`GOPATH`
 
@@ -125,25 +109,25 @@ func main() {
 
   ![image-20211103003726031](go%E7%AC%94%E8%AE%B0.assets/image-20211103003726031.png)
 
-#### 8.1 修改自己的GOPATH值
+#### 7.1 修改自己的GOPATH值
 
 > 在存放`go`代码的位置创建目录，将对应的目录地址填写过来
 
 ![image-20211103004455355](go%E7%AC%94%E8%AE%B0.assets/image-20211103004455355.png)
 
-#### 8.2 修改`GOPATH\bin`
+#### 7.2 修改`GOPATH\bin`
 
 > 需要在`PATH`这个环境变量修改，修改成：`%GOPATH%\bin`，表示进到在上面设置的`GOPATH`的`bin`目录下
 
 ![image-20211103004636063](go%E7%AC%94%E8%AE%B0.assets/image-20211103004636063.png)
 
-#### 8.3 检查`GOPATH`
+#### 7.3 检查`GOPATH`
 
 > 看到已经修改过来了
 
 ![image-20211103004908553](go%E7%AC%94%E8%AE%B0.assets/image-20211103004908553.png)
 
-### 9、创建代码目录
+### 8、创建代码目录
 
 > 按照上述说明的进行创建目录
 
@@ -171,7 +155,7 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("hello world!")
+		fmt.Println("hello world!")
 }
 ```
 
@@ -198,29 +182,32 @@ func main() {
 > - 先编译得到一个可执行编译文件
 > - 然后将可执行文件拷贝到`GOPATH/bin`目录
 
-### 5、单引号双引号
+### 5、单引号与双引号
 
-```json
-在go语法中，双引号是常用的来表达字符串，如果你使用了单引号，编译器会提示出错
+> - 在`go`语法中，双引号是常用的来表达字符串，如果你使用了单引号，编译器会提示出错
+>   - `invalid character literal (more than one character)`
+>   - 这个报错提示了无效的字符字面，超过了一个字符，因为字符串一般是大于一个字符的数量的字符串
+>     - 单引号只能包含一个字符，例如`'b'` ，程序会输出`98`表示字符`b`的`ascii`码
+>     - `ascii`码是用数字对应字母的
 
-invalid character literal (more than one character)
-``
-单引号只能包含一个字符，例如’b’ ,程序会输出98表示字符b的ascii码。
+> - 如果非要使用单引号输出必须使用string函数转换,如下
 
-如果非要使用单引号输出必须使用string函数转换
-fmt.Println(string('b') )
-Printf 和 Println 的区别
-printf 输出后不换行， println输出后自动换行；
-printf格式化输出，println 直接输出内容
+```go	
+fmt.Println(string('b'))
 ```
 
-### 6、跨平台编译
+> `Printf`和`Println`的区别
+>
+> `Printf`输出后不换行,`Println`输出后自动换行
+> `Printf`格式化输出,`Println`直接输出内容
+
+### 6、跨平台编译代码
 
 > `GO`代码可以跨平台编译
 >
 > 只需要指定对应目标操作系统的平台和处理器架构就可以了
 
-#### 6.1 mac编译linux程序
+#### 6.1 `mac`编译`linux`程序
 
 ```bash
 # 编译linux程序64位
@@ -230,7 +217,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
 ```
 
-#### 6.2 linux编译mac和windows程序
+#### 6.2 `linux`编译`mac`和`windows`程序
 
 ```bash
 # 编译mac程序64位
@@ -240,7 +227,7 @@ CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
 ```
 
-#### 6.3 windows下编译mac程序
+#### 6.3 `windows`下编译`mac`程序
 
 ```bash
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
@@ -266,7 +253,7 @@ import "fmt"
 // main包必须有一个main函数，是整个程序的入口，所有代码都从main函数里进行执行
 // main函数没有参数，也没有返回值
 func main() {
-	fmt.Println("hello, go!")
+		fmt.Println("hello, go!")
 }
 ```
 
@@ -437,10 +424,10 @@ const (
 )
 
 func main() {
-	fmt.Println("第一个批量定义常量")
-	fmt.Printf("%v\n", a1)
-	fmt.Printf("%v\n", a2)
-	fmt.Printf("%v\n", a3)
+    fmt.Println("第一个批量定义常量")
+    fmt.Printf("%v\n", a1)
+    fmt.Printf("%v\n", a2)
+    fmt.Printf("%v\n", a3)
 }
 ```
 
@@ -463,7 +450,7 @@ import "fmt"
 const pi = 3.1415926
 
 func main() {
-	fmt.Println(pi)
+		fmt.Println(pi)
 }
 ```
 
@@ -476,8 +463,8 @@ import "fmt"
 const pi = 3.1
 
 func main() {
-	pi = 45  // 对常量进行重复赋值
-	fmt.Printf("%v\n", pi)
+    pi = 45  // 对常量进行重复赋值
+    fmt.Printf("%v\n", pi)
 }
 // 输出报错如下图
 // 翻译过来就是不能指定给pi，已声明未const
@@ -498,26 +485,26 @@ import "fmt"
 
 // 批量声明
 const (
-	CODE_OK = 200
-	CODE_NOT_FOUND = 404
+    CODE_OK = 200
+    CODE_NOT_FOUND = 404
 )
 
 // 批量声明变量，如果后面没写值就和上一行一样的值
 const (
-	n1 = 100
-	n2
-	n3 = 300
-  n4
+    n1 = 100
+    n2
+    n3 = 300
+    n4
 )
 func main() {
-	fmt.Println(CODE_OK) // 200
-	fmt.Println(CODE_NOT_FOUND) // 404
+    fmt.Println(CODE_OK) // 200
+    fmt.Println(CODE_NOT_FOUND) // 404
 
-	// <--->
-	fmt.Println(n1) // 100
-	fmt.Println(n2) // 100
-	fmt.Println(n3) // 300
-  fmt.Println(n4) // 300
+    // <--->
+    fmt.Println(n1) // 100
+    fmt.Println(n2) // 100
+    fmt.Println(n3) // 300
+    fmt.Println(n4) // 300
 }
 ```
 
@@ -535,17 +522,17 @@ import "fmt"
 
 //批量声明变量，如果后面没写值就和上一行一样的值
 const (
-	n1 = iota // 0
-	n2        // 1
-	n3        // 2
+    n1 = iota // 0
+    n2        // 1
+    n3        // 2
 )
 
 
 const (
-	b1 = iota // 0
-	b2        // 1
-	_         // 2 匿名变量表示不需要这个值，可以丢弃掉
- 	b3        // 3
+    b1 = iota // 0
+    b2        // 1
+    _         // 2 匿名变量表示不需要这个值，可以丢弃掉
+    b3        // 3
 )
 
 func main() {
@@ -572,31 +559,31 @@ import "fmt"
 
 // iota插队: `const`中每新增一行常量声明，将使`iota`的计数加一，
 const (
-	b1 = iota
-	b2 = 100 // 表示在const中新增一行，并且是在同一个const中
- 	b3 = iota
+    b1 = iota
+    b2 = 100 // 表示在const中新增一行，并且是在同一个const中
+    b3 = iota
 )
 
 // 多个常量声明在一行
 const (
-	// d1和d2在同一行，所以iota是0，所以d1:0 + 1 = 1, d2: 0 + 2 = 2
-	d1, d2 = iota + 1, iota + 2
+    // d1和d2在同一行，所以iota是0，所以d1:0 + 1 = 1, d2: 0 + 2 = 2
+    d1, d2 = iota + 1, iota + 2
 
-	// d1和d2在同一行，所以iota是0，所以d3:1 + 1 = 2, d4: 1 + 2 = 3
-	d3, d4 = iota + 1, iota + 2
+    // d1和d2在同一行，所以iota是0，所以d3:1 + 1 = 2, d4: 1 + 2 = 3
+    d3, d4 = iota + 1, iota + 2
 )
 
 
 func main() {
-	fmt.Println(b1) // 0
-	fmt.Println(b2) // 1
-	fmt.Println(b3) // 2
+    fmt.Println(b1) // 0
+    fmt.Println(b2) // 1
+    fmt.Println(b3) // 2
 
-	// <--->
-	fmt.Println(d1) // 1
-	fmt.Println(d2) // 2
-	fmt.Println(d3) // 2
-	fmt.Println(d4) // 3
+    // <--->
+    fmt.Println(d1) // 1
+    fmt.Println(d2) // 2
+    fmt.Println(d3) // 2
+    fmt.Println(d4) // 3
 }
 ```
 
@@ -612,16 +599,16 @@ import "fmt"
 // 定义数量集
 // << 表示左移符号，向左移动几位
 const (
-	_ = iota
-	KB = 1 << (10 * iota) // 表示向左移动10位，也就是2的10次方，转换为二进制就是1024
-	MB = 1 << (10 * iota)
-	GB = 1 << (10 * iota)
-	TB = 1 << (10 * iota)
+    _ = iota
+    KB = 1 << (10 * iota) // 表示向左移动10位，也就是2的10次方，转换为二进制就是1024
+    MB = 1 << (10 * iota)
+    GB = 1 << (10 * iota)
+    TB = 1 << (10 * iota)
 )
 
 func main() {
-	fmt.Println(KB) // 1024
-	fmt.Println(MB) // 1048576
+    fmt.Println(KB) // 1024
+    fmt.Println(MB) // 1048576
 }
 ```
 
@@ -643,33 +630,33 @@ package main
 import "fmt"
 
 func main() {
-	s1 := 100
-	// 查看变量的类型
-	fmt.Printf("%T\n", s1) // int
+    s1 := 100
+    // 查看变量的类型
+    fmt.Printf("%T\n", s1) // int
 
-	// 查看变量的值，任何类型都可以看
-	fmt.Printf("%v\n", s1) // 100
+    // 查看变量的值，任何类型都可以看
+    fmt.Printf("%v\n", s1) // 100
 
-	// 输出整型的值
-	fmt.Printf("%d\n", s1) // 100
+    // 输出整型的值
+    fmt.Printf("%d\n", s1) // 100
 
-	// 将10进制转换为2进制
-	fmt.Printf("%b\n", s1) // 1100100
+    // 将10进制转换为2进制
+    fmt.Printf("%b\n", s1) // 1100100
 
-	// 将10进制转换为8进制
-	fmt.Printf("%o\n", s1) // 144
+    // 将10进制转换为8进制
+    fmt.Printf("%o\n", s1) // 144
 
-	// 将10进制转换为16进制
-	fmt.Printf("%x\n", s1) // 64
-  
-  // 输出字符,常用与for循环内输出每个元素值
-  fmt.Printf("%c\n", s1)
+    // 将10进制转换为16进制
+    fmt.Printf("%x\n", s1) // 64
 
-	s2 := "bob"
-	// 输出字符串的值
-	fmt.Printf("%T\n", s2) // string
-	fmt.Printf("%s\n", s2) // bob
-	fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
+    // 输出字符,常用与for循环内输出每个元素值
+    fmt.Printf("%c\n", s1)
+
+    s2 := "bob"
+    // 输出字符串的值
+    fmt.Printf("%T\n", s2) // string
+    fmt.Printf("%s\n", s2) // bob
+    fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
 }
 ```
 
@@ -693,25 +680,25 @@ package main
 import "fmt"
 
 func main() {
-	// 定义整型变量
-	i1 := 101
-	fmt.Printf("%d\n", i1) // 表示输出10进制数, 101
-	fmt.Printf("%b\n", i1) // 10进制转换为2进制, 1100101
-	fmt.Printf("%o\n", i1) // 10进制转换为8进制, 145
-	fmt.Printf("%x\n", i1) // 10进制转换为16进制, 65
+    // 定义整型变量
+    i1 := 101
+    fmt.Printf("%d\n", i1) // 表示输出10进制数, 101
+    fmt.Printf("%b\n", i1) // 10进制转换为2进制, 1100101
+    fmt.Printf("%o\n", i1) // 10进制转换为8进制, 145
+    fmt.Printf("%x\n", i1) // 10进制转换为16进制, 65
 
-	// 八进制,表示0-7的数字，一般以0开头，用于文件权限
-	i2 := 077
-	fmt.Printf("%d\n", i2) // 表示将8进制转换为10进制，63
+    // 八进制,表示0-7的数字，一般以0开头，用于文件权限
+    i2 := 077
+    fmt.Printf("%d\n", i2) // 表示将8进制转换为10进制，63
 
-	// 十六进制，表示0-f的值，一般以0x开头,用于内存地址
-	i3 := 0x1234567
-	fmt.Printf("%d\n", i3) // 表示将16进制转换为10进制，19088743
+    // 十六进制，表示0-f的值，一般以0x开头,用于内存地址
+    i3 := 0x1234567
+    fmt.Printf("%d\n", i3) // 表示将16进制转换为10进制，19088743
 
-	// 声明int8的类型,指定数字为什么类型，否则就是int类型
-	i4 := int8(9)
-	fmt.Printf("%d\n", i4) // 9
-	fmt.Printf("%T\n", i4) // int8
+    // 声明int8的类型,指定数字为什么类型，否则就是int类型
+    i4 := int8(9)
+    fmt.Printf("%d\n", i4) // 9
+    fmt.Printf("%T\n", i4) // int8
 }
 ```
 
@@ -738,14 +725,14 @@ import (
 )
 
 func main() {
-	fmt.Printf("%f\n", math.Pi) // 3.141593
-	fmt.Printf("%.2f\n", math.Pi) // 3.14
-	fmt.Printf("%T\n", math.Pi) // float64
-	
-	// 定义float32类型
-	s2 := float32(1.3245)
-	fmt.Printf("%f\n", s2) // 1.324500
-	fmt.Printf("%T\n", s2) // float32
+    fmt.Printf("%f\n", math.Pi) // 3.141593
+    fmt.Printf("%.2f\n", math.Pi) // 3.14
+    fmt.Printf("%T\n", math.Pi) // float64
+
+    // 定义float32类型
+    s2 := float32(1.3245)
+    fmt.Printf("%f\n", s2) // 1.324500
+    fmt.Printf("%T\n", s2) // float32
 }
 ```
 
@@ -765,12 +752,12 @@ package main
 import "fmt"
 
 func main() {
-	var s1 bool // 只声明布尔值不赋值，默认值是false
-	s2 := true
-	fmt.Printf("%T\n", s1) // bool
-	fmt.Printf("%T\n", s1) // bool
-	fmt.Printf("%v\n", s1) // false
-	fmt.Printf("%v\n", s2) // true
+    var s1 bool // 只声明布尔值不赋值，默认值是false
+    s2 := true
+    fmt.Printf("%T\n", s1) // bool
+    fmt.Printf("%T\n", s1) // bool
+    fmt.Printf("%v\n", s1) // false
+    fmt.Printf("%v\n", s2) // true
 }
 ```
 
@@ -792,21 +779,21 @@ package main
 import "fmt"
 
 func main() {
-  // 字符串
-	s1 := "hello"
-	fmt.Printf("%T\n", s1) // string
-	fmt.Printf("%#v\n", s1) // hello
-	
-  // 单独的字母，汉字、符号表示一个字符
-	s2 := 'h'
-	s3 := 'e'
-	fmt.Printf("%T\n", s2) // int32
-	fmt.Printf("%v\n", s2) // 104
-	fmt.Printf("%v\n", s3) // 101
-  
-  // 字节: 1字节=8bit(8个二进制位)
-  // 1个字符'A'等于1个字节
-  // 1个utf8编码的汉字'沙' 一般占3个字节
+    // 字符串
+    s1 := "hello"
+    fmt.Printf("%T\n", s1) // string
+    fmt.Printf("%#v\n", s1) // hello
+
+    // 单独的字母，汉字、符号表示一个字符
+    s2 := 'h'
+    s3 := 'e'
+    fmt.Printf("%T\n", s2) // int32
+    fmt.Printf("%v\n", s2) // 104
+    fmt.Printf("%v\n", s3) // 101
+
+    // 字节: 1字节=8bit(8个二进制位)
+    // 1个字符'A'等于1个字节
+    // 1个utf8编码的汉字'沙' 一般占3个字节
 }
 ```
 
