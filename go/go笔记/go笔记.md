@@ -1874,7 +1874,9 @@ func main() {
 >
 > 这里的`<<`表示左移操作，`1<<10`表示将1的二进制表示向左移10位，也就是由`1`变成了`10000000000`，也就是十进制的1024
 >
-> 同理`2<<2`表示将2的二进制表示向左移2位，也就是由`10`变成了`1000`，也就是十进制的8。
+> 同理`2<<2`表示将2的二进制表示向左移2位，也就是由`10`变成了`1000`，也就是十进制的8
+>
+> 左移与右移常用于权限配置这一类设置
 
 ```go
 package main
@@ -1901,13 +1903,365 @@ func main() {
 
 ### 1、数组
 
-> 类似于其他语言的列表，比如`python`的`list`、`shell`语言的数组
+> 数组类似于其他语言的列表，比如`python`的`list`、`shell`语言的数组，但又完全不一样
 >
-> 常用来存储元素的
+> 常用来存储元素，元素是基本数据类型：字符串、整型、布尔值
+>
+> - 注意
+>   - `go`中的数组需要指定长度和类型
+>   - 并且长度和元素类型是数组整个类型的一部分，这是和其他语言的不一样的地方
+>
+> - 数组使用场景不多，用的比较多的是切片
+
+#### 1.1 数组声明
+
+> 数组定义以后长度和类型都确定好了，不能再修改
+>
+> 数组定义以后都有一个零值，也叫默认值
+>
+> - 字符串类型初始值为`""`
+> - 整型类型初始值为0
+> - 布尔类型初始值为`false`
 
 ```go
-// 
+// 格式
+var 数组名 [数组长度]数组类型
+
+// 输出元素
+变量名 := 数组名[索引值] 
 ```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var arr1 [3]int
+	var arr2 [3]string
+	var arr3 [3]bool
+	fmt.Printf("%v\n", arr1) // [0 0 0]
+
+	// 可以看到arr1的类型不仅包含长度，还包含了元素类型
+	fmt.Printf("%T\n", arr1) // [3]int
+
+	fmt.Printf("%v\n", arr2) // [     ]
+	fmt.Printf("%T\n", arr2) // [3]string
+
+	fmt.Printf("%v\n", arr3) // [false false false]
+	fmt.Printf("%T\n", arr3) // [3]bool
+}
+```
+
+#### 1.2 数组比较
+
+> `数组长度和元素类型是数组整个类型的一部分`
+>
+> 这是和其他语言的不一样的地方
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var arr1 [3]int
+	var arr2 [3]int
+	var arr3 [4]int
+
+	fmt.Println(arr1 == arr2) // true
+	fmt.Println(arr1 == arr3)  // invalid operation: arr1 == arr3 (mismatched types [3]int and [4]int)
+}
+
+// arr1 == arr3 不能比较，会报错，因为长度也是数组的一部分,那么arr1和arr3不相等
+// 会报错：invalid operation: arr1 == arr3 (mismatched types [3]int and [4]int)
+// 翻译过来就是：无效操作：arr1 == arr3（类型[3]int和[4]int不匹配）
+```
+
+![image-20211206173943254](go%E7%AC%94%E8%AE%B0.assets/image-20211206173943254.png)
+
+#### 1.3 数组初始化
+
+> 为什么要对数组初始化？
+>
+> - 定义完数组后，`go`会自动给数组元素设置初始的零值(默认值)，这应该不是我们想要的，所以要对数组已经设置的值进行重新赋值，所以需要初始化，相当于覆盖了默认值
+> - 数组定义以后都有一个零值，也叫默认值
+>   - 字符串类型初始值为`""`
+>   - 整型类型初始值为0
+>   - 布尔类型初始值为`false`
+> - 注意
+>   - 当声明数组后初始化直接赋值时，一定要先对数组声明
+>   - 数组初始化可以用短变量声明方式进行初始化
+
+> 下面代码是初始化数组的三种方式
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var arr1 [3]int
+	fmt.Println(arr1) // [0 0 0]
+
+	// 数组初始化
+	// 初始化方法1
+	// 也可以对声明的数字进行重新赋值
+	arr1 = [3]int{1, 2, 3}
+	fmt.Println(arr1) // [1 2 3]
+
+	// 初始化方法2
+	// 可以用短变量方式直接定义数组
+	// 根据初始化的值的个数自动推导长度，但如果长度比较大，比如100、1000这种就会比较麻烦
+	arr2 := [...]int{1,2,3,4,5,6,7}
+	fmt.Println(arr2) // [1 2 3 4 5 6 7]
+
+	// 初始化方法3
+	// 根据索引来初始化，其他元素用零值(默认值)补全
+	arr3 := [5]int{0:1, 4:2}
+	fmt.Println(arr3) // [1 0 0 0 2]
+}
+```
+
+#### 1.4 数组的遍历
+
+> 对数组进行变量，使用`for`循环
+
+> c语言风格for循环
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var arr1 [3]string
+	arr1 = [3]string{"sam", "bob", "lily"}
+
+	// c语言风格for循环
+	for i := 0; i < len(arr1); i++ {
+		fmt.Printf("%v: %v\n",i, arr1[i])
+	}
+}
+
+// 输出
+/*
+    0: sam
+    1: bob
+    2: lily
+*/
+```
+
+> `for range`循环数组
+>
+> `for range`只有一个变量时，这个值为索引值
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// for range遍历
+	arr2 := [...]string{"jix", "sem", "eop"}
+	for i, v := range arr2 {
+		fmt.Printf("%v:%v\n", i, v)
+	}
+}
+
+// 输出
+/*
+    0:jix
+    1:sem
+    2:eop
+*/
+```
+
+#### 1.5 多维数组
+
+##### 1.5.1 定义多维数组
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 多维数组
+	// [[1 2] [3 4] [5 6]]
+	var arr1 [3][2]int
+	fmt.Println(arr1) // [[0 0] [0 0] [0 0]]
+
+	// 初始化
+	arr1 = [3][2]int{
+		[2]int{1, 2},
+		[2]int{3, 4},
+		[2]int{5, 6},
+	}
+	fmt.Println(arr1) // [[1 2] [3 4] [5 6]]
+}
+```
+
+##### 1.5.2 遍历多维数组
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 多维数组
+	// [[1 2] [3 4] [5 6]]
+	var arr1 [3][2]int
+	fmt.Println(arr1) // [[0 0] [0 0] [0 0]]
+
+	// 初始化
+	arr1 = [3][2]int{
+		[2]int{1, 2},
+		[2]int{3, 4},
+		[2]int{5, 6},
+	}
+	fmt.Println(arr1) // [[1 2] [3 4] [5 6]]
+
+	// C语言风格
+	for i := 0; i < len(arr1); i++ {
+		for j:= 0; j < len(arr1[i]); j++ {
+			fmt.Printf("每个元素: %v\n", arr1[i][j])
+		}
+	}
+
+	// for range风格
+	for _, v1 := range arr1 {
+		fmt.Printf("\n最外层的元素: %v\n", v1)
+		for _, v2 := range v1 {
+			fmt.Printf("最里面的元素: %v\n", v2)
+		}
+	}
+}
+```
+
+![image-20211206181116451](go%E7%AC%94%E8%AE%B0.assets/image-20211206181116451.png)
+
+
+
+#### 1.6 数组是值类型
+
+> 将一个`A数组`赋值给另一个`B数组`，这样就相当于是将`A`数组完全复制了一份给`B数组`
+>
+> 修改`B数组`的元素，不会影响`A数组`，相当于`B数组`是`A数组`的副本，完全拷贝了`A数组`一份
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 数组是值类型
+	s1 := [...]int{1, 2, 3}
+	s2 := s1
+	s2[0] = 100
+
+	fmt.Println(s1) // [1 2 3]
+	fmt.Println(s2) // [100 2 3]
+}
+```
+
+#### 1.7 数组例题
+
+> 求数组元素的所有和
+
+```go
+func addArrSum() {
+	s1 := [...]int{1, 2, 3, 4, 5}
+	sum := 0
+	for _, v := range s1 {
+		sum = sum + v
+	}
+	fmt.Printf("sum = %v", sum)
+}
+```
+
+> 求数组和为数组中指定的两个元素的下标
+>
+> 例如：[1,2,3,4,5]
+>
+> 求和为5的两个元素的下标
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := [...]int{1, 2, 3, 4, 5}
+	const sum = 5
+	for i:= 0; i < len(s1); i++ {
+		for j := i + 1; j < len(s1); j++ {
+			if s1[i] + s1[j] == sum {
+				fmt.Printf("(%v, %v)\n", i, j)
+			} else {
+				continue
+			}
+		}
+ 	}
+}
+
+/*		
+输出
+	(0, 3)
+	(1, 2)
+*/
+```
+
+### 2、切片
+
+> `!!!比较重要`
+
+> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
