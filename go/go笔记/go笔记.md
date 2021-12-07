@@ -2416,7 +2416,7 @@ func main() {
 }
 ```
 
-#### 2.4 由数组得到切片
+#### 2.3 由数组得到切片
 
 > 可以由原始数组得到切片，和`python`的切片操作一致
 >
@@ -2733,7 +2733,17 @@ func main() {
 
 #### 2.12 切片`append`添加元素
 
-> 调用`append`函数必须要用原数组变量名接收返回值
+> - 调用`append`函数必须要用原数组变量名接收返回值
+>
+> - 追加元素时，原来的底层数组放不下时，`go`会将底层数组更换一个新的数组内存地址，并且新的数组内存地址进行了自动扩容，那么更换了个那就必须接收，所以要用原来的切片变量名来进行接收
+>
+> - 自动扩容有时候是原来数组长度的2倍
+> - `append`函数可以追加一个元素，追加多个元素，追加切片
+
+```go
+// 格式
+切片 = append(切片变量名，需要追加的元素)
+```
 
 ```go
 package main
@@ -2743,9 +2753,111 @@ import "fmt"
 func main() {
 	// 定义切片
 	s1 := []string{"sam", "bob", "lily"}
+	fmt.Printf("%v\n", s1)
+	fmt.Printf("len(s1)=%v  cap(s1)=%v\n", len(s1), cap(s1)) // len(s1)=3  cap(s1)=3
 
 	// 调用append函数必须要用原数组变量名接收返回值
+	// 追加一个元素
 	s1 = append(s1, "six_people")
+	fmt.Printf("%v\n", s1) // [sam bob lily six_people]
+	fmt.Printf("len(s1)=%v  cap(s1)=%v\n", len(s1), cap(s1)) // len(s1)=4  cap(s1)=6
+
+	// 追加多个元素
+	s1 = append(s1, "aliy", "wide")
+	fmt.Printf("%v\n", s1) // [sam bob lily six_people wide wide]
+	fmt.Printf("len(s1)=%v  cap(s1)=%v\n", len(s1), cap(s1)) // len(s1)=4  cap(s1)=6
+}
+```
+
+> 将一个切片追加到另一个切片
+>
+> `append`函数里追加另一个切片
+>
+> - `s1 = append(s1, s2...)`
+> - `s2...`表示将s2切片拆开，不是省略号
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义切片
+	s1 := []string{"sam", "bob", "lily"}
+	fmt.Printf("%v\n", s1)
+	fmt.Printf("len(s1)=%v  cap(s1)=%v\n", len(s1), cap(s1)) // len(s1)=3  cap(s1)=3
+
+	// 追加一个切片
+	s2 := []string{"lining", "xiaohong"}
+    
+    // s2... 表示将s2拆开，不是省略号，将s2切片整个都追加到s1切片
+	s1 = append(s1, s2...)
+	fmt.Printf("%v\n", s1) // [sam bob lily lining xiaohong]
+	fmt.Printf("len(s1)=%v  cap(s1)=%v\n", len(s1), cap(s1)) // len(s1)=7  cap(s1)=12
+
+}
+```
+
+#### 2.13 切片`copy`
+
+> 由于切片是引用类型，当把一个切片指向另一个切片时，修改一个切片的值，另一个切片也会跟着修改
+>
+> 为了解决这种问题，引入了`copy`函数
+>
+> - `copy`函数可以快速的将一个切片完整复制到另一个切片空间中
+> - 即使修改了原始的切片元素值，`copy`过去的切片对应位置的元素值也不会修改
+
+```go
+// 格式
+copy(目标切片， 源切片 []T)
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义切片
+	s1 := []int{1, 2, 3}
+	s2 := s1
+	s3 := make([]int, 3)
+    // copy切片，s3是目标切片，s1是源切片
+	copy(s3, s1)
+    
+    // 修改源切片s1的第一个元素值为100
+	s1[0] = 100
+	fmt.Printf("s1 = %v\n", s1) //  [100 2 3]
+	fmt.Printf("s2 = %v\n", s2) //  [100 2 3]
+	fmt.Printf("s3 = %v\n", s3) //  [1 2 3]
+}
+
+// 可以看到s3 copy了s1切片后，即使s1的元素值修改了，s3的也不会变
+```
+
+#### 2.14 切片删除元素
+
+> `go`语言中没有特定删除切片指定元素的方法，需要自己写
+
+```go
+// 格式
+a := []int{1,2,3,4,5,6}
+a = append(a[:index], a[index+1:]...)
+
+// 这三个点(...)是表示拆开，不是省略号的意思
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 删除切片指定索引位置元素
+	s1 := []int{1, 2, 3, 4, 5}
+
+	// 比如删除索引位置为2，值为3的元素
+	s1 = append(s1[:2], s1[3:]...)
 	fmt.Printf("%v\n", s1)
 }
 ```
