@@ -10,7 +10,7 @@
 
 - [Typora](https://www.typora.io/)：一款`MarkDown`编写软件
 
-  - `Typora`使用[主题](https://theme.typora.io/): `drake-vue`，对该主题做了如下修改
+  - `Typora`使用[主题](https://theme.typora.io/theme/Drake/): `drake-vue`，对该主题做了如下修改
 
     - 手动修改了该主题的侧边栏颜色，修改为黑色
 
