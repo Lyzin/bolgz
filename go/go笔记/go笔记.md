@@ -2239,8 +2239,9 @@ func main() {
 > 切片声明时只指定了类型，不指定切片长度，不过切片底层还是数组
 >
 > - 切片声明以后
->   - 切片是没有零值的，这个和数组是很大的区别
->   - 没有零值那这个切片的值是空，也就是`nil`，在其他编程语言里表示空，`redis`里表示空就是用`nil`表示
+>   - 切片是没有零值(默认值)的，这个和数组是很大的区别
+>   - 因为该切片长度为0，容量也为0
+>   - 切片没有零值(默认值)，那这个切片的值是空，一个元素都没有，该切片的值就是`nil`，在其他编程语言里表示空，`redis`里表示空就是用`nil`表示
 >   - 声明切片和nil相比较等于关系，一定是`true`
 
 ```go
@@ -2389,8 +2390,168 @@ func main() {
 
 ![image-20211206194604406](go%E7%AC%94%E8%AE%B0.assets/image-20211206194604406.png)
 
-#### 2.5 切片是引用类型验证
 
+
+#### 2.5 切片再切片
+
+> 可以对切片再进行切片，但是索引长度不能超过原数组长度，否则会出现数组索引越界情况 
+>
+> - `切片是引用类型，指向了底层数组`:
+>   - 引用类型：表示切片和原始数组都指向了同一个数组
+>   - 修改了底层数组的元素值，那么切片对应位置元素的值也会被修改
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var s1 []int
+	s1 = []int{1,2,3,4,5,6}
+
+	// 先对定义的切片s1进行切片s2
+	s2 := s1[2:]
+	fmt.Printf("%v\n", s2)
+	fmt.Printf("len(s2)=%v cap(s2)=%v\n", len(s2), cap(s2))
+
+	// 再对切片s2再进行切片出来s3
+	s3 := s2[1:2]
+	fmt.Printf("%v\n", s3)
+	fmt.Printf("len(s3)=%v cap(s3)=%v\n", len(s3), cap(s3))
+
+	// 切片是引用类型，指向了底层数组
+	// 可以看到修改了原始切片s1，对应的s2切片的值也会修改成和s1一样
+	s1[4] = 400
+	fmt.Printf("%v\n", s2)
+}
+```
+
+#### 2.6 `make`函数定义切片
+
+> 上面的`切片声明`、`由数组获得切片`都是基于数组而产生切片，这两种方式创建的切片，长度和容量是由原始数组限制了，不能超过原始数组的长度和容量，没法在指定切片的时候就指定切片的长度和容量，那有没有直接定义切片的方式，那就是`make`函数
+>
+> - `make`函数是内置函数，可以动态创建切片
+>   - 为什么说动态呢？
+>     - 因为`make`提供了两个参数：`size`和`cap`，可以自由指定切片长度和容量，
+
+```go
+// make函数创建切片
+make([]T, size, cap)
+
+// []T: 表示切片的类型
+// size: 表示切片的长度，也就是len()切片元素个数返回的值
+// cap: 表示切片的容量，也就是cap()切片容量返回的值
+// 当size、cap参数只写一个数字时，表示size和cap都是同一个值
+```
+
+```go	
+package main
+
+import "fmt"
+
+func main() {
+    // 只写size的值，表示size和cap参数值都是同一个
+	s1 := make([]int, 5)
+	fmt.Printf("%v\n",s1) // [0 0 0 0 0]
+	fmt.Printf("len(s1)=%v cap(s1)=%v\n",len(s1), cap(s1)) // len(s1)=5 cap(s1)=5
+	
+    // 下面表示切片长度为0，容量为10
+    // s2=[]，表示底层数组就是空的,但是这个切片的容量长度是10
+	s2 := make([]int, 0, 10)
+	fmt.Printf("%v\n",s2) // 
+	fmt.Printf("len(s2)=%v cap(s2)=%v\n",len(s2), cap(s2))  // len(s1)=0 cap(s1)=10
+}
+```
+
+#### 2.7 切片比较运算
+
+> 因为切片是`引用类型`，不能使用`==`来进行两个切片的全部元素是否相等比较
+>
+> 切片只能和`nil`进行比较
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	s1 := make([]int, 5)
+
+	s2 := make([]int, 5)
+	fmt.Println(s1 == s2)
+}
+
+// 下图的报错提示了slice只能用nil来比较
+```
+
+![image-20211207130223515](go%E7%AC%94%E8%AE%B0.assets/image-20211207130223515.png)
+
+
+
+#### 2.8 切片`nil`值
+
+> - 只有声明切片方式得到的切片的值是`nil`
+>
+> - 切片值是`nil`
+>   - 这个切片的长度和容量都是0
+>   - 表示这个切片是没有底层数组的
+> - 不能说`长度为0`、`容量为0`的切片一定是`nil`
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 声明一个切片，它的值才是nil
+	var s1 []int
+	fmt.Println(s1 == nil) // true
+	fmt.Printf("s1=%#v len(s1)=%v cap(s1)=%v\n", s1, len(s1), cap(s1)) // s1=[]int(nil) len(s1)=0 cap(s1)=0
+
+	// 短变量声明并初始化一个切片，可以看到s2的长度和容量都是0，但是s2不等于nil
+	s2 := []int{}
+	fmt.Printf("s2=%#v len(s2)=%v cap(s2)=%v\n", s2, len(s2), cap(s2)) // s2=[]int{} len(s2)=0 cap(s2)=0
+	fmt.Println(s2 == nil) // false
+
+	// make函数构造一个切片
+	s3 := make([]int, 0)
+	fmt.Println(s3 == nil) // false
+	fmt.Printf("s3=%#v len(s3)=%v cap(s3)=%v\n", s3, len(s3), cap(s3)) // s3=[]int{} len(s3)=0 cap(s3)=0
+}
+```
+
+#### 2.9 判断切片是否为空
+
+> 判断切片是否为空，不能用`nil`判断，而是要用`len() == 0`
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 声明一个切片，它的值才是nil
+    // s1长度是0
+	var s1 []int
+	fmt.Printf("s1=%#v len(s1)=%v cap(s1)=%v\n", s1, len(s1), cap(s1)) // s1=[]int(nil) len(s1)=0 cap(s1)=0
+	fmt.Println(len(s1) == 0) // true
+
+	// 短变量声明并初始化一个切片，可以看到s2的长度和容量都是0，s2的长度是0
+	s2 := []int{}
+	fmt.Printf("s2=%#v len(s2)=%v cap(s2)=%v\n", s2, len(s2), cap(s2)) // s2=[]int{} len(s2)=0 cap(s2)=0
+	fmt.Println(len(s2) == 0) // true
+
+}
+```
+
+![image-20211207132221179](go%E7%AC%94%E8%AE%B0.assets/image-20211207132221179.png)
+
+
+
+#### 2.x 切片是引用类型验证
+
+> `切片是引用类型，指向了底层数组`
+>
 > 下面是切片属于引用类型的验证
 >
 > - 可以看到从`数组s1`进行了切片得到了`切片s2`
@@ -2424,7 +2585,11 @@ func main() {
 }
 ```
 
-#### 2.6 `make`函数定义切片
+#### 2.8 切片本质
+
+> 切片本质就是一个框，框住了一段连续的内存区域，真正的数据是保存在底层数组中
+>
+> 切片是引用类型
 
 
 
