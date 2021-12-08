@@ -5,6 +5,8 @@
 > 官网：[https://golang.org/dl/](https://golang.org/dl/)
 >
 > 国内镜像站：[https://golang.google.cn/dl](https://golang.google.cn/dl)
+>
+> 流程图地址：[https://app.diagrams.net/](https://app.diagrams.net/)
 
 ### 2、Go优势
 
@@ -2909,6 +2911,8 @@ func main() {
 }
 ```
 
+![image-20211208141932267](go%E7%AC%94%E8%AE%B0.assets/image-20211208141932267.png)
+
 #### 2.15 切片是引用类型验证
 
 > `切片是引用类型，指向了底层数组`
@@ -2960,9 +2964,22 @@ func main() {
 
 #### 2.17 切片练习题
 
-> 
+> `for`循环生成切片
 
+```go
+package main
 
+import "fmt"
+
+func main() {
+	// 创建切片,下面是长度为5，有5个0的切片
+	s1 := make([]int, 5, 10)
+	for i := 0; i < 10; i++{
+		s1 = append(s1, i)
+	}
+	fmt.Printf("%v", s1) // 追加到5个0后面，所以结果是: [0 0 0 0 0 0 1 2 3 4 5 6 7 8 9]
+}
+```
 
 
 
