@@ -2981,15 +2981,75 @@ func main() {
 }
 ```
 
+### 3、指针
+
+> `go`语言中不存在指针运算，仅可以操作指针
+>
+> go中操作指针
+> `&` : 取变量的内存地址，内存地址是一个16进制数
+>
+> `*` : 根据内存地址取值，获取到的是这个内存地址指向的原始值
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 查看内存地址：&
+	age := 18
+	ageMemAddr := &age
+	fmt.Printf("%v\n", age) // 18
+	fmt.Printf("%v\n", ageMemAddr) // 0xc000128008
+
+	// 根据内存地址取具体值
+    ageVal := *ageMemAddr  // ageVal的值表示是一个内存地址(也叫指针)
+	fmt.Printf("%v\n", ageVal) // 18
+	fmt.Printf("%T\n", ageVal) // int
+}
+```
+
+![image-20211208192024388](go%E7%AC%94%E8%AE%B0.assets/image-20211208192024388.png)
 
 
 
+### 4、new
 
+> `new`函数用来申请内存地址
 
+```go
+package main
 
+import "fmt"
 
+func main() {
+	// var 声明变量时需要指定类型，下面是给a1指定的类型是 指针类型，表示我想定义一个空指针变量, 然后对这个空指针经过*号获取原来的值进行重新赋值
+	// 但是指针类型的零值是nil，
+	// 所以会报错：panic: runtime error: invalid memory address or nil pointer dereference，翻译过来: 解除对空指针的引用
+	//var a1 *int
+	//fmt.Printf("%v\n", a1)
+	//*a = 100
 
+	// new函数申请内存地址
+	var a2 = new(int)
+	// 申请了一个内存地址
+	fmt.Printf("%v\n", a2)  // 0xc00001e098
+	// *a2表示根据内存地址找到对应的值
+	fmt.Printf("%v\n", *a2) // 0
+	// 重新对这个内存地址对应的值进行赋值,因为它是一个int类型的内存地址,所以int类型的零值是0，所以输出为0
+	// 再对这个内存地址对应的值重新赋值为100，其实可以把(*a2)理解为一个变量名，一开始它的值是0，下面重新又赋一个值100
+	*a2 = 100
+	// 再次打印出该内存地址对应的值
+	fmt.Printf("%v\n", *a2) // 100
+}
+```
 
+### 5、make
+
+> `make`也是用于内存分配，区别于`new`
+>
+> - 只用于切片`slice`、`map`、`chanl`的内存创建
+> - 并且返回的是上面这三种类型本身，不是他们的指针类型, 因为这三种属于引用类型
 
 
 
