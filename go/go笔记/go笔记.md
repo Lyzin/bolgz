@@ -7,6 +7,8 @@
 > 国内镜像站：[https://golang.google.cn/dl](https://golang.google.cn/dl)
 >
 > 流程图地址：[https://app.diagrams.net/](https://app.diagrams.net/)
+>
+> [golang内置库文档](https://studygolang.com/pkgdoc)
 
 ### 2、Go优势
 
@@ -3061,6 +3063,8 @@ func main() {
 >
 > 必须初始化才可以用
 
+#### 6.1 `var`关键字声明`map`
+
 ```go
 // 格式
 map[KeyType]ValueType
@@ -3069,22 +3073,200 @@ map[KeyType]ValueType
 // ValueType:表示值类型
 ```
 
-> `map`类型初始值是`nil`，需要使用`make()`函数来分配内存
+> 从下面代码可以看到
+>
+> - `var`关键字声明的`map`本来就是`map[]`，本质的值是`nil`,所以和`nil`比较是`true`
+> - `map`的类型是包含了`KeyType`和`ValueType`，`key-value`的`type`也是`map`整个类型的一部分
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 声明map
+	var m1 map[string]int
+	fmt.Printf("%v\n", m1) // map[]
+	fmt.Printf("%#v\n", m1) // map[string]int(nil)
+    fmt.Printf("m1==nil:%v\n", m1==nil) // m1==nil:true
+	fmt.Printf("%T\n", m1) // map[string]int
+}
+```
+
+> `map`类型初始值是`nil`，不能直接给`map`来赋值，会报错的
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义map
+	var m1 map[string]int
+	m1["age"] = 18
+	fmt.Printf("%v\n", m1["age"])
+
+}
+// 会看到有一个panic错误
+```
+
+![image-20211208233358205](go%E7%AC%94%E8%AE%B0.assets/image-20211208233358205.png)
+
+
+
+#### 6.2 `map`初始化
+
+> 如果只是用var声明了一个`map`,并没有初始化，那这个`map`的值是`nil`，表示还没有初始化（也就是没有在内存里开辟空间）
+>
+> 需要使用`make()`函数来分配内存，也就是初始化`map`
+
+> 先来看看`make()`函数初始化格式
 
 ```go
 make(map[KeyType]ValueType, [cap])
-
 // make的第一个参数：map[KeyType]ValueType 表示是一个map类型
 // make的第二个参数： [cap]表示map的容量，非必填参数，但还需要给指定一个容量
 ```
 
+```go
+package main
 
+import "fmt"
 
+func main() {
+	// 定义map
+	var m1 map[string]int
+	m1 = make(map[string]int, 10) // 
+	m1["age1"] = 18
+	m1["age2"] = 28
+	m1["age2"] = 900
+	fmt.Printf("%v\n", m1) // map[age1:18 age2:900]
+	fmt.Printf("%v\n", m1["age1"]) // 18
+	fmt.Printf("%v\n", m1["age2"]) // 900
+}
+```
 
+> 从上面代码可以看出，在初始化好`map`以后：
+>
+> - 可以正常填充键值对
+> - 当键有多个一样时，最终在`map`里只会留下最后一个相同的`key-value`
+> - 因为容量是可以自动扩容的，所以建议在使用`make`函数定义容量时，估算好容量，避免自动扩容，因为自动扩容会增大运行速度
 
+6.3 `map`获取`key-value`
 
+> `map`取值也是用中括号里面放`key`来取值，和`python`一样
+>
+> 注意：
+>
+> - 取值时是可以接收两个值，第一个是值本身，第二个是这个值是否存在的布尔说明，如果存在则返回`true`，不存在则返回`false`
+>   - `v1, ok := m1["age1"]` 这个ok是约定成俗的一个接收`key`是否存在的变量，就和`python`面向对象里的`self`一样,换成别的也可以
+>     - 所以就可以用`ok`这个值来判断`key`是否存在
+>   - 当获取的`key`不存在时，`ok`是`false`,并且查找的值是值类型的零值(默认值)
 
+```go
+package main
 
+import "fmt"
+
+func main() {
+	// 定义map
+	var m1 map[string]int
+	m1 = make(map[string]int, 10)
+	m1["age1"] = 18
+	m1["age2"] = 28
+	m1["age3"] = 900
+	fmt.Printf("%v\n", m1)
+	fmt.Printf("%v\n", m1["age1"])
+	fmt.Printf("%v\n", m1["age2"])
+
+	v1, ok := m1["age1"]
+	fmt.Printf("v1=%v ok=%v\n", v1, ok) // v1=18 ok=true
+	fmt.Printf("v1=%T ok=%T\n", v1, ok) // v1=int ok=bool
+	if ok {
+		fmt.Printf("age1的val:%v\n", v1)
+	} else {
+		fmt.Printf("age1这个key不存在\n")
+	}
+
+	// 如果key不存在直接去获取，那么拿到的是对应值类型的零值(默认值)
+	v2， ok := m1["age"]
+	fmt.Printf("v2=%v\n", v2) // v2=0 ok=false
+}
+```
+
+#### 6.3 `map`遍历
+
+> 使用`for range`来遍历`map`
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义map
+	var m1 map[string]int
+	m1 = make(map[string]int, 10)
+	m1["age1"] = 18
+	m1["age2"] = 28
+	m1["age3"] = 900
+
+	// 遍历map的key-value
+	fmt.Printf("遍历map的key-value\n")
+	for k,v := range m1 {
+		fmt.Printf("%v:%v\n",k,v)
+	}
+
+	// 只遍历map的key
+	fmt.Printf("\n只遍历map的key\n")
+	for k := range m1 {
+		fmt.Printf("%v\n",k)
+	}
+
+	// 只遍历map的value
+	fmt.Printf("\n只遍历map的value\n")
+	for _, v := range m1 {
+		fmt.Printf("%v\n",v)
+	}
+}
+```
+
+#### 6.4 删除键值对
+
+> 使用`delete函数`删除`map`的键值对
+>
+> 当删除的`key`不存在时，不做任何处理
+
+```go
+// 格式
+delete(map, key)
+
+// map: 表示要删除的map
+// key: 表示要删除的键值对的键
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 定义map
+	var m1 map[string]int
+	m1 = make(map[string]int, 10)
+	m1["age1"] = 18
+	m1["age2"] = 28
+	m1["age3"] = 900
+
+	// 删除键值对
+	delete(m1, "age1")
+	fmt.Printf("%v\n", m1) // map[age2:28 age3:900]
+
+	// 删除不存在的键
+	delete(m1, "age")
+	fmt.Printf("%v\n", m1) // map[age2:28 age3:900]
+}
+```
 
 
 
