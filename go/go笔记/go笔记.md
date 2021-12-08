@@ -3013,9 +3013,11 @@ func main() {
 
 
 
-### 4、new
+### 4、`new`(很少用)
 
 > `new`函数用来申请内存地址
+>
+> `new`很少用，一般用来给基础数据类型申请内存，string\int, 返回的是对应类型指针 
 
 ```go
 package main
@@ -3044,16 +3046,37 @@ func main() {
 }
 ```
 
-### 5、make
+### 5、`make`和`new`的区别
 
 > `make`也是用于内存分配，区别于`new`
 >
 > - 只用于切片`slice`、`map`、`chanl`的内存创建
 > - 并且返回的是上面这三种类型本身，不是他们的指针类型, 因为这三种属于引用类型
 
+### 6、`map`
 
+> `map`是一种无序的基于`key-value`的数据结构
+>
+> `map`属于引用类型
+>
+> 必须初始化才可以用
 
+```go
+// 格式
+map[KeyType]ValueType
 
+// KeyType:表示键类型
+// ValueType:表示值类型
+```
+
+> `map`类型初始值是`nil`，需要使用`make()`函数来分配内存
+
+```go
+make(map[KeyType]ValueType, [cap])
+
+// make的第一个参数：map[KeyType]ValueType 表示是一个map类型
+// make的第二个参数： [cap]表示map的容量，非必填参数，但还需要给指定一个容量
+```
 
 
 
