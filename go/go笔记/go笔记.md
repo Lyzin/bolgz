@@ -2738,11 +2738,10 @@ func main() {
 #### 2.12 切片`append`添加元素
 
 > - 调用`append`函数必须要用原数组变量名接收返回值
->
-> - 追加元素时，原来的底层数组放不下时，`go`会将底层数组更换一个新的数组内存地址，并且新的数组内存地址进行了自动扩容，那么更换了个那就必须接收，所以要用原来的切片变量名来进行接收
->
+>- 追加元素时，原来的底层数组放不下时，`go`会将底层数组更换一个新的数组内存地址，并且新的数组内存地址进行了自动扩容，那么更换了个那就必须接收，所以要用原来的切片变量名来进行接收
 > - 自动扩容有时候是原来数组长度的2倍
-> - `append`函数可以追加一个元素，追加多个元素，追加切片
+>- `append`函数可以追加一个元素，追加多个元素，追加切片
+>   - 相当于是两个切片相加
 
 ```go
 // 格式
@@ -3062,6 +3061,8 @@ func main() {
 > `map`属于引用类型
 >
 > 必须初始化才可以用
+>
+> `map`和`python`里的`dict`很类似
 
 #### 6.1 `var`关键字声明`map`
 
@@ -3116,6 +3117,8 @@ func main() {
 
 #### 6.2 `map`初始化
 
+##### 6.2.1 `var`关键字初始化
+
 > 如果只是用var声明了一个`map`,并没有初始化，那这个`map`的值是`nil`，表示还没有初始化（也就是没有在内存里开辟空间）
 >
 > 需要使用`make()`函数来分配内存，也就是初始化`map`
@@ -3152,7 +3155,30 @@ func main() {
 > - 当键有多个一样时，最终在`map`里只会留下最后一个相同的`key-value`
 > - 因为容量是可以自动扩容的，所以建议在使用`make`函数定义容量时，估算好容量，避免自动扩容，因为自动扩容会增大运行速度
 
-6.3 `map`获取`key-value`
+##### 6.2.2 短变量初始化
+
+> `map`也可以使用短变量进行初始化，省去了声明的步骤，一步做到声明+初始化
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	// map
+	m1 := make(map[int]string, 5)
+	m1[0] = "bob"
+	m1[1] = "sam"
+	m1[2] = "alop"
+	
+	fmt.Printf("%v\n", m1) // map[0:bob 1:sam 2:alop]
+}
+
+```
+
+#### 6.3 `map`获取`key-value`
 
 > `map`取值也是用中括号里面放`key`来取值，和`python`一样
 >
@@ -3231,7 +3257,7 @@ func main() {
 }
 ```
 
-#### 6.4 删除键值对
+#### 6.5 删除键值对
 
 > 使用`delete函数`删除`map`的键值对
 >
@@ -3268,9 +3294,140 @@ func main() {
 }
 ```
 
+#### 6.6 `map`和切片互相转换
 
+> `map`里可以放切片，同时切片里可以放`map`
 
+##### 6.6.1 切片的元素值是`map`
 
+> 切片的每个元素的值都是`map`类型
+>
+> 注意：
+>
+> - 因为定义的切片的元素是`map`，所以要对每个元素还要进行分配内存初始化(`make`函数分配内存)
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	// 元素类型为map的切片
+	
+	// 先对切片初始化，分配内存空间
+	var s1  = make([]map[string]int, 5, 5)
+	
+	// 需要先对切片里，内部的map进行初始化
+	s1[0] = make(map[string]int, 1)
+	s1[1] = make(map[string]int, 1)
+	s1[2] = make(map[string]int, 1)
+	
+	// 重新赋值
+	s1[0]["name1"] = 13
+	s1[1]["name2"] = 23
+	s1[2]["name3"] = 33
+	
+	fmt.Printf("%v\n", s1)
+	fmt.Printf("%v\n", s1[2]["name3"])
+}
+
+```
+
+##### 6.6.2 `map`的元素值是切片
+
+> `map`的每个元素的值都是切片
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	// map的键值对的值是切片类型
+	
+	// 定义并初始化map,并且ValueType是一个切片类型: []int
+	var m1  = make(map[string][]int, 5)
+	
+	fmt.Printf("%v\n", m1) // map[]
+	
+	// 对切片类型进行初始化
+	m1["name1"] = make([]int, 5, 5)
+	m1["name2"] = make([]int, 5, 5)
+	
+	// 对切片进行重新赋值
+	m1["name1"] = []int{1,2,3}
+	m1["name2"] = []int{4,5,6}
+	
+	fmt.Printf("%v\n", m1) // map[name1:[1 2 3] name2:[4 5 6]]
+}
+
+```
+
+#### 6.7 `map`练习题
+
+>  `map`可以用来统计长段字符串里每个单词出现的次数，下面是`go`/`python`版本
+
+```go
+// go版本
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	// how do you do每个单词出现的次数
+	longStr := "how do you do"
+	
+	// 将字符串转换成切片
+	longStrToList := strings.Split(longStr, " ")
+	
+	// 声明一个空map
+	longStrToMap := make(map[string]int, 6)
+	for _, v := range longStrToList {
+		_, ok := longStrToMap[v]
+		if !ok {
+			longStrToMap[v] = 1
+		} else {
+			longStrToMap[v]++
+		}
+	}
+	fmt.Printf("\n%v\n", longStrToMap)
+}
+```
+
+![image-20211209122734426](go%E7%AC%94%E8%AE%B0.assets/image-20211209122734426.png)
+
+```python
+# python版本
+def cal_words_times():
+    # 统计"how do you do"每个单词出现的次数
+    say_hi = "how do you do"
+    say_hi_list = say_hi.split(" ")
+
+    say_hi_dict = {}
+    for i in say_hi_list:
+        if not i in say_hi_dict:
+            say_hi_dict[i] = 1
+        else:
+            say_hi_dict[i] += 1
+    return say_hi_dict
+```
+
+![image-20211209122721022](go%E7%AC%94%E8%AE%B0.assets/image-20211209122721022.png)
+
+> 其实能够看出来，`go`和`python`语法有较多类似的地方，核心编程思想都是一样的，就是看如何用不同语言去实现
+
+## 八、函数
+
+> 比较重要的语法: `函数`
+
+### 1、函数定义
 
 
 
