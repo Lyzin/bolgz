@@ -750,6 +750,10 @@ func main() {
 > 字符串的值为`双引号(")`中的内容
 >
 > `Go`语言中字符串必须是双引号`(")`，单引号`(')`表示字符
+>
+> `golang`中`string`底层是通过`byte数组`实现的
+>
+> 中文字符在`unicode`下占`2个字节`，在`utf-8编`码下占`3个字节`，而`golang`默认编码正好是`utf-8`,所以一个中文表示3个字符
 
 #### 4.1 字符串
 
@@ -1008,6 +1012,32 @@ func main() {
 	fmt.Printf("%T\n", s2) // float64
 }
 ```
+
+### 5、rune类型
+
+> - rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
+> - int32的别名，几乎在所有方面等同于int32，它用来区分字符值和整数值
+
+```go
+type rune = int32
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	
+	var str = "hello 你好"
+	fmt.Println("len(str):", len(str)) // 12
+	
+}
+```
+
+> - 结果是12
+>   - 因为`go`是`utf-8`编码，而`go`底层字符串是用`byte`编码的，一个汉字表示3个字符
+>   - 所以`str`的长度是`hello(5个字符)`+`空格(1个字符)`+`你好(6个字符)`=`12个字符`
 
 ## 五、流程控制
 
@@ -3477,8 +3507,11 @@ func 函数名(参数) (返回值) {
 > 命名的返回值：
 >
 > - 相当于是在函数中提前声明一遍变量，比如下面的`ret`
-> - 可以在函数中直接使用
-> - 并且return时不需要显式指出`ret`这个变量名，因为都在函数定义时已经指明了返回值名字叫`ret`
+>   - 可以在函数中直接使用,因为在函数定义时已经声明了`ret`这个变量
+>   - 并且return时不需要显式指出`ret`这个变量名，因为都在函数定义时已经指明了返回值名字叫`ret`
+> - 并且需要用`括号`将命名的返回值包裹起来`(ret int)`
+>   - 表示返回值的变量名是`ret`，并且是一个`int`类型
+> - 当然不管是形参、还是返回值变量名可以定义，也可不定义，不定义就只写返回类型，但是需要在函数`return`时显式的指定返回值
 
 ```go
 // 有参数有返回值
@@ -3490,17 +3523,242 @@ func f1(a int, b int) (ret int) {
 
 #### 1.2 函数定义变种
 
-> 
+> 下面的几种变种都是围绕`1.1`来扩展的
 
-as
+##### 1.2.1 有形参但没有返回值
 
+> 只有`形参`，没有返回值
+>
+> 没有返回值的函数，不能用变量接收函数，直接`函数名+()`执行就可以
 
+```go
+package main
 
+import (
+	"fmt"
+)
 
+func main() {
+	add(1,2)
+	add(10,20)
+}
+
+func add(a int, b int){
+	c := a + b
+	fmt.Printf("%v + %v = %v\n",a,b,c)
+}
+```
+
+##### 1.2.2 没有形参但有返回值
+
+> 只有返回值，没有形参
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	ret := add()
+	fmt.Printf("ret = %v\n", ret)
+}
+
+func add() int{
+	c := 1 + 3
+	return c
+}
+
+```
+
+##### 1.2.3 没有形参和返回值
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	add()
+	// fmt.Printf("ret = %v\n", ret)
+}
+
+func add(){
+	s := 45
+	fmt.Printf("%v\n", s)
+}
+```
+
+##### 1.2.4 返回值没有指定变量名
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	ret := add()
+	fmt.Printf("ret = %v\n", ret)
+}
+
+func add() int{
+	s := 45
+	return s
+}
+```
+
+##### 1.2.5 返回值有多个
+
+> - 返回值有多个，用括号包裹，然后逗号隔开
+> - 在执行函数时，返回多少个值，必须用多少个值来接收
+>   - 或者考虑将多个返回值组装成`切片`或者`map`返回
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	x,y,z := add(1,2)
+	fmt.Printf("%v\n", x) // 1
+	fmt.Printf("%v\n", y) // 2
+	fmt.Printf("%v\n", z) // 3
+}
+
+func add(x,y int) (int,int,int) {
+	z := x + y
+	return x, y, z
+}
+```
+
+##### 1.2.6 形参类型省略
+
+> 当传入多个形参的类型都一样时，可以值留最后一个形参的类型，前面的都可以省略，这个只适用于同种类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := add(1,2)
+	fmt.Printf("%v\n", ret) // 3
+}
+
+func add(x, y int) (ret int) {
+	ret = x + y
+	return ret
+}
+```
 
 #### 1.3 可变长参数
 
 > 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个切片类型
+>
+> 可变长参数使用三个点(`...`)表示,如下面的形参的`y`
+>
+> 可变长参数必须放在形参后面
+
+```go
+// 格式
+func 函数名(形参 ...T)
+
+// 形参: 形参名
+// ...T: 可变长参数的类型
+```
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	x, y := add(1,2,3)
+	fmt.Printf("x = %v\n", x)
+	fmt.Printf("y = %v\n", y)
+}
+
+func add(x int, y ...int) (int, []int){
+	fmt.Printf("x: %v\n", x)
+	fmt.Printf("y: %v\n", y)
+	fmt.Printf("y type: %T\n", y)
+	return x,y
+}
+```
+
+#### 1.4 形参没有默认值
+
+> `go`语言中形参是没有默认值，不像`python`的函数，可以在形参指定一个默认值
+
+#### 1.5 函数`defer`
+
+> 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.x 练习题例子
+
+> 统计字符串里中文字符出现的次数
+
+```go
+package main
+
+import (
+	"fmt"
+	"unicode"
+)
+
+func main() {
+	// 判断字符串中汉字的字符数量
+	// 思路：
+	// 1、拿到字符串的字符
+	// 2、判断字符串是否是汉字
+	// 3、然后统计中文字符出现的次数
+	s := "hello新年是新的年"
+	
+	ret := 0
+	// 1、拿到字符串的字符
+	for _, v := range s {
+		// 2、判断字符串是否是汉字
+		if unicode.Is(unicode.Han, v) {
+			ret += 1
+		} else {
+			continue
+		}
+	}
+	
+	fmt.Printf("中文字符出现次数:%v\n", ret) // 6
+	
+}
+
+
+
+```
 
