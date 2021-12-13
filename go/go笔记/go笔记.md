@@ -3110,6 +3110,8 @@ func main() {
 
 > `make`也是用于内存分配，区别于`new`
 >
+> `make`区别点:
+>
 > - 只用于切片`slice`、`map`、`chanl`的内存创建
 > - 并且返回的是上面这三种类型本身，不是他们的指针类型, 因为这三种属于引用类型
 
@@ -3658,7 +3660,7 @@ func add(x, y int) (ret int) {
 
 #### 1.3 可变长参数
 
-> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个切片类型
+> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`
 >
 > 可变长参数使用三个点(`...`)表示,如下面的形参的`y`
 >
@@ -3686,9 +3688,9 @@ func main() {
 }
 
 func add(x int, y ...int) (int, []int){
-	fmt.Printf("x: %v\n", x)
-	fmt.Printf("y: %v\n", y)
-	fmt.Printf("y type: %T\n", y)
+	fmt.Printf("x: %v\n", x) 
+	fmt.Printf("y: %v\n", y) //[2, 3]
+	fmt.Printf("y type: %T\n", y) // []int
 	return x,y
 }
 ```
@@ -3697,7 +3699,162 @@ func add(x int, y ...int) (int, []int){
 
 > `go`语言中形参是没有默认值，不像`python`的函数，可以在形参指定一个默认值
 
-#### 1.5 函数`defer`
+#### 1.5 变量作用域
+
+##### 1.5.1 全局作用域
+
+> 全局作用域是指定义在函数外部区域，这里的变量可以在全局的任意位置访问到
+>
+> - 函数中查找变量的规则顺序：
+>   1. 先在函数内部查找
+>   2. 如果可以找到，就是用函数内部定义的变量
+>   3. 如果找不到，那就在函数外部的全局变量查找，找到则是用
+>   4. 在函数内部、函数外部都找不到，会报`undefined`的错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var x int = 10  // 定义的是全局变量
+
+func main() {
+	/*
+	函数中查找变量的规则顺序
+	1、先在函数内部查找
+	2、如果可以找到，就是用函数内部定义的变量
+	3、如果找不到，那就在函数外部的全局变量查找，找到则是用
+	4、在函数内部、函数外部都找不到，会报undefined的错误
+	*/
+	x = 123
+	fmt.Printf("x=%v\n", x) // 123
+}
+```
+
+> 如果变量在函数内外都没有定义，因为找不到该变量，会报`undefined`错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var x int = 10  // 定义的是全局变量
+
+func main() {
+	x = 123
+	fmt.Printf("x=%v\n", x) // 123
+	
+	// 输出变量y
+	fmt.Printf("y=%v\n", y) // undefined
+}
+```
+
+![image-20211213144417133](go%E7%AC%94%E8%AE%B0.assets/image-20211213144417133.png)
+
+##### 1.5.2 局部作用域
+
+> 局部作用域就是在函数内部区域的
+>
+> 局部作用域和全局作用域变量重名，优先使用局部作用域，表示是`就近原则`
+
+##### 1.5.3 语法块作用域
+
+> `go`语言中一些语法块也有自己的作用域，比如:`if循环`、`for循环`、`switch语句`常见的这三种
+>
+> 如果在语法块外部访问语法块内部的变量，都会报`undefined`错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	x := 13
+	if x > 13 {
+		y := 23
+		fmt.Printf("y=%v\n", y) // if语句内的变量只能if语句内访问到，if外面访问不到
+	}
+	
+	fmt.Printf("y=%v\n", y) // undefined: y
+
+	s1 := []int{1,2,3,4,5}
+	for _, v := range s1 {
+		d := 99
+		fmt.Printf("v=%v\n", v)
+		fmt.Printf("d=%v\n", d)
+	}
+	fmt.Printf("d=%v\n", d) // undefined: d
+	
+}
+```
+
+#### 1.6 函数类型变量
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.x 函数`defer`
 
 > 
 
