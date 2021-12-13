@@ -3794,19 +3794,183 @@ func main() {
 }
 ```
 
-#### 1.6 函数类型变量
+#### 1.6 形参是函数类型
+
+> 函数传入的形参时需要指定类型，形参的类型除了`int`/`string`/`boolean`，还可以是函数类型
+>
+
+> 那什么是函数类型？下面代码展示了什么是函数类型
+>
+> - 从`main`函数可以看出
+>   - `f1`函数的类型是`func()`
+>   - `f2`函数的类型是`func() int`
+>   - `f3`函数的类型是`func(int, string) int`
+> - 所以函数类型是什么依据与函数定义时，设置的形参类型和返回值类型
+
+```go
+package main
+
+import (
+	"fmt"
+)
 
 
+func f1() {
+	fmt.Printf("这是f1")
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+func f3(x int, y string) int{
+	fmt.Printf("x=%v\n", x)
+	fmt.Printf("y=%v\n", y)
+	ret := 33
+	return ret
+}
 
 
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+> 知道了函数类型是什么，那么就可以将函数类型作为形参的一种类型传入函数中
+>
+> - 下面代码的函数`f3`定义时，给形参`x`指定的类型是`func() int`,
+>   - `func() int`类型就表示形参`x`的类型是一个函数类型，并且这个函数类型本身是没有形参传入，但是有一个`int`型的返回值
+>   - 执行`x()`就相当于是在执行`func() int`这个类型的函数
+>     - `func() int`函数有一个返回值是2，那么`x()`的结果就是`4`,所以函数`f3`里的`ret`值就是`4`,并且`ret`是整型，所以可以作为函数`f3`的返回值
+
+```go
+package main
+
+import (
+	"fmt"
+)
 
 
+func f1() {
+	fmt.Printf("这是f1")
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+func f3(x func() int) int{
+	ret := x()
+	return ret
+}
 
 
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3(f2)
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+#### 1.7 函数返回值是函数类型
+
+> 形参的类型可以使函数类型，那么函数返回值也可以是函数类型
+>
+> `func() int`是一种函数类型，作为了函数返回值，那么最后在`f3`返回时，就可以把符合`func() int`类型的返回值的函数返回，比如`f1`函数
+
+```go
+package main
+
+import (
+	"fmt"
+)
 
 
+func f1() int{
+	return 33
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+// 返回值是函数类型
+func f3(x func() int) func() int{
+	return f1
+}
 
 
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3(f2)
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+#### 1.8 匿名函数
+
+> 声明函数时，没有指定函数名
+>
+> 在函数内部没法声明一个`带名字`的函数，但是可以声明匿名函数
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 声明匿名函数
+	// 在函数内部定义
+	f1 := func(a, b int) int{
+		c := a + b
+		return c
+	}
+	ret := f1(10,20)
+	fmt.Printf("ret: %v\n", ret)
+	
+	// 如果是执行调用一次，可以定义成立即执行函数
+	func (x, y int) {
+		z := x + y
+		fmt.Printf("z = %v\n", z)
+	}(12,14)
+}
+```
+
+#### 1.9 函数闭包
+
+> 
 
 
 
