@@ -3970,7 +3970,84 @@ func main() {
 
 #### 1.9 函数闭包
 
-> 
+> 函数闭包是指：函数与外部变量的引用，就叫闭包
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+
+
+func f1() {
+	fmt.Printf("this is from f1\n")
+}
+
+func f2(x, y int) int {
+	z := x + y
+	return z
+}
+
+func f3(f func()) {
+	fmt.Printf("this is from f1\n")
+	// 这里执行closeBag返回的匿名函数
+	f()
+}
+
+
+func closeBag(f func(int, int) int, x int, y int) func() {
+	temp := func() {
+		// 这里会执行符合条件的f2函数
+		ret := f(x, y)
+		fmt.Printf("ret:%v\n", ret)
+	}
+	return temp
+}
+
+func fileSuffixData(sufstr string) func(string) string{
+	temp := func(name string) string {
+		if ! strings.HasSuffix(name, sufstr) {
+			fmt.Printf("文件不是以%v结尾的\n", sufstr)
+			fmt.Printf("传入的name:%v \t 传入的sufstr:%v\n", name, sufstr)
+			name = name + sufstr
+		} else {
+			fmt.Printf("文件是以%v结尾的\n", sufstr)
+		}
+		return name
+	}
+	fmt.Printf("temp的值:%v\n", temp)
+	return temp
+}
+
+
+func main() {
+	// 直接执行f1函数
+	f1()
+	
+	f1 := f1
+	fmt.Printf("f1: %v\n", f1)
+	fmt.Printf("f1: %#v\n", f1)
+	fmt.Printf("f1的类型: %T\n", f1) //func()
+	
+	fmt.Println("\n\n执行闭包函数！！！！\n")
+	closeBag := closeBag(f2, 10, 10)
+	fmt.Printf("closeBag: %v\n", closeBag)
+	fmt.Printf("closeBag Type is: %T\n", closeBag)
+	
+	f3(closeBag)
+	
+	jpgSuffix := fileSuffixData(".jpg")
+	fmt.Printf("jpgSuffix值是:%v\t jpgSuffix的类型是:%T\n", jpgSuffix, jpgSuffix)
+	fmt.Printf("ret:%v", jpgSuffix("name"))
+	
+	
+}
+
+
+```
 
 
 
