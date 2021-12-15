@@ -750,6 +750,10 @@ func main() {
 > 字符串的值为`双引号(")`中的内容
 >
 > `Go`语言中字符串必须是双引号`(")`，单引号`(')`表示字符
+>
+> `golang`中`string`底层是通过`byte数组`实现的
+>
+> 中文字符在`unicode`下占`2个字节`，在`utf-8编`码下占`3个字节`，而`golang`默认编码正好是`utf-8`,所以一个中文表示3个字符
 
 #### 4.1 字符串
 
@@ -1008,6 +1012,32 @@ func main() {
 	fmt.Printf("%T\n", s2) // float64
 }
 ```
+
+### 5、rune类型
+
+> - rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
+> - int32的别名，几乎在所有方面等同于int32，它用来区分字符值和整数值
+
+```go
+type rune = int32
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	
+	var str = "hello 你好"
+	fmt.Println("len(str):", len(str)) // 12
+	
+}
+```
+
+> - 结果是12
+>   - 因为`go`是`utf-8`编码，而`go`底层字符串是用`byte`编码的，一个汉字表示3个字符
+>   - 所以`str`的长度是`hello(5个字符)`+`空格(1个字符)`+`你好(6个字符)`=`12个字符`
 
 ## 五、流程控制
 
@@ -3080,6 +3110,8 @@ func main() {
 
 > `make`也是用于内存分配，区别于`new`
 >
+> `make`区别点:
+>
 > - 只用于切片`slice`、`map`、`chanl`的内存创建
 > - 并且返回的是上面这三种类型本身，不是他们的指针类型, 因为这三种属于引用类型
 
@@ -3477,8 +3509,11 @@ func 函数名(参数) (返回值) {
 > 命名的返回值：
 >
 > - 相当于是在函数中提前声明一遍变量，比如下面的`ret`
-> - 可以在函数中直接使用
-> - 并且return时不需要显式指出`ret`这个变量名，因为都在函数定义时已经指明了返回值名字叫`ret`
+>   - 可以在函数中直接使用,因为在函数定义时已经声明了`ret`这个变量
+>   - 并且return时不需要显式指出`ret`这个变量名，因为都在函数定义时已经指明了返回值名字叫`ret`
+> - 并且需要用`括号`将命名的返回值包裹起来`(ret int)`
+>   - 表示返回值的变量名是`ret`，并且是一个`int`类型
+> - 当然不管是形参、还是返回值变量名可以定义，也可不定义，不定义就只写返回类型，但是需要在函数`return`时显式的指定返回值
 
 ```go
 // 有参数有返回值
@@ -3490,17 +3525,758 @@ func f1(a int, b int) (ret int) {
 
 #### 1.2 函数定义变种
 
-> 
+> 下面的几种变种都是围绕`1.1`来扩展的
 
-as
+##### 1.2.1 有形参但没有返回值
 
+> 只有`形参`，没有返回值
+>
+> 没有返回值的函数，不能用变量接收函数，直接`函数名+()`执行就可以
 
+```go
+package main
 
+import (
+	"fmt"
+)
 
+func main() {
+	add(1,2)
+	add(10,20)
+}
+
+func add(a int, b int){
+	c := a + b
+	fmt.Printf("%v + %v = %v\n",a,b,c)
+}
+```
+
+##### 1.2.2 没有形参但有返回值
+
+> 只有返回值，没有形参
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	ret := add()
+	fmt.Printf("ret = %v\n", ret)
+}
+
+func add() int{
+	c := 1 + 3
+	return c
+}
+
+```
+
+##### 1.2.3 没有形参和返回值
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	add()
+	// fmt.Printf("ret = %v\n", ret)
+}
+
+func add(){
+	s := 45
+	fmt.Printf("%v\n", s)
+}
+```
+
+##### 1.2.4 返回值没有指定变量名
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	ret := add()
+	fmt.Printf("ret = %v\n", ret)
+}
+
+func add() int{
+	s := 45
+	return s
+}
+```
+
+##### 1.2.5 返回值有多个
+
+> - 返回值有多个，用括号包裹，然后逗号隔开
+> - 在执行函数时，返回多少个值，必须用多少个值来接收
+>   - 或者考虑将多个返回值组装成`切片`或者`map`返回
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	x,y,z := add(1,2)
+	fmt.Printf("%v\n", x) // 1
+	fmt.Printf("%v\n", y) // 2
+	fmt.Printf("%v\n", z) // 3
+}
+
+func add(x,y int) (int,int,int) {
+	z := x + y
+	return x, y, z
+}
+```
+
+##### 1.2.6 形参类型省略
+
+> 当传入多个形参的类型都一样时，可以值留最后一个形参的类型，前面的都可以省略，这个只适用于同种类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := add(1,2)
+	fmt.Printf("%v\n", ret) // 3
+}
+
+func add(x, y int) (ret int) {
+	ret = x + y
+	return ret
+}
+```
 
 #### 1.3 可变长参数
 
-> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个切片类型
+> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`
+>
+> 可变长参数使用三个点(`...`)表示,如下面的形参的`y`
+>
+> 可变长参数必须放在形参后面
+
+```go
+// 格式
+func 函数名(形参 ...T)
+
+// 形参: 形参名
+// ...T: 可变长参数的类型
+```
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	x, y := add(1,2,3)
+	fmt.Printf("x = %v\n", x)
+	fmt.Printf("y = %v\n", y)
+}
+
+func add(x int, y ...int) (int, []int){
+	fmt.Printf("x: %v\n", x) 
+	fmt.Printf("y: %v\n", y) //[2, 3]
+	fmt.Printf("y type: %T\n", y) // []int
+	return x,y
+}
+```
+
+#### 1.4 形参没有默认值
+
+> `go`语言中形参是没有默认值，不像`python`的函数，可以在形参指定一个默认值
+
+#### 1.5 变量作用域
+
+##### 1.5.1 全局作用域
+
+> 全局作用域是指定义在函数外部区域，这里的变量可以在全局的任意位置访问到
+>
+> - 函数中查找变量的规则顺序：
+>   1. 先在函数内部查找
+>   2. 如果可以找到，就是用函数内部定义的变量
+>   3. 如果找不到，那就在函数外部的全局变量查找，找到则是用
+>   4. 在函数内部、函数外部都找不到，会报`undefined`的错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var x int = 10  // 定义的是全局变量
+
+func main() {
+	/*
+	函数中查找变量的规则顺序
+	1、先在函数内部查找
+	2、如果可以找到，就是用函数内部定义的变量
+	3、如果找不到，那就在函数外部的全局变量查找，找到则是用
+	4、在函数内部、函数外部都找不到，会报undefined的错误
+	*/
+	x = 123
+	fmt.Printf("x=%v\n", x) // 123
+}
+```
+
+> 如果变量在函数内外都没有定义，因为找不到该变量，会报`undefined`错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+var x int = 10  // 定义的是全局变量
+
+func main() {
+	x = 123
+	fmt.Printf("x=%v\n", x) // 123
+	
+	// 输出变量y
+	fmt.Printf("y=%v\n", y) // undefined
+}
+```
+
+![image-20211213144417133](go%E7%AC%94%E8%AE%B0.assets/image-20211213144417133.png)
+
+##### 1.5.2 局部作用域
+
+> 局部作用域就是在函数内部区域的
+>
+> 局部作用域和全局作用域变量重名，优先使用局部作用域，表示是`就近原则`
+
+##### 1.5.3 语法块作用域
+
+> `go`语言中一些语法块也有自己的作用域，比如:`if循环`、`for循环`、`switch语句`常见的这三种
+>
+> 如果在语法块外部访问语法块内部的变量，都会报`undefined`错误
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	x := 13
+	if x > 13 {
+		y := 23
+		fmt.Printf("y=%v\n", y) // if语句内的变量只能if语句内访问到，if外面访问不到
+	}
+	
+	fmt.Printf("y=%v\n", y) // undefined: y
+
+	s1 := []int{1,2,3,4,5}
+	for _, v := range s1 {
+		d := 99
+		fmt.Printf("v=%v\n", v)
+		fmt.Printf("d=%v\n", d)
+	}
+	fmt.Printf("d=%v\n", d) // undefined: d
+	
+}
+```
+
+#### 1.6 形参是函数类型
+
+> 函数传入的形参时需要指定类型，形参的类型除了`int`/`string`/`boolean`，还可以是函数类型
+>
+
+> 那什么是函数类型？下面代码展示了什么是函数类型
+>
+> - 从`main`函数可以看出
+>   - `f1`函数的类型是`func()`
+>   - `f2`函数的类型是`func() int`
+>   - `f3`函数的类型是`func(int, string) int`
+> - 所以函数类型是什么依据与函数定义时，设置的形参类型和返回值类型
+
+```go
+package main
+
+import (
+	"fmt"
+)
 
 
+func f1() {
+	fmt.Printf("这是f1")
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+func f3(x int, y string) int{
+	fmt.Printf("x=%v\n", x)
+	fmt.Printf("y=%v\n", y)
+	ret := 33
+	return ret
+}
+
+
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+> 知道了函数类型是什么，那么就可以将函数类型作为形参的一种类型传入函数中
+>
+> - 下面代码的函数`f3`定义时，给形参`x`指定的类型是`func() int`,
+>   - `func() int`类型就表示形参`x`的类型是一个函数类型，并且这个函数类型本身是没有形参传入，但是有一个`int`型的返回值
+>   - 执行`x()`就相当于是在执行`func() int`这个类型的函数
+>     - `func() int`函数有一个返回值是2，那么`x()`的结果就是`4`,所以函数`f3`里的`ret`值就是`4`,并且`ret`是整型，所以可以作为函数`f3`的返回值
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+
+func f1() {
+	fmt.Printf("这是f1")
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+func f3(x func() int) int{
+	ret := x()
+	return ret
+}
+
+
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3(f2)
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+#### 1.7 函数返回值是函数类型
+
+> 形参的类型可以使函数类型，那么函数返回值也可以是函数类型
+>
+> `func() int`是一种函数类型，作为了函数返回值，那么最后在`f3`返回时，就可以把符合`func() int`类型的返回值的函数返回，比如`f1`函数
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+
+func f1() int{
+	return 33
+}
+
+func f2() int {
+	x := 4
+	return x
+}
+
+// 函数作为参数传入到函数里
+// 返回值是函数类型
+func f3(x func() int) func() int{
+	return f1
+}
+
+
+func main() {
+	f1 := f1
+	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
+	
+	f2 := f2
+	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
+	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
+	
+	f3 := f3(f2)
+	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+}
+```
+
+#### 1.8 匿名函数
+
+> 声明函数时，没有指定函数名
+>
+> 在函数内部没法声明一个`带名字`的函数，但是可以声明匿名函数
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 声明匿名函数
+	// 在函数内部定义
+	f1 := func(a, b int) int{
+		c := a + b
+		return c
+	}
+	ret := f1(10,20)
+	fmt.Printf("ret: %v\n", ret)
+	
+	// 如果是执行调用一次，可以定义成立即执行函数
+	func (x, y int) {
+		z := x + y
+		fmt.Printf("z = %v\n", z)
+	}(12,14)
+}
+```
+
+#### 1.9 函数闭包
+
+> 函数闭包是指：函数与外部变量的引用，就叫闭包
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+
+
+func f1() {
+	fmt.Printf("this is from f1\n")
+}
+
+func f2(x, y int) int {
+	z := x + y
+	return z
+}
+
+func f3(f func()) {
+	fmt.Printf("this is from f1\n")
+	// 这里执行closeBag返回的匿名函数
+	f()
+}
+
+
+func closeBag(f func(int, int) int, x int, y int) func() {
+	temp := func() {
+		// 这里会执行符合条件的f2函数
+		ret := f(x, y)
+		fmt.Printf("ret:%v\n", ret)
+	}
+	return temp
+}
+
+func fileSuffixData(sufstr string) func(string) string{
+	temp := func(name string) string {
+		if ! strings.HasSuffix(name, sufstr) {
+			fmt.Printf("文件不是以%v结尾的\n", sufstr)
+			fmt.Printf("传入的name:%v \t 传入的sufstr:%v\n", name, sufstr)
+			name = name + sufstr
+		} else {
+			fmt.Printf("文件是以%v结尾的\n", sufstr)
+		}
+		return name
+	}
+	fmt.Printf("temp的值:%v\n", temp)
+	return temp
+}
+
+
+func main() {
+	// 直接执行f1函数
+	f1()
+	
+	f1 := f1
+	fmt.Printf("f1: %v\n", f1)
+	fmt.Printf("f1: %#v\n", f1)
+	fmt.Printf("f1的类型: %T\n", f1) //func()
+	
+	fmt.Println("\n\n执行闭包函数！！！！\n")
+	closeBag := closeBag(f2, 10, 10)
+	fmt.Printf("closeBag: %v\n", closeBag)
+	fmt.Printf("closeBag Type is: %T\n", closeBag)
+	
+	f3(closeBag)
+	
+	jpgSuffix := fileSuffixData(".jpg")
+	fmt.Printf("jpgSuffix值是:%v\t jpgSuffix的类型是:%T\n", jpgSuffix, jpgSuffix)
+	fmt.Printf("ret:%v", jpgSuffix("name"))
+	
+	
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.x 函数`defer`
+
+> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 九、练习题例子
+
+#### 1、 练习题1
+
+> 统计字符串里中文字符出现的次数
+
+```go
+package main
+
+import (
+	"fmt"
+	"unicode"
+)
+
+func main() {
+	// 判断字符串中汉字的字符数量
+	// 思路：
+	// 1、拿到字符串的字符
+	// 2、判断字符串是否是汉字
+	// 3、然后统计中文字符出现的次数
+	s := "hello新年是新的年"
+	
+	ret := 0
+	// 1、拿到字符串的字符
+	for _, v := range s {
+		// 2、判断字符串是否是汉字
+		if unicode.Is(unicode.Han, v) {
+			ret += 1
+		} else {
+			continue
+		}
+	}
+	
+	fmt.Printf("中文字符出现次数:%v\n", ret) // 6
+	
+}
+
+
+
+```
 
