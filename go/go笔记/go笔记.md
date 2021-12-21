@@ -234,7 +234,7 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
 #### 6.3 `windows`下编译`mac`程序
 
 ```bash
-CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build
+set CGO_ENABLED=0 set GOOS=darwin set GOARCH=amd64 go build
 ```
 
 ## 三、变量与常量
@@ -3941,9 +3941,14 @@ func main() {
 
 #### 1.8 匿名函数
 
-> 声明函数时，没有指定函数名
->
-> 在函数内部没法声明一个`带名字`的函数，但是可以声明匿名函数
+> - `匿名函数`出现的原因：在函数内部没法声明一个带名字的函数，但是可以声明匿名函数
+> - `匿名函数`定义：
+>   - 声明函数时，没有指定函数名的函数叫匿名函数
+> - `匿名函数`出现的时机：一般都用在`函数内部`
+> - 如果函数只调用一次，那么匿名函数可以是`立即执行函数`
+>   - 立即执行函数就是在匿名函数定义后的后面放上括号表示立即执行
+> - 注意：
+>   - 匿名函数是不指定函数名，但是可以`带形参`和`返回值`
 
 ```go
 package main
@@ -3970,7 +3975,233 @@ func main() {
 
 #### 1.9 函数闭包
 
-> 函数闭包是指：函数与外部变量的引用，就叫闭包
+> `函数闭包`是指：函数与外部变量的引用，就叫闭包
+>
+> 闭包是一个函数，这个函数包含了他外部作用域的一个变量
+
+##### 1.9.1 类比替换形参为函数类型
+
+> 在作用域概念里，当前函数内部引用变量时，优先在自己的函数内部找，没有找到的话，就在函数外层找
+>
+> - 那么类型到下面的`closeBag`函数就可以看到：
+>
+>   - `tmp`变量接收一个匿名函数，里面打印一个变量`x`，这个变量在这个匿名函数里没有，就会往外层找，
+>
+>   - 可以看到外层函数的形参就是有一个变量`x`，那么打印的就是这个形参`x`的值
+>   - 从返回值可以看到变量`tmp`的值是匿名函数的`指针`(内存地址)，并且`tmp`的类型是`func()`,是一个函数类型，那么`tmp`加上括号就在执行这个匿名函数
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	closeBag(3)
+}
+
+func closeBag(x int) {
+	tmp := func() {
+		fmt.Printf("tmp匿名函数: %v", x)
+	}
+	fmt.Printf("tmp值: %v\n", tmp) // 0x4965c0
+	fmt.Printf("tmp带类型说明的值:%#v\n", tmp) // (func())(0x4965c0)
+
+	// 表示在执行tmp这个匿名函数
+	tmp() // tmp匿名函数: 3
+}
+
+/* 执行结果:
+	tmp值: 0x4965c0
+	tmp带类型说明的值:(func())(0x4965c0)
+	tmp匿名函数: 3
+*/
+```
+
+> 那么最外层的形参`x`可以是`int`类型，`x`类型替换一下就可以是`函数类型`
+>
+> - 要传入一个形参是函数类型，就必须先有一个这样的函数，才可以在`main`函数中进行调用，执行后才可以看到最终的效果
+>   - 因为在函数`closeBag`中传入的函数类型是`func(int, int)`,那么定义这种类型的函数就是`f1`
+>   - 另外`f1`函数需要接收两个`int`形参，那么在`closeBag`函数中的`tmp`匿名函数时就需要将这两个`int`形参定义
+> - 然后执行`closeBag`函数时，除了需要传入符合的函数类型`func(int, int)`外，还需要传入两个`int`变量`a和b`，因为他内部的`x`需要接收两个`int`形参
+> - 最后可以看到执行的结果：
+>   - 先打印了： `f1函数的内部地址:0x496460`
+>   - 接着打印了: `tmp值: 0x496730`
+>     - 可以看到tmp的内存地址是他自己的匿名函数的内存地址
+>   - 继续打印： `tmp带类型说明的值:(func())(0x496730)`
+>     - 可以看到tmp的类型是`func()`,表示他是一个匿名函数类型
+>   - 继续打印： `tmp匿名函数中的x: 0x496460`
+>     - 注意看这里的x是`tmp`匿名函数里传入的变量`x`,并且这个变量x的值是一个指针(函数内存地址)，该`x`的值和`f1`函数的内存地址一致，那就说明`x`等价于`f1`,所以执行`x(a,b)`就等价于执行`f1(a,b)`函数
+>   - 继续打印：`tmp匿名函数中的x: (func(int, int))(0x496460)`
+>     - 可以看到`x`的类型是`func(int, int)`,值是`0x496460`，和`f1`函数的内存地址一致
+>   - 最后打印：`4 + 5 = 9`
+>     - 这里就是在执行`f1`函数里的代码
+> - 至此可以看出`tmp`匿名函数就是闭包，接收外部喊出传入的参数，传入的参数类型可以使基础数据类型，也可以是函数类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Printf("f1函数的内部地址:%v\n",f1)
+	closeBag(f1, 4, 5)
+}
+
+// 因为要传入一个函数类型是: func(int, int)
+// 需要先定义一个符合这个类型条件的函数
+func f1(a, b int) {
+	fmt.Printf("%v + %v = %v\n", a, b, a + b)
+}
+
+func closeBag(x func(int, int), a, b int) {
+	tmp := func() {
+		fmt.Printf("tmp匿名函数中的x: %v\n", x)
+		fmt.Printf("tmp匿名函数中的x: %#v\n", x)
+		x(a, b)
+	}
+	fmt.Printf("tmp值: %v\n", tmp)
+	fmt.Printf("tmp带类型说明的值:%#v\n", tmp)
+
+	// 执行tmp这个匿名函数
+	tmp()
+}
+
+/*
+	执行结果：
+		f1函数的内部地址:0x496460
+        tmp值: 0x496730
+        tmp带类型说明的值:(func())(0x496730)
+        tmp匿名函数中的x: 0x496460
+        tmp匿名函数中的x: (func(int, int))(0x496460)
+        4 + 5 = 9
+*/
+```
+
+##### 1.9.2 闭包例子
+
+> 下面是闭包函数例子的一个分析
+
+> - 下面的`addr`函数：
+>   - `addr`函数没有形参，返回值是函数类型的`func(int) int`，表示返回值的类型是一个函数类型，并且这个返回值函数接收一个`int`变量，返回一个`int`
+>   - `addr`函数内部定义了一个`int`的`x`,赋值为`100`
+>   - 使用`tmp`接收一个带形参以及返回值的匿名函数，然后将`tmp`返回
+> - 从执行结果来看
+>   - `ret`就是`tmp`，是`addr`函数内部定义的匿名函数的内存地址，并且这个匿名函数符合`func(int) int`类型，是一个函数
+>   - 拿到了`ret`的内存地址，要执行`ret`函数，那就按格式输入对应的形参值，就可以得到返回值了，执行`ret`函数，就在执行`tmp`函数，也就是等价于`ret(y int) int`这个函数，那传入对应的`y`参数就可以了
+>   - 所以`x`是100，`y`是传入的200，最后结果就是300
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := addr()
+	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
+
+	data := ret(200)
+	fmt.Printf("data是:%v\n", data)
+}
+
+func addr() func(int) int {
+	var x int
+	x = 100
+	tmp := func(y int) int {
+		x += y // x += y 等价于 x = x + y
+		return x
+	}
+
+	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp)
+	return tmp
+}
+
+/*
+	执行结果：
+		addr函数内部 tmp的值和类型: (func(int) int)(0x496610)
+        main方法执行 ret的值和类型: (func(int) int)(0x496610)
+        data是:300
+*/
+```
+
+> 既然可以在`addr`里面定义`x`，那就可以将`x`放到`addr`函数的形参里，也表示把`x`写活了
+>
+> 可以看到执行结果和上面的一样
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := addr(100)
+	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
+
+	data := ret(200)
+	fmt.Printf("data是:%v\n", data)
+}
+
+func addr(x int) func(int) int {
+	tmp := func(y int) int {
+		x += y // x += y 等价于 x = x + y
+		return x
+	}
+
+	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp)
+	return tmp
+}
+
+/*
+	执行结果:
+		addr函数内部 tmp的值和类型: (func(int) int)(0x496610)
+        main方法执行 ret的值和类型: (func(int) int)(0x496610)
+        data是:300
+*/
+```
+
+> 既然`x`可以放到`addr`函数的形参里，并且类型是`int`，那么就可以对`x`类型替换为`函数类型`
+>
+> 继续分析`addr`函数:
+>
+> -  
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := addr(f1, 100)
+	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
+
+	data := ret(200)
+	fmt.Printf("data是:%v\n", data)
+}
+
+func f1(a int) int {
+	return a
+}
+
+func addr(x func(int) int, a int) func(int) int {
+	tmp := func(y int) int {
+		ret := x(a) + y
+		return ret
+	}
+
+	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp)
+	return tmp
+}
+
+/*
+        执行结果:
+            addr函数内部 tmp的值和类型: (func(int) int)(0x496610)
+            main方法执行 ret的值和类型: (func(int) int)(0x496610)
+            data是:300
+*/
+```
+
+
+
+
 
 ```go
 package main
@@ -3979,8 +4210,6 @@ import (
 	"fmt"
 	"strings"
 )
-
-
 
 func f1() {
 	fmt.Printf("this is from f1\n")
@@ -3996,7 +4225,6 @@ func f3(f func()) {
 	// 这里执行closeBag返回的匿名函数
 	f()
 }
-
 
 func closeBag(f func(int, int) int, x int, y int) func() {
 	temp := func() {
@@ -4022,7 +4250,6 @@ func fileSuffixData(sufstr string) func(string) string{
 	return temp
 }
 
-
 func main() {
 	// 直接执行f1函数
 	f1()
@@ -4042,8 +4269,6 @@ func main() {
 	jpgSuffix := fileSuffixData(".jpg")
 	fmt.Printf("jpgSuffix值是:%v\t jpgSuffix的类型是:%T\n", jpgSuffix, jpgSuffix)
 	fmt.Printf("ret:%v", jpgSuffix("name"))
-	
-	
 }
 
 
