@@ -2897,13 +2897,12 @@ func main() {
 // 可以看到s3 copy了s1切片后，即使s1的元素值修改了，s3的也不会变
 ```
 
-#### 2.14 切片删除元素
+#### 2.14 切片append删除元素
 
 > `go`语言中没有特定删除切片指定元素的方法，需要自己写
 >
-> `切片`修改的是底层数组
->
-> 切片在这里修改了某个值，底层数组的值也会进行修改
+> - `切片`修改的是底层数组
+> - 切片修改了某个值，底层数组的值也会进行修改，因为切片是引用类型，指向的也是底层的数组
 
 ```go
 // 格式
@@ -2927,6 +2926,12 @@ func main() {
 	fmt.Printf("%v\n", s1)
 }
 ```
+
+> 注意:
+>
+> - `append`切片删除元素时，给`append`里传入的第一个值一定必须是切片类型，不能是其他类型，否则会下面的报错，提示`append`第一个元素必须是切片(`slice`)
+
+![image-20211221193527755](go%E7%AC%94%E8%AE%B0.assets/image-20211221193527755.png)
 
 ```go
 package main
@@ -3024,7 +3029,7 @@ func main() {
 
 #### 2.17 切片练习题
 
-> `for`循环生成切片
+##### 2.17.1 `for`循环生成切片
 
 ```go
 package main
@@ -3041,6 +3046,59 @@ func main() {
 }
 ```
 
+##### 2.17.2 实现lstrip()函数
+
+> 编写删除字符串首部的空格代码，和`python`的`lstrip()`一样
+
+```go
+func strLeftStrip(s string) string {
+	//  去除字符串首位左侧的空格
+	if !strings.HasPrefix(s, " ") {
+		return s
+	}
+	// 将s转换为切片
+	sToSlice := strings.Split(s, "")
+	sToSlice = append(sToSlice[:0], sToSlice[1:]...)
+	ret := strings.Join(sToSlice, "")
+	return ret
+}
+```
+
+##### 2.17.3 实现rstrip()函数
+
+> 编写删除字符串尾部的空格代码，和`python`的`rstrip()`一样
+
+```go
+func strRightStrip(s string) string {
+	//  去除字符串首位左侧的空格
+	if !strings.HasSuffix(s, " ") {
+		return s
+	}
+	// 将s转换为切片
+	sToSlice := strings.Split(s, "")
+	sToSlice = append(sToSlice[0:len(sToSlice) - 1], "")
+	ret := strings.Join(sToSlice, "")
+	return ret
+}
+```
+
+##### 2.17.4 实现strip()函数
+
+> 编写删除字符串首部和尾部的空格代码，和`python`的`strip()`一样
+
+```go
+func strStrip(s string) string {
+	if !strings.HasSuffix(s, " ") && !strings.HasPrefix(s, " ") {
+		return s
+	}
+	// 先处理左侧首部空格
+	s = strLeftStrip(s)
+	
+	s = strRightStrip(s)
+	return s
+}
+```
+
 ### 3、指针
 
 > `go`语言中不存在指针运算，仅可以操作指针
@@ -3054,7 +3112,7 @@ func main() {
 >   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
 >   - 那么申请的内存空间的地址永远不会变，但是变量`a`的值可以变，也就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
 >
-> - 就是说申请好内存地址以后，可以放任意值进去，但是内存地址申请好以后是不会变得
+> - 就是说变量`a`申请好内存地址以后，可以放任意值进去，也可以对放进去的值进行修改(也叫重新赋值)，但是变量`a`的内存地址申请好以后是永远不会变的
 
 ![image-20211221174834896](go%E7%AC%94%E8%AE%B0.assets/image-20211221174834896.png)
 
@@ -4008,7 +4066,27 @@ func main() {
 
 > `函数闭包`是指：函数与外部变量的引用，就叫闭包
 >
-> 闭包是一个函数，这个函数包含了他外部作用域的一个变量
+> 闭包是指当一个函数内部有变量，并且这个函数内部的变量是引用的这个函数外部作用域的一个变量，就是闭包
+>
+> 常见于一个有名函数里包含了一个匿名函数，匿名函数里使用的变量引用的是有名函数定义的变量，如下代码
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ret := closeBag(3)
+	ret() // tmp匿名函数中x的值: 3
+}
+
+func closeBag(x int) func(){
+	tmp := func() {
+		fmt.Printf("tmp匿名函数中x的值: %v", x)
+	}
+	return tmp
+}
+```
 
 ##### 1.9.1 类比替换形参为函数类型
 
@@ -4359,7 +4437,55 @@ func main() {
 
 #### 1.x 函数`defer`
 
-> 
+> defer用来回收资源
+
+```go
+package main
+
+import "fmt"
+
+
+
+
+func main() {
+	a := 1
+	b := 2
+	defer calc("10", a, calc("10", a, b))
+	a = 0
+	defer calc("20", a, calc("20", a, b))
+	b = 1
+	
+}
+
+func calc(index string, a, b int) int{
+	ret := a + b
+	fmt.Printf("%#v %#v %#v %#v\n",index, a, b, ret)
+	return ret
+}
+// 第一个defer: defer calc("10", a, calc("10", a, b))
+// 先执行defer中的calc函数: calc("10", a, b) ==> calc("10", 1, 2) => return得到3，打印 "10", 1, 2, 3
+// 第一个defer就变成了: defer calc("10", 1, 3) 此时的defer先不执行存起来
+
+// 接着执行第二个defer: defer calc("20", a, calc("20", a, b))，并且a重新赋值为0, b仍等于2
+// 同样先执行第二个defer中的calc函数: calc("20", a, b) ==> calc("20", 0, 2) ==> return得到2， 打印"20", 0, 2, 2
+// 第二个defer就变成了: defer calc("20", 0, 2) 此时的defer也先不执行存起来
+
+// 接着继续往下走，将b重新赋值为了1
+// 再执行defer语句,有多个defer语句时,逆序执行defer语句代码
+// 所以第二个defer语句先执行, defer calc("20", 0, 2) ==> 打印"20", 0, 2, 2
+// 接着第二个defer语句执行, defer calc("10", 1, 3) ==> 打印"10", 1, 3, 4
+
+// 最后输出结果就是依次就是
+/*
+"10", 1, 2, 3
+"20", 0, 2, 2
+"20", 0, 2, 2
+"10", 1, 3, 4
+*/
+
+
+
+```
 
 
 
