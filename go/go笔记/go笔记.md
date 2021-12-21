@@ -3068,11 +3068,11 @@ func main() {
 	age := 18
 	ageMemAddr1 := &age
 	fmt.Printf("age的值:%v\n", age) // 18
-	fmt.Printf("age的内存地址: %p\n", ageMemAddr1) // 0xc000128008
+	fmt.Printf("age的内存地址: %p\n", ageMemAddr1) // 0xc00001e098
 	
 	// 根据内存地址取变量指向的具体值
 	ageVal1 := *ageMemAddr1
-	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal1)
+	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal1) // 18
 	
 	
 	fmt.Printf("\n对age重新赋值\n")
@@ -3080,13 +3080,13 @@ func main() {
 	// 对age重新赋值，但是age的内存地址不变，但是age指向的值会变
 	age = 28
 	ageMemAddr2 := &age
-	fmt.Printf("age的值:%v\n", age) // 18
-	fmt.Printf("age的内存地址: %v\n", ageMemAddr2) // 0xc000128008
+	fmt.Printf("age的值:%v\n", age) // 28
+	fmt.Printf("age的内存地址: %v\n", ageMemAddr2) // 0xc00001e098
 	
 	ageVal2 := *ageMemAddr2
-	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal2)
+	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal2) // 28
 	
-	fmt.Printf("\nage重新赋值后的内存地址没有变:%v\n", ageMemAddr1 == ageMemAddr2)
+	fmt.Printf("\nage重新赋值后的内存地址没有变:%v\n", ageMemAddr1 == ageMemAddr2) // true
 }
 
 /*
@@ -3103,10 +3103,6 @@ func main() {
         age重新赋值后的内存地址没有变:true
 */
 ```
-
-
-
-
 
 ### 4、`new`(很少用)
 
