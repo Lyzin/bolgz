@@ -645,6 +645,16 @@ func main() {
 
 ### 1、整型
 
+> https://www.jianshu.com/p/793efa912d4e
+>
+> https://www.jianshu.com/p/d02f454f6439#comments
+>
+> https://www.jianshu.com/p/d02f454f6439?ivk_sa=1024320u
+>
+> https://www.jianshu.com/p/a011fb51f2f4
+>
+> https://www.cnblogs.com/tmtony/p/11804575.html
+>
 > 整型分为以下两个大类，按长度分为：
 >
 > - 有符号整型：`int8、int16、int32、int64` 
