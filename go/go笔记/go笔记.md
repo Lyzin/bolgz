@@ -3050,6 +3050,14 @@ func main() {
 >
 > `*` : 根据内存地址取值，获取到的是这个内存地址指向的原始值
 
+> - 从下图和代码可以看出来
+>   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
+>   - 那么申请的内存空间的地址永远不会变，但是变量`a`的值可以变，也就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
+>
+> - 就是说申请好内存地址以后，可以放任意值进去，但是内存地址申请好以后是不会变得
+
+![image-20211221174834896](go%E7%AC%94%E8%AE%B0.assets/image-20211221174834896.png)
+
 ```go
 package main
 
@@ -3058,18 +3066,45 @@ import "fmt"
 func main() {
 	// 查看内存地址：&
 	age := 18
-	ageMemAddr := &age
-	fmt.Printf("%v\n", age) // 18
-	fmt.Printf("%v\n", ageMemAddr) // 0xc000128008
-
-	// 根据内存地址取具体值
-    ageVal := *ageMemAddr  // ageVal的值表示是一个内存地址(也叫指针)
-	fmt.Printf("%v\n", ageVal) // 18
-	fmt.Printf("%T\n", ageVal) // int
+	ageMemAddr1 := &age
+	fmt.Printf("age的值:%v\n", age) // 18
+	fmt.Printf("age的内存地址: %p\n", ageMemAddr1) // 0xc000128008
+	
+	// 根据内存地址取变量指向的具体值
+	ageVal1 := *ageMemAddr1
+	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal1)
+	
+	
+	fmt.Printf("\n对age重新赋值\n")
+	
+	// 对age重新赋值，但是age的内存地址不变，但是age指向的值会变
+	age = 28
+	ageMemAddr2 := &age
+	fmt.Printf("age的值:%v\n", age) // 18
+	fmt.Printf("age的内存地址: %v\n", ageMemAddr2) // 0xc000128008
+	
+	ageVal2 := *ageMemAddr2
+	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal2)
+	
+	fmt.Printf("\nage重新赋值后的内存地址没有变:%v\n", ageMemAddr1 == ageMemAddr2)
 }
+
+/*
+	执行结果:
+        age的值:18
+        age的内存地址: 0xc00001e098
+        根据age的内存地址取对应值:18
+
+        对age重新赋值
+        age的值:28
+        age的内存地址: 0xc00001e098
+        根据age的内存地址取对应值:28
+
+        age重新赋值后的内存地址没有变:true
+*/
 ```
 
-![image-20211208192024388](go%E7%AC%94%E8%AE%B0.assets/image-20211208192024388.png)
+
 
 
 
@@ -4082,13 +4117,14 @@ func closeBag(x func(int, int), a, b int) {
 > 下面是闭包函数例子的一个分析
 
 > - 下面的`addr`函数：
->   - `addr`函数没有形参，返回值是函数类型的`func(int) int`，表示返回值的类型是一个函数类型，并且这个返回值函数接收一个`int`变量，返回一个`int`
+>   - `addr`函数自身是没有形参，`addr`函数的返回值是函数类型(`func(int) int`)，表示返回值的类型是一个函数类型，并且这个函数类型返回值自身是先形参接收一个`int`变量，然后返回值是一个`int`
 >   - `addr`函数内部定义了一个`int`的`x`,赋值为`100`
->   - 使用`tmp`接收一个带形参以及返回值的匿名函数，然后将`tmp`返回
-> - 从执行结果来看
->   - `ret`就是`tmp`，是`addr`函数内部定义的匿名函数的内存地址，并且这个匿名函数符合`func(int) int`类型，是一个函数
->   - 拿到了`ret`的内存地址，要执行`ret`函数，那就按格式输入对应的形参值，就可以得到返回值了，执行`ret`函数，就在执行`tmp`函数，也就是等价于`ret(y int) int`这个函数，那传入对应的`y`参数就可以了
->   - 所以`x`是100，`y`是传入的200，最后结果就是300
+>   - 使用变量`tmp`接收一个带形参以及返回值的匿名函数，最后将`tmp`值`return`返回
+> - 从`addr`函数执行结果来看
+>   - `ret`就是`tmp`，是`addr`函数内部定义的`tmp`这个匿名函数的内存地址，并且该匿名函数符合`func(int) int`函数类型，所以`tmp`的值是一个函数内存地址
+>   - 因为`ret`的值是一个函数的内存地址，当拿到了`ret`的内存地址，要执行`ret`函数，那就按`ret`函数接收形参和返回值的格式输入对应的形参值，就可以得到返回值了
+>   - 执行`ret`函数，其实就是在执行`tmp`函数，相当于执行`ret(y int) int`,就是在执行``ret(y int) int`这个函数，只需要传入给函数对应的`y`参数就可以了
+>   - 最后因为`x`是100，`y`是传入的200，最后`addr`函数执行结果就是：`100 + 200 = 300`
 
 ```go
 package main
@@ -4123,9 +4159,9 @@ func addr() func(int) int {
 */
 ```
 
-> 既然可以在`addr`里面定义`x`，那就可以将`x`放到`addr`函数的形参里，也表示把`x`写活了
+> 既然可以在`addr`里面定义`x`，那就可以将`x`提出来，放到`addr`函数的形参里，这样是把`x`写活了，可以穿入任意的整数值
 >
-> 可以看到执行结果和上面的一样
+> 再次执行`addr`函数可以看到执行结果和上面的一样
 
 ```go
 package main
@@ -4160,7 +4196,7 @@ func addr(x int) func(int) int {
 
 > 既然`x`可以放到`addr`函数的形参里，并且类型是`int`，那么就可以对`x`类型替换为`函数类型`
 >
-> 继续分析`addr`函数:
+> 分析传入形参是函数类型的`addr`函数:
 >
 > -  
 
