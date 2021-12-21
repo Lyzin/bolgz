@@ -4170,20 +4170,23 @@ package main
 import "fmt"
 
 func main() {
-	ret := addr(f1, 100)
+	fmt.Printf("main方法里的f1函数: %#v\n", f1)
+
+	ret := addr(f1, 100, 200)
 	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
 
 	data := ret(200)
 	fmt.Printf("data是:%v\n", data)
 }
 
-func f1(a int) int {
-	return a
+func f1(a int, b int) int {
+	return a + b
 }
 
-func addr(x func(int) int, a int) func(int) int {
+func addr(x func(int, int) int, a int, b int) func(int) int {
 	tmp := func(y int) int {
-		ret := x(a) + y
+		fmt.Printf("tmp匿名函数中的x: %#v\n", x)
+		ret := x(a, b) + y
 		return ret
 	}
 
@@ -4193,9 +4196,11 @@ func addr(x func(int) int, a int) func(int) int {
 
 /*
         执行结果:
-            addr函数内部 tmp的值和类型: (func(int) int)(0x496610)
-            main方法执行 ret的值和类型: (func(int) int)(0x496610)
-            data是:300
+           main方法里的f1函数: (func(int, int) int)(0x496570)
+           addr函数内部 tmp的值和类型: (func(int) int)(0x4966b0)
+           main方法执行 ret的值和类型: (func(int) int)(0x4966b0)
+           tmp匿名函数中的x: (func(int, int) int)(0x496570)
+           data是:500
 */
 ```
 
