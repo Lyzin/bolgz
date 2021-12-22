@@ -1901,7 +1901,372 @@ obj = Foo()
 print(isinstance(obj,Foo))
 ```
 
+#### 5、time模块
 
+> 时间模块，比较常用
+
+##### 5.1 `time.time()`
+
+> 用于获取当前时间戳，从1970年到现在的秒数，如果要取的时间戳是毫秒级别，需要乘以1000
+
+```python
+import time
+
+# 1、时间戳: 从1970年到现在的秒数
+t1 = time.time()
+print("t1=", t1) # 2021-12-22 22:37:10
+```
+
+##### 5.2 `time.localtime()`
+
+> 用于获取结构化时间，常用来单独取时间的某一部分，比如年、月、日等
+
+> 看`time.localtime()`的实现源码：
+>
+> - 其实就解释了它可以接收`时间戳`(秒数，不是毫秒数)，然后转化为结构化时间
+> - 当然它的默认值是None，不传秒数就是取`当前时间戳`转化为结构化时间
+
+```python
+def localtime(seconds=None): # real signature unknown; restored from __doc__
+    """
+    localtime([seconds]) -> (tm_year,tm_mon,tm_mday,tm_hour,tm_min,
+                              tm_sec,tm_wday,tm_yday,tm_isdst)
+    
+    Convert seconds since the Epoch to a time tuple expressing local time.
+    When 'seconds' is not passed in, convert the current time instead.
+    """
+    pass
+```
+
+> 转化的例子
+
+```python
+import time
+
+# 结构花时间
+# 用于单独获取时间的某一部分
+# t4: time.struct_time(tm_year=2021, tm_mon=12, tm_mday=22, tm_hour=22, tm_min=38, tm_sec=55, tm_wday=2, tm_yday=356, tm_isdst=0)
+t4 = time.localtime()
+
+print("t4=", t4)
+print("t4 year=", t4.tm_year) # 2021
+print("t4 mon=", t4.tm_mon) # 12
+print("t4 mday=", t4.tm_mday) # 22
+
+# 传入一个时间戳，1640183901
+# t5: time.struct_time(tm_year=2021, tm_mon=12, tm_mday=20, tm_hour=22, tm_min=21, tm_sec=41, tm_wday=0, tm_yday=354, tm_isdst=0)
+t5 = time.localtime(1640010101)
+print("t5==>", t5)
+```
+
+##### 5.3 `time.strftime()`
+
+> 字符串格式显示的时间，常用对外展示比较可阅读的时间，比如：`2021-12-20 22:21:41`
+
+> 查看源码可以看出：
+>
+> - 主要用来将一个时间元祖(也就是结构化时间)，根据一定的格式进行转化
+> - 当时间元祖没有传入时，取当前时间的`time.localtime()`作为替代
+> - 所以可以使用将结构化时间传入给该函数
+
+```python
+def strftime(format, p_tuple=None): # real signature unknown; restored from __doc__
+    """
+    strftime(format[, tuple]) -> string
+    
+    Convert a time tuple to a string according to a format specification.
+    See the library reference manual for formatting codes. When the time tuple
+    is not present, current time as returned by localtime() is used.
+    
+    Commonly used format codes:
+    
+    %Y  Year with century as a decimal number.
+    %m  Month as a decimal number [01,12].
+    %d  Day of the month as a decimal number [01,31].
+    %H  Hour (24-hour clock) as a decimal number [00,23].
+    %M  Minute as a decimal number [00,59].
+    %S  Second as a decimal number [00,61].
+    %z  Time zone offset from UTC.
+    %a  Locale's abbreviated weekday name.
+    %A  Locale's full weekday name.
+    %b  Locale's abbreviated month name.
+    %B  Locale's full month name.
+    %c  Locale's appropriate date and time representation.
+    %I  Hour (12-hour clock) as a decimal number [01,12].
+    %p  Locale's equivalent of either AM or PM.
+    
+    Other codes may be available on your platform.  See documentation for
+    the C library strftime function.
+    """
+    return ""
+```
+
+> 转化的例子
+
+```python
+import time
+
+t2 = time.strftime("%Y-%m-%d %X")
+t3 = time.strftime("%Y-%m-%d %H:%M:%S")
+print("t2=", t2)  # 2021-12-22 22:37:10
+print("t3=", t3) # 2021-12-22 22:37:10
+
+# 需要传入一个结构化时间，那么可以对时间戳先转化为结构化时间，在给strftime()传入
+# t5是一个结构化时间，指定一个时间戳戳: 1640010101
+# t5: time.struct_time(tm_year=2021, tm_mon=12, tm_mday=20, tm_hour=22, tm_min=21, tm_sec=41, tm_wday=0, tm_yday=354, tm_isdst=0)
+t5 = time.localtime(1640010101)
+print("t5==>", t5)
+t6 = time.strftime("%Y-%m-%d %X", t5)
+print("t6==>", t6) # 2021-12-20 22:21:41
+```
+
+##### 5.4 `time.strptime()`
+
+> 主要用来将字符串时间转换为格式化时间
+
+> 来看源码:
+>
+> - 看源码注释解释：根据传入的时间格式，将一个字符串时间转化成一个结构化时间
+> - 而且它的返回值就是一个`结构化时间`
+
+```python
+def strptime(string, format): # real signature unknown; restored from __doc__
+    """
+    strptime(string, format) -> struct_time
+    
+    Parse a string to a time tuple according to a format specification.
+    See the library reference manual for formatting codes (same as
+    strftime()).
+    
+    Commonly used format codes:
+    
+    %Y  Year with century as a decimal number.
+    %m  Month as a decimal number [01,12].
+    %d  Day of the month as a decimal number [01,31].
+    %H  Hour (24-hour clock) as a decimal number [00,23].
+    %M  Minute as a decimal number [00,59].
+    %S  Second as a decimal number [00,61].
+    %z  Time zone offset from UTC.
+    %a  Locale's abbreviated weekday name.
+    %A  Locale's full weekday name.
+    %b  Locale's abbreviated month name.
+    %B  Locale's full month name.
+    %c  Locale's appropriate date and time representation.
+    %I  Hour (12-hour clock) as a decimal number [01,12].
+    %p  Locale's equivalent of either AM or PM.
+    
+    Other codes may be available on your platform.  See documentation for
+    the C library strftime function.
+    """
+    return struct_time
+```
+
+```python
+import time
+
+# 将一个字符串时间转化为结构化时间
+# t1 = time.struct_time(tm_year=2021, tm_mon=11, tm_mday=22, tm_hour=23, tm_min=27, tm_sec=55, tm_wday=0, tm_yday=326, tm_isdst=-1)
+t_str = "2021-11-22 23:27:55"
+t1 = time.strptime(t_str, "%Y-%m-%d %X")
+print("t1===>", t1)
+```
+
+##### 5.5 `time.mktime()`
+
+> 主要是用来将结构化时间转换为时间戳
+
+> 来看源码：
+>
+> - 源码注释说：将一个本地的`结构化时间`转化成`秒数`
+> - 返回的是一个浮点数，需要返回整数时，就需要`int()`进行转换
+
+```python
+def mktime(p_tuple): # real signature unknown; restored from __doc__
+    """
+    mktime(tuple) -> floating point number
+    
+    Convert a time tuple in local time to seconds since the Epoch.
+    Note that mktime(gmtime(0)) will not generally return zero for most
+    time zones; instead the returned value will either be equal to that
+    of the timezone or altzone attributes on the time module.
+    """
+    return 0.0
+```
+
+```python
+import time
+
+# t7是结构化时间
+# t7: time.struct_time(tm_year=2021, tm_mon=12, tm_mday=22, tm_hour=23, tm_min=28, tm_sec=28, tm_wday=2, tm_yday=356, tm_isdst=0)
+t7 = time.localtime()
+print("t7===>", t7)
+t8 = int(time.mktime(t7)) * 1000
+print("t8===>", t8) # 1640186908000
+```
+
+##### 5.5 时间戳转换为字符串时间格式图
+
+> 下图是转化的图
+
+![image-20211222232146570](python%E7%AC%94%E8%AE%B0.assets/image-20211222232146570.png)
+
+> 转化的代码
+
+```python
+import time
+
+# 将t1时间戳转化为字符串时间
+t1 = 1637594296
+print("t1时间戳:", t1)
+
+# 转化为结构化时间
+t1 = time.localtime(t1)
+
+# 转化为字符串时间
+t1 = time.strftime("%Y-%m-%d %X", t1)
+
+print("t1字符串时间:", t1)
+
+# t1时间戳: 1637594296
+# t1字符串时间: 2021-11-22 23:18:16
+```
+
+##### 5.6 字符串时间格式转化为时间戳
+
+> 下图是转化的图
+
+![image-20211222234739800](python%E7%AC%94%E8%AE%B0.assets/image-20211222234739800.png)
+
+> 下面是转化的代码
+
+```python
+import time
+
+# 将t1字符串时间转化为时间戳
+t1 = "2021-11-22 23:27:55"
+print("t1字符串:", t1)
+
+# 先转化为结构化时间
+t1 = time.strptime(t1, "%Y-%m-%d %X")
+
+# 再将结构化时间转化为时间戳
+t1 = int(time.mktime(t1))
+print("t1时间戳:", t1)
+
+# 执行结果:
+# t1字符串: 2021-11-22 23:27:55
+# t1时间戳: 1637594875
+```
+
+#### 6、datetime模块
+
+> `datetime`也是一个时间模块，不同于`time`模块，可以用来对时间进行加减
+
+##### 6.1 当前时间
+
+```python
+# 当前时间
+now_time = datetime.datetime.now()
+
+# now_time: 2021-12-22 23:55:17.339830
+print("now_time:", now_time)
+
+# now_time type: <class 'datetime.datetime'>
+print("now_time type:", type(now_time))
+```
+
+##### 6.2 时间加减
+
+> `datetime`可以对时间进行加减，使用`datetime.timedelta()`
+
+> 先看源码
+>
+> - 可以看到这个时间加减类，接收`days`/`seconds`/`weeks`/`hours`等格式，传入的值是一个float类型
+> - `float = ...` 这三个点在python中表示是`<class ellipsis>`,用来占位的，和pass一样
+
+```python
+class timedelta(SupportsAbs[timedelta]):
+    min: ClassVar[timedelta]
+    max: ClassVar[timedelta]
+    resolution: ClassVar[timedelta]
+    def __init__(
+        self,
+        days: float = ...,
+        seconds: float = ...,
+        microseconds: float = ...,
+        milliseconds: float = ...,
+        minutes: float = ...,
+        hours: float = ...,
+        weeks: float = ...,
+        *,
+        fold: int = ...,
+    ) -> None: ...
+    @property
+    def days(self) -> int: ...
+    @property
+    def seconds(self) -> int: ...
+    @property
+    def microseconds(self) -> int: ...
+    def total_seconds(self) -> float: ...
+```
+
+```python
+import datetime
+
+# 当前时间
+now_time = datetime.datetime.now()
+
+# now_time: 2021-12-22 23:55:17.339830
+print("now_time:", now_time) # 2021-12-23 00:09:04.046012
+
+# now_time type: <class 'datetime.datetime'>
+print("now_time type:", type(now_time)) # <class 'datetime.datetime'>
+
+# 天数加减
+three_day_later = now_time + datetime.timedelta(days=3)
+print("三天后:", three_day_later) # 2021-12-26 00:09:04.046012
+
+three_day_early = now_time + datetime.timedelta(days=-3)
+print("三天前:", three_day_early) # 2021-12-20 00:09:04.046012
+```
+
+##### 6.3 时间戳转化为字符串时间戳
+
+> 一步到位将时间戳转化为字符串时间
+>
+> - 其实`time`模块也可以做到，但是需要两步
+>   - 第一步需要先转化为结构化时间
+>   - 第二步需要指定输出字符串的格式
+
+```python
+t1 = 1637594296
+t2 = datetime.datetime.fromtimestamp(t1)
+print(t2) # 2021-11-22 23:18:16
+```
+
+##### 6.4 字符串时间转化为时间戳
+
+> 将字符串时间转换为时间戳，比如我对某个时间进行了加减，然后需要转换为时间戳存起来
+>
+> 注意:
+>
+> - `datetime.datetime.now()`返回的时间类型是`<class 'datetime.datetime'>`
+> - 可以通过`timetuple()`将时间类型为`<class 'datetime.datetime'>`转换为结构化时间
+> - 最后再使用`time.mktime()`转化为时间戳
+
+```python
+import datetime
+
+three_day_early = datetime.datetime.now() + datetime.timedelta(days=-3)
+print("三天前:", three_day_early) # 2021-12-20 00:33:05.384049
+print("三天前格式:", type(three_day_early)) # <class 'datetime.datetime'>
+
+# timetuple() 返回的是结构化时间
+struct_three_day_early = three_day_early.timetuple()
+
+t1 = int(time.mktime(struct_three_day_early)) * 1000
+print(t1) # 1639931585000
+```
 
 ### 五、正则表达式
 

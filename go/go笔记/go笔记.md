@@ -8,7 +8,7 @@
 >
 > 流程图地址：[https://app.diagrams.net/](https://app.diagrams.net/)
 >
-> [golang内置库文档](https://studygolang.com/pkgdoc)
+> Golang内置库文档：[https://studygolang.com/pkgdoc](https://studygolang.com/pkgdoc)
 
 ### 2、Go优势
 
