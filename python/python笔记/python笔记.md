@@ -2104,7 +2104,7 @@ t8 = int(time.mktime(t7)) * 1000
 print("t8===>", t8) # 1640186908000
 ```
 
-##### 5.5 时间戳转换为字符串时间格式图
+##### 5.5 时间戳转换为字符串时间
 
 > 下图是转化的图
 
@@ -2131,7 +2131,7 @@ print("t1字符串时间:", t1)
 # t1字符串时间: 2021-11-22 23:18:16
 ```
 
-##### 5.6 字符串时间格式转化为时间戳
+##### 5.6 字符串时间转化为时间戳
 
 > 下图是转化的图
 
@@ -2182,7 +2182,7 @@ print("now_time type:", type(now_time))
 > 先看源码
 >
 > - 可以看到这个时间加减类，接收`days`/`seconds`/`weeks`/`hours`等格式，传入的值是一个float类型
-> - `float = ...` 这三个点在python中表示是`<class ellipsis>`,用来占位的，和pass一样
+> - `float = ...` 这三个点在python中表示是`<class ellipsis>`，用来占位的，和pass一样
 
 ```python
 class timedelta(SupportsAbs[timedelta]):
@@ -2230,7 +2230,7 @@ three_day_early = now_time + datetime.timedelta(days=-3)
 print("三天前:", three_day_early) # 2021-12-20 00:09:04.046012
 ```
 
-##### 6.3 时间戳转化为字符串时间戳
+##### 6.3 时间戳转化为字符串时间
 
 > 一步到位将时间戳转化为字符串时间
 >
