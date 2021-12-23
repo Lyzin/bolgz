@@ -2230,23 +2230,39 @@ three_day_early = now_time + datetime.timedelta(days=-3)
 print("三天前:", three_day_early) # 2021-12-20 00:09:04.046012
 ```
 
-##### 6.3 时间戳转化为字符串时间
+##### 6.3 时间戳转化为datetime类型的字符串时间
 
-> 一步到位将时间戳转化为字符串时间
+> 一步到位将时间戳转化为字符串格式的时间，此时的字符串格式时间类型是`<class 'datetime.datetime'>`，可以使用`datetime.timedelta()`进行时间的加减
 >
 > - 其实`time`模块也可以做到，但是需要两步
 >   - 第一步需要先转化为结构化时间
 >   - 第二步需要指定输出字符串的格式
 
 ```python
-t1 = 1637594296
-t2 = datetime.datetime.fromtimestamp(t1)
-print(t2) # 2021-11-22 23:18:16
+import datetime
+
+# 结束时间+7天
+# 对时间戳进行加减N天
+
+# 当前时间戳
+t1 = time.time()
+t2 = datetime.datetime.fromtimestamp(t1) + datetime.timedelta(days=7)
+
+# 2021-12-30 00:47:04.755311
+print(t2) 
+
+# <class 'datetime.datetime'>
+print(type(t2))
+
+# 再将加了N天的时间转化为时间戳
+t3 = t2.timetuple()
+t3_stamp = int(time.mktime(t3)) * 1000
+print(t3_stamp) # 1640796424000
 ```
 
-##### 6.4 字符串时间转化为时间戳
+##### 6.4 datetime类型的字符串时间转化为时间戳
 
-> 将字符串时间转换为时间戳，比如我对某个时间进行了加减，然后需要转换为时间戳存起来
+> 将类型是`<class 'datetime.datetime'>`的字符串时间转换为时间戳，比如我对某个时间进行了加减，然后需要转换为时间戳存起来
 >
 > 注意:
 >
@@ -2266,6 +2282,53 @@ struct_three_day_early = three_day_early.timetuple()
 
 t1 = int(time.mktime(struct_three_day_early)) * 1000
 print(t1) # 1639931585000
+```
+
+##### 6.5 datetime和time模块复习
+
+```python
+import datetime, time
+
+def time_switch_to_stamp():
+    # 时间戳转换为字符串时间戳
+    s = 1640796424000 // 100
+
+    # 转为结构体
+    s_struct = time.localtime(s)
+
+    # 转为字符串时间
+    s_str_time = time.strftime("%Y-%m-%d %X")
+    print(s_str_time)
+
+    # 字符串格式转化为时间戳
+    s_str_time_new = "2021-12-25 10:00:00"
+
+    # 先转化为结构化时间
+    s_struct_new = time.strptime(s_str_time_new, "%Y-%m-%d %X")
+
+    # 再转化为时间戳
+    s_time_new_stamp = int(time.mktime(s_struct_new))
+    print(s_time_new_stamp)
+
+
+def datetime_switch_to_stamp():
+    """
+    这个里面既包含了将时间戳转换为字符串时间，也包含了将字符串时间转换为时间戳
+    :return:
+    """
+    # 在存在的一个时间戳上+N天，并且再将最后的N天转换为时间戳
+    s = 1640796424000 // 1000
+
+    three_day_later = datetime.datetime.fromtimestamp(s) + datetime.timedelta(days=3)
+
+    # 三天后的时间转化为时间戳
+    # step1: 三天后的时间转化为结构化时间
+    new_struct_time = three_day_later.timetuple()
+
+    # step2: 再将结构化时间转换为是时间戳
+    new_time_stamp = int(time.mktime(new_struct_time))
+
+    print(new_time_stamp)
 ```
 
 ### 五、正则表达式
