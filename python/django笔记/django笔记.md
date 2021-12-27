@@ -2,8 +2,6 @@
 
 ### 1、web框架的底层理解
 
-> 从手动创建一个`web`框架开始
-
 ```python
 # 网络协议
 HTTP协议    数据传输明文协议
@@ -80,9 +78,9 @@ while True:
 
 ### 2、wsgiref模块
 
-> Django底层用的还是`wsgiref`模块来请求和响应数据
+> Django底层用的是`wsgiref`模块来请求和响应数据
 >
-> `wsgiref`模块
+> `wsgiref`模块也叫web服务网关接口
 >
 > 1. 请求来的时候解析`HTTP`格式的数据，封装成大字典
 > 2. 响应走的时候给数据打包成符合`HTTP`格式的数据返回给浏览器
@@ -159,8 +157,6 @@ python manage.py startapp home
 
 ```python
 # 注册创建的App
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -227,18 +223,43 @@ python manage.py runserver
 >
 > - 是一个`Http`响应，并且返回的是字符串内容
 > - 这个内容可以被读、追加或者替换
-
-![image-20211216002949454](django%E7%AC%94%E8%AE%B0.assets/image-20211216002949454.png)
+>
+> 视图函数中的`request`参数是一个对象，用来获取请求的所有数据
 
 ```python
-# 应用中使用,写在views.py中
-def index(request):
+# HttpResponse部分源码
+class HttpResponse(HttpResponseBase):
     """
-    :param request: 请求相关的所有的数据
-    :return: HttpResponse对象值
+    An HTTP response class with a string as content.
+
+    This content that can be read, appended to or replaced.
     """
-    ret = HttpResponse('Hi, index')
+
+    streaming = False
+
+    def __init__(self, content=b'', *args, **kwargs):
+        super(HttpResponse, self).__init__(*args, **kwargs)
+        # Content is a bytestring. See the `content` property methods.
+        self.content = content
+```
+
+```python
+# 写在urls.py文件
+from home import views
+
+urlpatterns = [
+    # url(r'^admin/', admin.site.urls),
+    url("^home/", views.home)
+]
+-------------------------------------------------------------------
+# 写在应用的views.py中
+from django.shortcuts import render,HttpResponse
+
+# Create your views here.
+def home(request):
+    ret = HttpResponse("Hi, Django")
     print(ret) # <HttpResponse status_code=200, "text/html; charset=utf-8">
+    print(ret.status_code) # 200
     print(type(ret)) # <class 'django.http.response.HttpResponse'>
     return ret
 ```
@@ -321,15 +342,273 @@ def index_redirect(request):
 
 ### 7、静态文件配置
 
+> `html`文件都放在`templates`文件下
+>
+> 将静态文件放在`static`文件夹里
+>
+> - 前端写好的文件都可以叫静态文件，比如`js`/`css`/`图片`/`前端框架`
+>
+> `django`需要自己创建`static`文件夹
+>
+> - 在`static`中可以放`js`/`css`/`plugins`等文件夹，做好区分
+
+
+
+#### 1.1 静态文件绝对路径
+
+> `谨记：`
+>
+> - `在浏览器输入url时，能看到对应的资源，是因为服务端开启了对应资源的接口`
+> - `如果访问不到，那就是服务端没有开启对应资源的接口`
+
+> 未开启对应资源的接口，而是只在Django目录下创建了`/static/css/home.css`目录和文件，然后直接在`html`里直接引用，就会报错，因为服务端根本没有将这个资源的入口开启，直接访问会404找不到
+
+```html
+# index文件里直接写css文件
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="../static/css/home.css">
+</head>
+<body>
+    <p>这是主页</p>
+</body>
+</html>
+```
+
+![image-20211227234555244](django%E7%AC%94%E8%AE%B0.assets/image-20211227234555244.png)
+
+> 上述在浏览器打开`http://127.0.0.1:8000/home/`就会出现home.css文件404的情况
+
+![image-20211227235030984](django%E7%AC%94%E8%AE%B0.assets/image-20211227235030984.png)
+
+#### 1.2 服务端开启静态资源入口
+
+> 因为上面的报错，所以需要服务端开启访问静态资源的入口，才可以使得前端可以访问到资源
+>
+> `STATICFILES_DIRS`表示:
+>
+> - 开放了静态文件路径，将`Django`目录下创建的`static`文件夹加入到了`静态资源列表`,前端页面就可以访问到了
+> - 是一个列表，表示可以放多个静态资源目录
+>   - 多个时，先从第一个找，找不到继续往下找，直到找到就会返回对应的资源
+>
+> `STATIC_URL = '/static/'`:
+>
+> - 表示前端访问静态资源时，需要带的一个令牌，拿着这个令牌，再去`STATICFILES_DIRS`里的文件夹中去找对应的资源文件
+> - 前端写静态资源的路径时，写的`static`就是`STATIC_URL`后面的`/static/`就是令牌
+> - 那么这个令牌就可以自定义了，只需要改了这里，前端页面去拿静态资源时的令牌就要变成修改的了，比如将`/static/`改为`/abc/`，那么前端页面里写静态资源路径时的第一个单词就要写成`/abc/`
+
+```python
+# 在setting.py文件下添加该行代码，表示服务端开启了访问静态资源的入口
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+# 这个是访问的令牌
+STATIC_URL = '/static/'
+
+# 此处为新加代码
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+```
+
+![image-20211227234806719](django%E7%AC%94%E8%AE%B0.assets/image-20211227234806719.png)
+
+> 再次访问`http://127.0.0.1:8000/home/`就会出现正常样式
+
+![image-20211227235127800](django%E7%AC%94%E8%AE%B0.assets/image-20211227235127800.png)
+
+
+
+#### 1.3 灵活取令牌值
+
+> ​	但是当前端页面很多时，并且我们都是用相对路径去写静态资源的路径，并且路径第一个单词是`令牌`，这个时候需要修改令牌时，就会需要修改很多文件，那么怎么灵活处理呢？就用到了`静态文件动态解析`
+>
+> `静态文件动态解析`:
+>
+> - 在html文件页面顶部写`{% load static %}`
+> - `在引用资源的位置写{% static "css/home.css" %}`
+> - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
+
+```python
+# 在html文件页面顶部写
+{% load static %}
+
+# 在引用资源的位置写
+<link rel="stylesheet" href="{% static "css/home.css" %}">
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="{% static "css/home.css" %}">
+</head>
+<body>
+    <p>这是主页</p>
+</body>
+</html>
+```
+
+![image-20211228000549317](django%E7%AC%94%E8%AE%B0.assets/image-20211228000549317.png)
+
+![image-20211228000832612](django%E7%AC%94%E8%AE%B0.assets/image-20211228000832612.png)
+
 
 
 ### 8、request对象方法
 
+#### 1.1 关闭`csrf`中间件
 
+> 在前阶段学习时，可以先注释`csrf`中间件，否则做一些`form`表单提交时会报错
+>
+> 后面再来探讨这个问题
 
+![image-20211228001140316](django%E7%AC%94%E8%AE%B0.assets/image-20211228001140316.png)
 
+#### 1.2 request对象
 
+> 在视图函数中都会有`request`形参，需要重点来学习下这个`request`，`request`是一个对象，里面有很多可以供我们使用的方法
 
+```python
+# 还是用之前的home函数
+from django.shortcuts import render,HttpResponse
+
+# Create your views here.
+
+def home(request):
+    print(request) # <WSGIRequest: GET '/home/'>
+    print(type(request)) #<class 'django.core.handlers.wsgi.WSGIRequest'>
+    print(dir(request)) 
+    return render(request, "index.html")
+```
+
+```python
+dir(request) # 可以看到有很多的方法
+
+# ['COOKIES', 'FILES', 'GET', 'META', 'POST', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_encoding', '_get_post', '_get_raw_host', '_get_scheme', '_initialize_handlers', '_load_post_and_files', '_mark_post_parse_error', '_messages', '_post_parse_error', '_read_started', '_set_post', '_stream', '_upload_handlers', 'body', 'build_absolute_uri', 'close', 'content_params', 'content_type', 'encoding', 'environ', 'get_full_path', 'get_host', 'get_port', 'get_raw_uri', 'get_signed_cookie', 'is_ajax', 'is_secure', 'method', 'parse_file_upload', 'path', 'path_info', 'read', 'readline', 'readlines', 'resolver_match', 'scheme', 'session', 'upload_handlers', 'user', 'xreadlines']
+```
+
+##### 1.2.1 request.method
+
+> 用来获取请求这个url的请求方法
+
+> 如果是以`get`方法请求的这个视图函数，那么`request.method`返回值就是`大写的GET`字符串
+>
+> 如果是以`post`方法请求的这个视图函数，那么`request.method`返回值就是`大写的POST`字符串
+>
+> 举例：这样就可以用来做请求方法拆分，可以使用`if`先判断请求方法是什么：
+>
+> - 如果请求方法是`GET`，可以先返回一个页面
+> - 如果请求方法是`POST`，返回单独的`POST`请求处理，在`POST`里就可以获取前端传入的请求数据
+
+```python
+from django.shortcuts import render,HttpResponse
+
+# Create your views here.
+
+def home(request):
+    if request.method == "POST":
+        return HttpResponse("POST data")
+    return render(request, "index.html")
+```
+
+##### 1.2.2 request.POST
+
+> 用来获取用户提交的`post`请求数据，不包含文件
+
+> 前端页面
+
+```html
+# 创建一个form表单
+<body>
+    <p>这是主页</p>
+    <form action="/home/" method="post">
+        用户名: <input type="text" name="uname">
+        密码: <input type="text" name="pwd">
+        爱好:
+            <input type="checkbox" name="hobby" value="足球">足球
+            <input type="checkbox" name="hobby" value="排球">排球
+            <input type="checkbox" name="hobby" value="桌球">桌球
+        <input type="submit">
+    </form>
+</body>
+</html>
+```
+
+![image-20211228003707768](django%E7%AC%94%E8%AE%B0.assets/image-20211228003707768.png)
+
+> 后端`views.py`代码，从中可以看出：
+>
+> - `request.POST`是一个查询字典，类型是`<class 'django.http.request.QueryDict'>`
+> - `request.POST`的`get方法`只会获取最后一个值，并且类型是`str`
+> - `request.POST`的`getlist方法`会获取所有值，并且类型是`list`
+
+```python
+def home(request):
+    if request.method == "POST":
+        # <QueryDict: {'uname': ['ko'], 'pwd': ['123'], 'hobby': ['足球', '排球']}>
+        print("request.POST:", request.POST)
+        # <class 'django.http.request.QueryDict'>
+        print("request.POST type:", type(request.POST))
+
+        # get方法只会获取最后一个值
+        uname = request.POST.get("uname")
+        # uname = > ko
+        print("uname=>", uname)
+        # <class 'str'>
+        print("uname type:", type(uname))
+
+        # get方法只会获取最后一个值
+        hob = request.POST.get("hobby")
+
+        # 桌球
+        print("hob=>", hob) # 桌球
+        
+        # <class 'str'>
+        print("hob type=>", type(hob)) # 桌球
+
+        hob_list= request.POST.getlist("hobby")
+        # ['排球', '桌球']
+        print("hob_list=>", hob_list)
+
+        # <class 'list'>
+        print("hob_list type=>", type(hob_list))
+        return HttpResponse("POST data")
+    return render(request, "index.html")
+```
+
+##### 1.2.3 request.GET
+
+> `request.GET`和`request.POST`的所有请求方法都一样，`request.GET`和`request.POST`
+>
+> `request.GET`常用于获取url后面携带的参数
+>
+> 同样`request.GET`也支持用`get`/`getlist`获取`url`后面带的值
+
+```python
+# 请求的url：http://127.0.0.1:8000/home/?user=ko&age=19
+# ?user=ko&age=19 是拼接的参数，在url里可以看到
+
+def home(request):
+    # < QueryDict: {'user': ['ko'], 'age': ['19']} >
+    print(request.GET)
+    
+    # <class 'django.http.request.QueryDict'>
+    print(type(request.GET))
+    
+    # 19
+    print(request.GET.get("age"))
+
+    # <class 'str'>
+    print(type(request.GET.get("age")))
+    return render(request, "index.html")
+```
 
 ### 9、Pycharm操作Django技巧
 
@@ -343,11 +622,44 @@ def index_redirect(request):
 
 ![image-20211216001748598](django%E7%AC%94%E8%AE%B0.assets/image-20211216001748598.png)
 
-## 三、ORM
+#### 9.3 浏览器访问页面不走缓存
+
+> 谷歌浏览器打开F12，找到设置，勾选下面的选项即可
+
+![image-20211227235948716](django%E7%AC%94%E8%AE%B0.assets/image-20211227235948716.png)
 
 
 
+## 三、ORM数据库
 
+## 
+
+### 1、Django连接Mysql
+
+> `Django`连接数据库时，需要先创建好数据库
+>
+> `Django`自带了一个小型数据库`sqlite3`
+>
+> `Django`如何连接`mysql`
+>
+> [官方地址: https://docs.djangoproject.com/en/1.11/ref/settings/#databases](https://docs.djangoproject.com/en/1.11/ref/settings/#databases)
+
+> `Django`连接mysql需要在`settings.py`中指定连接数据的名字、用户名、密码、端口
+
+```python
+# settings.py文件，大概78行
+# Database
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+
+# 这是默认的sqlite3连接，可以注释掉，连接mysql
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+```
 
 
 
