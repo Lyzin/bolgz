@@ -632,19 +632,93 @@ def home(request):
 
 ## 三、ORM数据库
 
-## 
+### 1、Pycharm连接数据库
 
-### 1、Django连接Mysql
+> 使用`docker`可以快速创建`mysql`等数据库，用来快速搭建想要的环境
+
+#### 1.1 mac下连接docker的mysql
+
+> 步骤：
+>
+> - 创建一个`mysql`容器，拉取`mysql:5.7`镜像
+> - 再去创建容器
+> - 注意
+>   - 创建完的数据库默认用户是root，密码使用`-e MYSQL_ROOT_PASSWORD=123456`设置为123456
+>   - 创建完以后需要登录容器内部，给root用户开启远程访问权限，否则在容器外部会出现访问数据库失败的情况
+
+```bash
+# 拉取mysql容器，选择5.7版本的tag，不写5.7则会拉取8版本，8版本对我们来说太新了
+docker pull mysql:5.7
+
+# 启动容器
+docker run -dit --name mysql -p 3306:3306  -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+#  表示设置数据库用户root的密码为123456
+
+# 登录容器，赋予root远程登录权限
+docker exec -it mysql /bin/bash
+
+# 登录mysql容器后，配置远程访问权限
+>> grant all privileges on *.* to root@"%" identified by "123456";
+>> flush privileges ;
+
+# 上面配置完成退出数据库，就可以在容器外部连接mysql了
+mysql -uroot -h127.0.0.1 -p123456
+```
+
+> 在上述配置好以后，就可以在`pycharm`中打开`mysql`连接界面，进行连接数据库了，下面用截图表示
+
+![image-20220104075847993](django%E7%AC%94%E8%AE%B0.assets/image-20220104075847993.png)
+
+![image-20220104075948885](django%E7%AC%94%E8%AE%B0.assets/image-20220104075948885.png)
+
+> 需要先下载对应数据库的驱动，上图配置界面会提示下载，点击下载即可
+>
+> 主机：数据库的地址，因为是本地连接，所以是127.0.0.1
+>
+> 端口：3306不变
+>
+> 用户、密码：数据库的用户和密码
+>
+> 数据库：提前创建好的数据名，需要提前在数据库中创建才可以进行连接
+>
+> 上面连接信息填写完以后，点击`测试连接`即可快速验证数据库是否连接成功，若未成功，需要检查下配置是否正确
+
+#### 1.2 windows下连接docker的mysql
+
+> `windows`下也可以用`docker`的`mysql`，一般可以在`linux`虚拟机里安装docker，在启动mysql容器
+>
+> 所以拉取`mysql`镜像,修改`mysql`的`root`权限、在`pycharm`中配置等步骤都和上面的`mac`配置一样
+>
+> 唯一区别在于：
+>
+> - windows下的`pycharm`想连接虚拟机里的docker的`mysql`容器，需要使用`pycharm`的`ssh隧道`功能先连接上虚拟机，再去连接虚拟机里的数据库
+> - 下图展示了如何配置
+
+![image-20220104080802817](django%E7%AC%94%E8%AE%B0.assets/image-20220104080802817.png)
+
+![image-20220104080909084](django%E7%AC%94%E8%AE%B0.assets/image-20220104080909084.png)
+
+> 虚拟机连接上后，再配置数据库连接
+
+![image-20220104081033712](django%E7%AC%94%E8%AE%B0.assets/image-20220104081033712.png)
+
+> 到这里数据库连接配置完成，可以在`pycharm`进行`django`的数据库连接了
+
+### 2、Django连接Mysql
 
 > `Django`连接数据库时，需要先创建好数据库
 >
-> `Django`自带了一个小型数据库`sqlite3`
+> `Django`自带了一个小型数据库`sqlite3`，这个数据库比较小，我们可以不用他，换成`mysql`
 >
 > `Django`如何连接`mysql`
 >
 > [官方地址: https://docs.djangoproject.com/en/1.11/ref/settings/#databases](https://docs.djangoproject.com/en/1.11/ref/settings/#databases)
+>
+> 注意一定要在`settings.py`文件中注册`APP`，否则会出现数据库迁移失败的情况
 
 > `Django`连接mysql需要在`settings.py`中指定连接数据的名字、用户名、密码、端口
+>
+> `Django`连接数据库一定要先创建数据库，再去`settings.py`里去连接
 
 ```python
 # settings.py文件，大概78行
@@ -659,9 +733,20 @@ DATABASES = {
     }
 }
 
+# 连接mysql
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mydatabase',   
+        'USER': 'mydatabaseuser',
+        'PASSWORD': 'mypassword',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+	}
+}
 ```
 
-
+![image-20211228010019204](django%E7%AC%94%E8%AE%B0.assets/image-20211228010019204.png)
 
 
 
