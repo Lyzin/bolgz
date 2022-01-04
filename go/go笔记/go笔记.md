@@ -1025,8 +1025,10 @@ func main() {
 
 ### 5、rune类型
 
-> - rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
-> - int32的别名，几乎在所有方面等同于int32，它用来区分字符值和整数值
+> `rune`官方解释：rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
+>
+> - int32的别名，几乎在所有方面等同于int32，一般用来表示字符的
+> - 可以使用`%c`取到对应的字符
 
 ```go
 type rune = int32
@@ -3172,26 +3174,39 @@ func main() {
 */
 ```
 
-> 如果定义变量的是什么类型，那么他的指针就是什么类型
+> 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型
 
 ```go
 package main
 
 import "fmt"
 
+var (
+	strData string
+	intData int
+	boolData bool
+)
+
 func main() {
 	// 如果定义变量的是什么类型，那么他的指针就是什么类型
-	s := "hello"
-	s_addr := &s
-	fmt.Printf("%v\n",s) // hello
-	fmt.Printf("%p\n",&s) // hello的内存地址：0xc000096210
-	fmt.Printf("%v\n", s_addr) // 是hello的内存地址: 0xc000096210
-	fmt.Printf("%T\n", s_addr) // *string 类型的指针
+	// string类型指针
+	strData = "hello"
+	strDataAddr := &strData
+	fmt.Printf("%v\n", strDataAddr) // 是hello的内存地址: 0x113cf30
+	fmt.Printf("%T\n", strDataAddr) // *string 类型的指针
 	
-	// 根据内存地址取原始值
-	s_val := *s_addr
-	fmt.Printf("%v\n", s_val) // hello
-	fmt.Printf("%T\n", s_val) // string
+	// int类型指针
+	intData = 13
+	intDataAddr := &intData
+	fmt.Printf("%v\n", intDataAddr) // 是13的内存地址: 0x116bd30
+	fmt.Printf("%T\n", intDataAddr) // *int 类型指针
+	
+	// bool类型指针
+	boolData = true
+	boolDataAddr := &boolData
+	fmt.Printf("%v\n", boolDataAddr) // 是bool的内存地址: 0x116bca1
+	fmt.Printf("%T\n", boolDataAddr) // *bool 类型指针
+
 }
 ```
 
@@ -4219,7 +4234,7 @@ func closeBag(x func(int, int), a, b int) {
 */
 ```
 
-##### 1.9.2 闭包例子
+##### 1.9.2 闭包函数分析
 
 > 下面是闭包函数例子的一个分析
 
@@ -4305,7 +4320,11 @@ func addr(x int) func(int) int {
 >
 > 分析传入形参是函数类型的`addr`函数:
 >
-> -  
+> -  `addr`函数定义一个类型为`func(int, int) int`的形参`x`，表示传入`x`的类型一定是函数类型，这个函数类型接收两个`int`参数，并且有一个`int`类型的返回值
+> -  `x`在`addr`函数内部被匿名函数使用，因为`x`本身是一个函数，所以在匿名函数内部就可以调用`x`函数，传入两个`int`形参，那这两个值就可以通过`addr`函数传入
+>    -  最后tmp返回的是`addr`函数内部的匿名函数的内存地址，在`main`函数里执行`addr`函数得到匿名函数的内存地址`ret`和`addr`函数内部`temp`函数的内存地址一样，并且`addr`函数内部的匿名函数接收一个`int`类型类型的形参并且返回一个`int`类型的值
+>    -  所以在`main`函数中就可以给`ret`继续传入一个`int`值
+> -  最终就将`addr`执行完毕，注意给`x`传入函数时一定要符合`addr`函数中`x`的类型
 
 ```go
 package main
@@ -4313,10 +4332,10 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Printf("main方法里的f1函数: %#v\n", f1)
+	fmt.Printf("main方法里的f1函数: %#v\n", f1) //  main方法里的f1函数: (func(int, int) int)(0x496570)
 
 	ret := addr(f1, 100, 200)
-	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
+	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret) // (func(int) int)(0x4966b0)
 
 	data := ret(200)
 	fmt.Printf("data是:%v\n", data)
@@ -4328,12 +4347,12 @@ func f1(a int, b int) int {
 
 func addr(x func(int, int) int, a int, b int) func(int) int {
 	tmp := func(y int) int {
-		fmt.Printf("tmp匿名函数中的x: %#v\n", x)
+		fmt.Printf("tmp匿名函数中的x: %#v\n", x) // tmp匿名函数中的x: (func(int, int) int)(0x496570)
 		ret := x(a, b) + y
 		return ret
 	}
 
-	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp)
+	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp) // (func(int) int)(0x4966b0)
 	return tmp
 }
 
@@ -4347,9 +4366,7 @@ func addr(x func(int, int) int, a int, b int) func(int) int {
 */
 ```
 
-
-
-
+##### 1.9.3 闭包例子
 
 ```go
 package main
@@ -4418,69 +4435,79 @@ func main() {
 	fmt.Printf("jpgSuffix值是:%v\t jpgSuffix的类型是:%T\n", jpgSuffix, jpgSuffix)
 	fmt.Printf("ret:%v", jpgSuffix("name"))
 }
-
-
 ```
 
+#### 1.10 函数传参都是值拷贝
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 1.x 函数`defer`
-
-> defer用来回收资源
+> 函数内部传参都是值拷贝形式
 >
-> 并且多个defer是以栈的形式运行，先进后出来执行defer函数的
+> - 从下面代码可以看到
+>   - 当给函数`f1`传入`x`和在`main`函数里的`x`的内存地址不一样
+>   - 所以函数`f1`对`x`的修改只发生在函数内部，退出函数后原来的`x`值不会变
+> - 这就是值拷贝
 
 ```go
 package main
 
 import "fmt"
 
+var (
+	strData string
+	intData int
+	boolData bool
+)
+
+func main() {
+	// 当传给函数的形参是一个变量时，该变量是值拷贝
+	x := 3
+	fmt.Printf("f1函数外传递进来的x的内存地址: %p\n", &x)
+	f1 := f1(x)
+	fmt.Printf("%v\n", f1)             // 结果是: 4
+	fmt.Printf("f1函数外最后x的值是: %v\n", x) // 结果是: 3
+}
+
+func f1(x int) int{
+	// 函数内传参都是值拷贝，所以函数内x的值变化不会影响函数外x的值
+	fmt.Printf("f1函数内传递进来的x的内存地址: %p\n", &x)
+	x += 1
+	return x
+}
+```
+
+#### 1.11 `defer`关键字
+
+> - defer主要是用来回收资源
+>
+> - 一个函数中有多个defer存在时，是以`栈(先进后出)`的形式运行，先执行最后一个defer函数，依次反着来
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	defer fmt.Printf("第一个defer\n")
+	defer fmt.Printf("第二个defer\n")
+	defer fmt.Printf("第三个defer\n")
+}
+```
+
+![image-20220104143521838](go%E7%AC%94%E8%AE%B0.assets/image-20220104143521838.png)
+
+> `defer`具体例子分析
 
 
+
+
+
+
+
+##### 1.11.x defer例子分析
+
+```go
+package main
+
+import "fmt"
 
 func main() {
 	a := 1
