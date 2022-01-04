@@ -434,7 +434,7 @@ STATICFILES_DIRS = [
 
 ```
 # 在html文件页面顶部写
-# {% load static %}
+# {{ load static }}
 
 # 在引用资源的位置写成下面格式，static开头，然后写static令牌映射的statics里的文件夹和对应到文件即可
 # <link rel="stylesheet" href="{% static 'css/home.css' %}">
