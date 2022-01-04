@@ -3172,6 +3172,29 @@ func main() {
 */
 ```
 
+> 如果定义变量的是什么类型，那么他的指针就是什么类型
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 如果定义变量的是什么类型，那么他的指针就是什么类型
+	s := "hello"
+	s_addr := &s
+	fmt.Printf("%v\n",s) // hello
+	fmt.Printf("%p\n",&s) // hello的内存地址：0xc000096210
+	fmt.Printf("%v\n", s_addr) // 是hello的内存地址: 0xc000096210
+	fmt.Printf("%T\n", s_addr) // *string 类型的指针
+	
+	// 根据内存地址取原始值
+	s_val := *s_addr
+	fmt.Printf("%v\n", s_val) // hello
+	fmt.Printf("%T\n", s_val) // string
+}
+```
+
 ### 4、`new`(很少用)
 
 > `new`函数用来申请内存地址
@@ -4448,6 +4471,8 @@ func main() {
 #### 1.x 函数`defer`
 
 > defer用来回收资源
+>
+> 并且多个defer是以栈的形式运行，先进后出来执行defer函数的
 
 ```go
 package main
