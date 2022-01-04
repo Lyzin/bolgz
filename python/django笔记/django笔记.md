@@ -429,15 +429,15 @@ STATICFILES_DIRS = [
 
 > `静态文件动态解析`:
 >
-> - 按照下面的格式去写
+> - 按照下图的格式去写
 > - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
 
-```html
+```
 # 在html文件页面顶部写
-{% load static %}
+# {% load static %}
 
-# 在引用资源的位置写
-<link rel="stylesheet" href="{% static "css/home.css" %}">
+# 在引用资源的位置写成下面格式，static开头，然后写static令牌映射的statics里的文件夹和对应到文件即可
+# <link rel="stylesheet" href="{% static 'css/home.css' %}">
 ```
 
 ```html
@@ -447,7 +447,7 @@ STATICFILES_DIRS = [
 <head>
     <meta charset="UTF-8">
     <title>home</title>
-    <link rel="stylesheet" href="{% static "css/home.css" %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 <body>
     <p>这是主页</p>
