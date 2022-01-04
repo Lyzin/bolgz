@@ -429,37 +429,21 @@ STATICFILES_DIRS = [
 
 > `静态文件动态解析`:
 >
+> - 先在`settings.py`文件中添加`STATICFILES_DIRS`这个列表值，将静态资源文件夹路径添加一下，可以是多个
+>
 > - 按照下图的格式去写
+>   - 现在`html`顶部写`load static`，这个`static`最终代表的是`settings.py`文件中的`STATIC_URL`的值，所以`static`在`html`就是一个令牌
+>   - 然后在`html`顶部导入令牌，在需要引入文件的位置按下图进行书写即可
 > - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
 
-```
-# 在html文件页面顶部写
-# {{ load static }}
 
-# 在引用资源的位置写成下面格式，static开头，然后写static令牌映射的statics里的文件夹和对应到文件即可
-# <link rel="stylesheet" href="{% static 'css/home.css' %}">
-```
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-{% load static %}
-<head>
-    <meta charset="UTF-8">
-    <title>home</title>
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-</head>
-<body>
-    <p>这是主页</p>
-</body>
-</html>
-```
 
 ![image-20211228000549317](django%E7%AC%94%E8%AE%B0.assets/image-20211228000549317.png)
 
 ![image-20211228000832612](django%E7%AC%94%E8%AE%B0.assets/image-20211228000832612.png)
 
-
+> 可以看到最终浏览器解析出来的静态资源路径前缀是abc，也就是在`settings.py`文件中写的`STATIC_URL`的值(就是静态资源的令牌)
+>
 
 ### 8、request对象方法
 
