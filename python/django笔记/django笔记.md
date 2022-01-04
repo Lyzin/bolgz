@@ -432,7 +432,7 @@ STATICFILES_DIRS = [
 > - 按照下面的格式去写
 > - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
 
-```python
+```html
 # 在html文件页面顶部写
 {% load static %}
 
