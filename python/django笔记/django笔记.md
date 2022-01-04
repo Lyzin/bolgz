@@ -696,6 +696,8 @@ mysql -uroot -h127.0.0.1 -p123456
 
 ![image-20220104080802817](django%E7%AC%94%E8%AE%B0.assets/image-20220104080802817.png)
 
+> 上图点击`ssh隧道`右边的三个点，然后进入下图添加`linux`主机的`ssh`连接配置
+
 ![image-20220104080909084](django%E7%AC%94%E8%AE%B0.assets/image-20220104080909084.png)
 
 > 虚拟机连接上后，再配置数据库连接
