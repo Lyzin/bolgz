@@ -426,34 +426,8 @@ STATICFILES_DIRS = [
 
 > ​	但是当前端页面很多时，并且我们都是用相对路径去写静态资源的路径，并且路径第一个单词是`令牌`，这个时候需要修改令牌时，就会需要修改很多文件，那么怎么灵活处理呢？就用到了`静态文件动态解析`
 >
-> `静态文件动态解析`:
->
-> - 在html文件页面顶部写`{% load static %}`
-> - `在引用资源的位置写{% static "css/home.css" %}`
-> - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
 
-```python
-# 在html文件页面顶部写
-{% load static %}
-
-# 在引用资源的位置写
-<link rel="stylesheet" href="{% static "css/home.css" %}">
-```
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-{% load static %}
-<head>
-    <meta charset="UTF-8">
-    <title>home</title>
-    <link rel="stylesheet" href="{% static "css/home.css" %}">
-</head>
-<body>
-    <p>这是主页</p>
-</body>
-</html>
-```
+![image-20220106150623144](django%E7%AC%94%E8%AE%B0.assets/image-20220106150623144.png)
 
 ![image-20211228000549317](django%E7%AC%94%E8%AE%B0.assets/image-20211228000549317.png)
 
