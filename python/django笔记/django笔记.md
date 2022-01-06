@@ -748,15 +748,56 @@ DATABASES = {
 
 ![image-20211228010019204](django%E7%AC%94%E8%AE%B0.assets/image-20211228010019204.png)
 
+### 3、ORM介绍和使用
+
+> `ORM`：对象关系映射
+>
+> 主要是用来将mysql语句通过面向对象去执行
+>
+> 主要是在`Django`的`app`的`models.py`文件中写创建表语句，以面向对象的形式
+
+#### 3.1 编写建表语句
+
+> 需要在`app`的`models.py`文件中写面向对象代码
+>
+> 下面是创建了一个User表语句代码
+
+```python
+from django.db import models
+
+# Create your models here.
+
+class User(models.Model):
+    # 等价于：id int primary_key auto_inscrement
+    id = models.AutoField(primary_key=True)
+    
+    # 等价于：name varchar(32)
+    name = models.CharField(max_length=32)
+    
+    # 等价于 age int
+    age = models.IntegerField()
+```
+
+#### 3.2 数据库迁移命令
+
+> 第一条命令，主要用来生成数据库建表语句记录，下面的命令只是生成记录，还没有真正在数据库中执行创建表
+
+```bash
+python manage.py makemigrations
+```
+
+> 执行后会在对应`app`的`migrations`文件夹下生成一个类似`0001_initial.py`的文件，主要记录了建表语句
+
+![image-20220105234018673](django%E7%AC%94%E8%AE%B0.assets/image-20220105234018673.png)
 
 
 
+> 第二条命令，将操作真正同步到数据库中
+>
 
-
-
-
-
-
+```python
+python manage.py makemigrations
+```
 
 
 
