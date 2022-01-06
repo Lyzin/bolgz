@@ -426,24 +426,40 @@ STATICFILES_DIRS = [
 
 > ​	但是当前端页面很多时，并且我们都是用相对路径去写静态资源的路径，并且路径第一个单词是`令牌`，这个时候需要修改令牌时，就会需要修改很多文件，那么怎么灵活处理呢？就用到了`静态文件动态解析`
 >
-
 > `静态文件动态解析`:
 >
-> - 先在`settings.py`文件中添加`STATICFILES_DIRS`这个列表值，将静态资源文件夹路径添加一下，可以是多个
->
-> - 按照下图的格式去写
->   - 现在`html`顶部写`load static`，这个`static`最终代表的是`settings.py`文件中的`STATIC_URL`的值，所以`static`在`html`就是一个令牌
->   - 然后在`html`顶部导入令牌，在需要引入文件的位置按下图进行书写即可
+> - 在html文件页面顶部写`{% load static %}`
+> - `在引用资源的位置写{% static "css/home.css" %}`
 > - 这样就会自动解析令牌的内容，无论我们在`setting.py`文件中将`STATIC_URL`的值改成什么，`Django`都可以正常解析
 
+```python
+# 在html文件页面顶部写
+{% load static %}
 
+# 在引用资源的位置写
+<link rel="stylesheet" href="{% static "css/home.css" %}">
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="{% static "css/home.css" %}">
+</head>
+<body>
+    <p>这是主页</p>
+</body>
+</html>
+```
 
 ![image-20211228000549317](django%E7%AC%94%E8%AE%B0.assets/image-20211228000549317.png)
 
 ![image-20211228000832612](django%E7%AC%94%E8%AE%B0.assets/image-20211228000832612.png)
 
-> 可以看到最终浏览器解析出来的静态资源路径前缀是abc，也就是在`settings.py`文件中写的`STATIC_URL`的值(就是静态资源的令牌)
->
+
 
 ### 8、request对象方法
 
@@ -680,8 +696,6 @@ mysql -uroot -h127.0.0.1 -p123456
 
 ![image-20220104080802817](django%E7%AC%94%E8%AE%B0.assets/image-20220104080802817.png)
 
-> 上图点击`ssh隧道`右边的三个点，然后进入下图添加`linux`主机的`ssh`连接配置
-
 ![image-20220104080909084](django%E7%AC%94%E8%AE%B0.assets/image-20220104080909084.png)
 
 > 虚拟机连接上后，再配置数据库连接
@@ -734,15 +748,56 @@ DATABASES = {
 
 ![image-20211228010019204](django%E7%AC%94%E8%AE%B0.assets/image-20211228010019204.png)
 
+### 3、ORM介绍和使用
+
+> `ORM`：对象关系映射
+>
+> 主要是用来将mysql语句通过面向对象去执行
+>
+> 主要是在`Django`的`app`的`models.py`文件中写创建表语句，以面向对象的形式
+
+#### 3.1 编写建表语句
+
+> 需要在`app`的`models.py`文件中写面向对象代码
+>
+> 下面是创建了一个User表语句代码
+
+```python
+from django.db import models
+
+# Create your models here.
+
+class User(models.Model):
+    # 等价于：id int primary_key auto_inscrement
+    id = models.AutoField(primary_key=True)
+    
+    # 等价于：name varchar(32)
+    name = models.CharField(max_length=32)
+    
+    # 等价于 age int
+    age = models.IntegerField()
+```
+
+#### 3.2 数据库迁移命令
+
+> 第一条命令，主要用来生成数据库建表语句记录，下面的命令只是生成记录，还没有真正在数据库中执行创建表
+
+```bash
+python manage.py makemigrations
+```
+
+> 执行后会在对应`app`的`migrations`文件夹下生成一个类似`0001_initial.py`的文件，主要记录了建表语句
+
+![image-20220105234018673](django%E7%AC%94%E8%AE%B0.assets/image-20220105234018673.png)
 
 
 
+> 第二条命令，将操作真正同步到数据库中
+>
 
-
-
-
-
-
+```python
+python manage.py makemigrations
+```
 
 
 
