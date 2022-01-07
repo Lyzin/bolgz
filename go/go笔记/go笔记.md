@@ -1025,8 +1025,10 @@ func main() {
 
 ### 5、rune类型
 
-> - rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
-> - int32的别名，几乎在所有方面等同于int32，它用来区分字符值和整数值
+> `rune`官方解释：rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values
+>
+> - int32的别名，几乎在所有方面等同于int32，一般用来表示字符的
+> - 可以使用`%c`取到对应的字符
 
 ```go
 type rune = int32
@@ -3113,10 +3115,20 @@ func strStrip(s string) string {
 
 > `go`语言中不存在指针运算，仅可以操作指针
 >
-> go中操作指针
+> - `指针`：
+>   - 是指某一个指针类型的一个值，也就是说通过`&变量名`获取到的值就是`指针`(也表示是这个`变量名`指向的内存地址)
+>   - 一个指针可以存一个内存地址，所以指针也就是内存地址
+>   - 一个指针中存储的内存地址为另外一个值(也叫变量)的地址
+
+#### 3.1 go中操作指针
+
 > `&` : 取变量的内存地址，内存地址是一个16进制数
 >
 > `*` : 根据内存地址取值，获取到的是这个内存地址指向的原始值
+>
+> - 注意：
+>   - 给函数中传入一个指针类型形参，就表示这个形参是一个内存地址
+>   - 所以在函数内部，要取得这个内存地址的值，就需要使用`*变量名`拿到内存地址对应的具体值，然后进行操作
 
 > - 从下图和代码可以看出来
 >   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
@@ -3136,8 +3148,8 @@ func main() {
 	age := 18
 	ageMemAddr1 := &age
 	fmt.Printf("age的值:%v\n", age) // 18
-	fmt.Printf("age的内存地址: %p\n", ageMemAddr1) // 0xc00001e098
-	
+	fmt.Printf("age的内存地址: %\vn", ageMemAddr1) // 0xc00001e098
+
 	// 根据内存地址取变量指向的具体值
 	ageVal1 := *ageMemAddr1
 	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal1) // 18
@@ -3170,6 +3182,42 @@ func main() {
 
         age重新赋值后的内存地址没有变:true
 */
+```
+
+> 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型
+
+```go
+package main
+
+import "fmt"
+
+var (
+	strData string
+	intData int
+	boolData bool
+)
+
+func main() {
+	// 如果定义变量的是什么类型，那么他的指针就是什么类型
+	// string类型指针
+	strData = "hello"
+	strDataAddr := &strData
+	fmt.Printf("%v\n", strDataAddr) // 是hello的内存地址: 0x113cf30
+	fmt.Printf("%T\n", strDataAddr) // *string 类型的指针
+	
+	// int类型指针
+	intData = 13
+	intDataAddr := &intData
+	fmt.Printf("%v\n", intDataAddr) // 是13的内存地址: 0x116bd30
+	fmt.Printf("%T\n", intDataAddr) // *int 类型指针
+	
+	// bool类型指针
+	boolData = true
+	boolDataAddr := &boolData
+	fmt.Printf("%v\n", boolDataAddr) // 是bool的内存地址: 0x116bca1
+	fmt.Printf("%T\n", boolDataAddr) // *bool 类型指针
+
+}
 ```
 
 ### 4、`new`(很少用)
@@ -4196,7 +4244,7 @@ func closeBag(x func(int, int), a, b int) {
 */
 ```
 
-##### 1.9.2 闭包例子
+##### 1.9.2 闭包函数分析
 
 > 下面是闭包函数例子的一个分析
 
@@ -4282,7 +4330,11 @@ func addr(x int) func(int) int {
 >
 > 分析传入形参是函数类型的`addr`函数:
 >
-> -  
+> -  `addr`函数定义一个类型为`func(int, int) int`的形参`x`，表示传入`x`的类型一定是函数类型，这个函数类型接收两个`int`参数，并且有一个`int`类型的返回值
+> -  `x`在`addr`函数内部被匿名函数使用，因为`x`本身是一个函数，所以在匿名函数内部就可以调用`x`函数，传入两个`int`形参，那这两个值就可以通过`addr`函数传入
+>    -  最后tmp返回的是`addr`函数内部的匿名函数的内存地址，在`main`函数里执行`addr`函数得到匿名函数的内存地址`ret`和`addr`函数内部`temp`函数的内存地址一样，并且`addr`函数内部的匿名函数接收一个`int`类型类型的形参并且返回一个`int`类型的值
+>    -  所以在`main`函数中就可以给`ret`继续传入一个`int`值
+> -  最终就将`addr`执行完毕，注意给`x`传入函数时一定要符合`addr`函数中`x`的类型
 
 ```go
 package main
@@ -4290,10 +4342,10 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Printf("main方法里的f1函数: %#v\n", f1)
+	fmt.Printf("main方法里的f1函数: %#v\n", f1) //  main方法里的f1函数: (func(int, int) int)(0x496570)
 
 	ret := addr(f1, 100, 200)
-	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret)
+	fmt.Printf("main方法执行 ret的值和类型: %#v\n", ret) // (func(int) int)(0x4966b0)
 
 	data := ret(200)
 	fmt.Printf("data是:%v\n", data)
@@ -4305,12 +4357,12 @@ func f1(a int, b int) int {
 
 func addr(x func(int, int) int, a int, b int) func(int) int {
 	tmp := func(y int) int {
-		fmt.Printf("tmp匿名函数中的x: %#v\n", x)
+		fmt.Printf("tmp匿名函数中的x: %#v\n", x) // tmp匿名函数中的x: (func(int, int) int)(0x496570)
 		ret := x(a, b) + y
 		return ret
 	}
 
-	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp)
+	fmt.Printf("addr函数内部 tmp的值和类型: %#v\n", tmp) // (func(int) int)(0x4966b0)
 	return tmp
 }
 
@@ -4324,9 +4376,7 @@ func addr(x func(int, int) int, a int, b int) func(int) int {
 */
 ```
 
-
-
-
+##### 1.9.3 闭包例子
 
 ```go
 package main
@@ -4342,7 +4392,7 @@ func f1() {
 
 func f2(x, y int) int {
 	z := x + y
-	return z
+	return z 
 }
 
 func f3(f func()) {
@@ -4395,67 +4445,199 @@ func main() {
 	fmt.Printf("jpgSuffix值是:%v\t jpgSuffix的类型是:%T\n", jpgSuffix, jpgSuffix)
 	fmt.Printf("ret:%v", jpgSuffix("name"))
 }
-
-
 ```
 
+#### 1.10 函数传参都是值拷贝
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 1.x 函数`defer`
-
-> defer用来回收资源
+> 函数内部传参都是值拷贝形式
+>
+> - 从下面代码可以看到
+>   - 当给函数`f1`传入`x`和在`main`函数里的`x`的内存地址不一样
+>   - 所以函数`f1`对`x`的修改只发生在函数内部，退出函数后原来的`x`值不会变
+> - 这就是值拷贝
 
 ```go
 package main
 
 import "fmt"
 
+var (
+	strData string
+	intData int
+	boolData bool
+)
 
+func main() {
+	// 当传给函数的形参是一个变量时，该变量是值拷贝
+	x := 3
+	fmt.Printf("f1函数外传递进来的x的内存地址: %p\n", &x)
+	f1 := f1(x)
+	fmt.Printf("%v\n", f1)             // 结果是: 4
+	fmt.Printf("f1函数外最后x的值是: %v\n", x) // 结果是: 3
+}
 
+func f1(x int) int{
+	// 函数内传参都是值拷贝，所以函数内x的值变化不会影响函数外x的值
+	fmt.Printf("f1函数内传递进来的x的内存地址: %p\n", &x)
+	x += 1
+	return x
+}
+```
+
+#### 1.11 `defer`关键字
+
+> - defer主要是用来回收资源
+>
+> - 一个函数中有多个defer存在时，是以`栈(先进后出)`的形式运行，先执行最后一个defer函数，依次反着来
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	defer fmt.Printf("第一个defer\n")
+	defer fmt.Printf("第二个defer\n")
+	defer fmt.Printf("第三个defer\n")
+}
+```
+
+![image-20220104143521838](go%E7%AC%94%E8%AE%B0.assets/image-20220104143521838.png)
+
+> `defer`主要用于延迟执行，清理回收资源等，在遇到defer语句时：
+>
+> - 先将该条defer语句后面的代码存起来，不执行
+> - 然后继续往下走，当其他代码都执行完以后，再来执行defer语句的代码
+>
+> 在`go`语言中，`return`在返回值时分为两步：
+>
+> - 第一步先给返回值赋值
+> - `defer`语句就在第一步和第二部中间
+> - 第二步给`RET`指令执行返回值
+
+##### 1.11.1 defer例子分析
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(f1())
+	fmt.Println(f2())
+	//fmt.Printf(f3())
+	//fmt.Printf(f4())
+}
+
+// f1函数
+/*
+	rval = x, x = 5, rval = 5
+	defer语句中x ++ , x = 6, rval没变
+	ret指令返回rval的值就是5
+*/
+func f1() int {
+	x := 5
+	defer func() {
+		x++
+	}()
+	return x
+}
+
+/*
+  f2函数的返回值有显示声明，那么ravl就是x
+  这里还涉及到了闭包，所以ret指令返回x的值是为6
+  x(rval) = 5
+  defer语句中x++，那么 x=6
+  ret指令返回 x(ravl)=6
+*/
+func f2() (x int) {
+	defer func() {
+		x++
+	}()
+	return 5
+}
+
+/*  f2函数的返回值有显示声明，那么ravl就是y
+	return x 就表示 y(rval)等x的值5， 所以 y(rval) = 5
+	defer 里对x进行了x++ ,但是 y的值没有变
+	ret指令返回y(rval)=5
+*/
+ */
+func f3() (y int) {
+	x := 5
+	defer func() {
+		x ++
+	}()
+	return x
+}
+
+/*
+	 f4函数的返回值有显示声明，那么ravl就是x
+	return 5就表示 x(rval) = 5
+	defer 语句里将x传入，但是函数形参传值都是值拷贝，所以defer里面x++是对x的副本进行了x++，原本x的值不变
+	ret指令返回 x(rval)还是等于5
+*/
+func f4() (x int) {
+	defer func(x int){
+		x++
+	}(x)
+	return 5
+}
+```
+
+##### 1.11.2 defer例子分析二
+
+```go
+package main
+
+// Go 语言的 func 声明中如果返回值变量显示声明，也就是 func foo() (ret int) {} 的时候，rval 就是 ret
+// rval就等于i的值，等于5
+// defer中对i进行了i++, 但是rval仍是5没变
+// ret指令返回rval就是5
+func f() int {
+	i := 5
+	defer func() {
+		i++
+	}()
+	return i
+}
+
+// f1函数的返回值变量有显示声明为result，所以rval就是result
+// 所以result(ret) = 0
+// defer 里面对 result ++ ， result = 1
+// ret指令返回result(ret)就是1
+func f1() (result int) {
+	defer func() {
+		result++
+	}()
+	return 0
+}
+
+// f2函数的返回值变量有显示声明为r，那么rval就是r
+// 那么r(rval) = t = 5，此时r(rval)的值已经确定为5
+// defer 里再对 t = t + 5，但是r(rval)的值不会再变，修改的是t的值，不是r(rval)的值
+// ret指令返回r(rval)就是5
+func f2() (r int) {
+	t := 5
+	defer func() {
+		t = t + 5
+	}()
+	return t
+}
+
+func main() {
+	println(f())  // 5
+	println(f1()) // 1
+	println(f2()) // 5
+}
+```
+
+##### 1.11.3 defer例子分析三
+
+```go
+package main
+
+import "fmt"
 
 func main() {
 	a := 1
@@ -4492,9 +4674,6 @@ func calc(index string, a, b int) int{
 "20", 0, 2, 2
 "10", 1, 3, 4
 */
-
-
-
 ```
 
 
