@@ -591,54 +591,6 @@ func main() {
 }
 ```
 
-### 6、`fmt `包使用总结
-
-> 常用的fmt包输出格式：
->
-> - `%v`:是万能输出变量的值，任何类型变量都可以输出
-> - `%#v`:输出变量并且与变量的类型
-> - `%T`:查看变量的类型
-> - `%s`:输出字符串
-> - `%d`:输出数字
-> - `%p`:输出内存地址
->   - `fmt.Printf("%p\n", &name)`
-
-```go
-package main
-
-import "fmt"
-
-func main() {
-    s1 := 100
-    // 查看变量的类型
-    fmt.Printf("%T\n", s1) // int
-
-    // 查看变量的值，任何类型都可以看
-    fmt.Printf("%v\n", s1) // 100
-
-    // 输出整型的值
-    fmt.Printf("%d\n", s1) // 100
-
-    // 将10进制转换为2进制
-    fmt.Printf("%b\n", s1) // 1100100
-
-    // 将10进制转换为8进制
-    fmt.Printf("%o\n", s1) // 144
-
-    // 将10进制转换为16进制
-    fmt.Printf("%x\n", s1) // 64
-
-    // 输出字符,常用与for循环内输出每个元素值
-    fmt.Printf("%c\n", s1)
-
-    s2 := "bob"
-    // 输出字符串的值
-    fmt.Printf("%T\n", s2) // string
-    fmt.Printf("%s\n", s2) // bob
-    fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
-}
-```
-
 
 
 ## 四、数据类型
@@ -4676,149 +4628,235 @@ func calc(index string, a, b int) int{
 */
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 九、练习题例子
-
-#### 1、 练习题1
+#### 1.12 常见内置函数
+
+> 常见的有
+>
+> - `close`关闭`channel`
+> - `len`用来求长度，比如`string/array/slice/map/channel`
+> - `new`用来分配内存，主要是分配值类型，比如`int/struct`，返回的是指针
+> - `make`用来分配内存，只要用来分配引用类型，比如`channel/map/slice`
+> - `append`用来追加元素到数组、切片中
+> - `panic`和`recover`用来错误处理
+
+##### 1.12.1 panic
+
+> 用来引出错误，类似于`python`的`raise`，主动抛出错误，表示程序出现严重错误
+>
+> 比如数据库连接失败
+
+```go
+package main
+
+func main() {
+	panicStu()
+}
+
+func panicStu() {
+	panic("哈哈哈，出错了")
+}
+
+// 输出
+```
+
+![image-20220113232527069](go%E7%AC%94%E8%AE%B0.assets/image-20220113232527069.png)
+
+##### 1.12.2 recover
+
+> 用来出现错误时，恢复程序
+>
+> 还是少用
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	panicStu()
+}
+
+func panicStu() {
+	defer func() {
+		err := recover()
+		fmt.Printf("err: %v\n", err)
+		fmt.Printf("释放数据库连接")
+	}()
+	panic("数据库连接失败")
+	fmt.Printf("outer")
+}
+
+/* 输出
+err: 数据库连接失败
+释放数据库连接
+*/
+```
+
+#### 1.13 `fmt `包使用总结
+
+##### 1.13.1 打印方法
+
+> 常见的有三种：
+>
+> - `print`
+> - `printf`
+> - `println`
+>
+> 常用的fmt包输出格式：
+>
+> - `%v`:是万能输出变量的值，任何类型变量都可以输出
+> - `%#v`:输出变量并且与变量的类型
+> - `%T`:查看变量的类型
+> - `%s`:输出字符串
+> - `%d`:输出数字
+> - `%p`:输出内存地址
+>   - `fmt.Printf("%p\n", &name)`
+> - `%f`:输出浮点值
+>   - `%.2f`：默认宽度，精度为2(就是小数点后面留两位)
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    s1 := 100
+    // 查看变量的类型
+    fmt.Printf("%T\n", s1) // int
+
+    // 查看变量的值，任何类型都可以看
+    fmt.Printf("%v\n", s1) // 100
+
+    // 输出整型的值
+    fmt.Printf("%d\n", s1) // 100
+
+    // 将10进制转换为2进制
+    fmt.Printf("%b\n", s1) // 1100100
+
+    // 将10进制转换为8进制
+    fmt.Printf("%o\n", s1) // 144
+
+    // 将10进制转换为16进制
+    fmt.Printf("%x\n", s1) // 64
+
+    // 输出字符,常用与for循环内输出每个元素值
+    fmt.Printf("%c\n", s1)
+
+    s2 := "bob"
+    // 输出字符串的值
+    fmt.Printf("%T\n", s2) // string
+    fmt.Printf("%s\n", s2) // bob
+    fmt.Printf("%#v\n", s2) // "bob" 即输出了值，也输出了类型
+    
+    s3 := 12.34
+    // 输出浮点值
+	fmt.Printf("%f\n", s3) // 12.340000
+}
+```
+
+##### 1.13.2 获取输入
+
+> `fmt`包可以获取标准输入，类似于`python`的`input`函数
+>
+> 常见的有三种
+>
+> - `fmt.Scan` 
+>   - 会从标准输入扫描文本，读取空白符分隔的值保存到传递给`Sacn`函数的参数中，换行符为空白符
+>   - `Sacn`函数返回成功扫描的数据个数和遇到的任何错误，如果读取的数据个数比提供的参数要，会返回一个错误原因
+> - `fmt.Scanf`用法和`Scan`一样
+> - `fmt.Scanln`用法和`Scan`一样
+
+```go
+// fmt.Scan代码
+
+package main
+
+import "fmt"
+
+func main() {
+	var s string
+	v, err := fmt.Scan(&s)
+	fmt.Printf("v=%v\n, err=%v\n", v, err)
+	fmt.Printf("您输入了: %v\n",s)
+}
+```
+
+> `fmt.Scan`上面代码分析：
+>
+> - 先定义了一个`s`变量，`s`的值是零值("")
+> - 然后将`s`的内存地址传给`Sacn`完成读取
+>   - 为什么要传`s`的内存地址？
+>     - 因为`Scan`会把标准输入获得的值保存到传递给`Sacn`函数的参数`s`，如果不传入`s`的内存地址，而是直接把`s`传入，那么会直接将`s`的值输出，而不会进行等待标准输入
+>     - 只有传入了内存地址，才可以对`s`的原有值进行重新赋值（保存值），这样最后输出的时候才是我们从标准输入里输入的值
+> - 如果不传`s`的内存地址，就会报下面的错误，可以看到`Scan`也抛出了`string`类型不是一个指针
+
+![image-20220114000247128](go%E7%AC%94%E8%AE%B0.assets/image-20220114000247128.png)
+
+#### 1.14 递归函数
+
+> 递归就是函数自己调用自己
+>
+> `go`语言中的递归
+>
+> - 递归适合处理问题规模相同，规模越来越小的场景
+> - 需要对递归设置退出条件，否则会出现无限循环
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	f := jiechen(3)
+	fmt.Printf("f:%v\n", f)
+}
+
+// 阶乘
+// 5！ = 5 x 4 x 3 x 2 x 1 = 5 x 4!
+// 4！ = 5 x 4 x 3 x 2 x 1 = 4 x 3!
+// 3！ = 5 x 4 x 3 x 2 x 1 = 3 x 2!
+func jiechen(n uint64) uint64 {
+	if n <=1 {
+		return 1
+	}
+	ret := n * jiechen(n-1)
+	return ret
+}
+```
+
+##### 1.14.1 递归例子
+
+> 上台阶问题
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	f := step(3)
+	fmt.Printf("f:%v\n", f)
+}
+
+// n个台阶，一次走1步，也可以走2步，有多少走法
+//
+func step(n uint64) uint64 {
+	if n == 1 {
+		// 只有一个台阶
+		return 1
+	}
+	if n == 2 {
+		// 走法1： 一步跨过2个
+		// 走法2： 一步一个台阶
+		// 总共2种走法
+		return 2
+	}
+	ret := step(n-1) + step(n-2)
+	return ret
+}
+```
+
+#### 1.15 练习题
 
 > 统计字符串里中文字符出现的次数
 
@@ -4850,10 +4888,64 @@ func main() {
 	}
 	
 	fmt.Printf("中文字符出现次数:%v\n", ret) // 6
-	
 }
-
-
-
 ```
 
+## 九、结构体
+
+### 1、自定义类型
+
+> `go`语言中可以在内置类型基础上，自定义自己的类型，用`type`关键字来声明
+
+```go
+// 自定义类型格式
+type 自定义类型名 T
+
+T表示内置的类型，比如int/string/bool
+```
+
+```go
+package main
+
+import "fmt"
+
+type myint int
+
+func main() {
+	var s myint
+	s = 10
+	fmt.Printf("s: %v\n", s) // 10
+	fmt.Printf("s: %T\n", s) // main.myint属于main函数里的myint类型
+}
+```
+
+### 2、类型别名
+
+> 可以对原有的内置数据类型起一个别名，在函数中可以用类型别名来代替原有类型名
+>
+> - 类型别名只在定义的程序中有效
+>
+> - 比如`rune`就是`int32`的类型别名，底层里`rune`用来表示字符
+
+```go
+package main
+
+import "fmt"
+
+// 表示给int类型起了个名字
+type myint = int
+
+func main() {
+	var s myint
+	s = 10
+	fmt.Printf("s: %v\n", s) // 10
+	fmt.Printf("s: %T\n", s) // 本质还是int
+
+	var m rune
+	m = '中'
+	fmt.Printf("m: %v\n", m) // 20013
+	fmt.Printf("m: %T\n", m) // 本质还是int32
+}
+```
+
+### 3、结构体
