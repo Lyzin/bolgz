@@ -828,7 +828,7 @@ func main() {
 
 > 需要引入包`strings`
 >
-> 分割后返回值为一个`list`
+> 分割后返回值为一个切片`list`
 
 ```go
 package main
@@ -4949,4 +4949,224 @@ func main() {
 ```
 
 ### 3、结构体
+
+> 在`go`语言中，基础数据类型只能表示单一的属性，当我们需要表示复杂数据属性时，就显得不够用了，所以`go`语言中有一个自定义数据类型，可以用来封装多个基础数据类型，这种类型被称为`结构体(struct)，用来表示混合数据类型
+>
+> - 结构体用来对标其他语言的面向对象
+> - 结构体类似于其他语言的面向对象编程，有`构造函数`、`方法`这种语法
+> - 内置的基础数据类型是用来描述一个值的，而结构体是用来描述一组值的
+>   - 比如一个人有名字、年龄、兴趣爱好等属性，本质上是一种聚合型的数据类型，就可以用结构体来表示
+
+```go
+// 使用type和struct关键字来定义结构体，具体代码格式如下：
+type 类型名 struct {
+    字段名 字段类型
+    字段名 字段类型
+    …
+}
+
+/*
+	其中：	
+		类型名：标识自定义结构体的名称，在同一个包内不能重复。
+		字段名：表示结构体字段名。结构体中的字段名必须唯一。
+		字段类型：表示结构体字段的具体类型。
+*/
+```
+
+#### 3.1 结构体定义
+
+> 下面代码就是表示定义一个结构体
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct {
+	name string
+	age int
+	hobby []string
+}
+
+func main() {
+	fmt.Printf("%v\n", person)
+}
+```
+
+> 注意结构体不能直接打印，会提示不是一个表达式
+
+![image-20220117183743359](go%E7%AC%94%E8%AE%B0.assets/image-20220117183743359.png)
+
+#### 3.2 结构体初始化
+
+> 初始化以后的结构体的类型是当前包的类型，比如下面的代码就是`main.person`
+>
+> 如果初始化时没有给值，那么就是该类型的零值(默认值)
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 定义结构体
+type person struct {
+	name string
+	age int
+	hobby []string
+}
+
+func main() {
+	var p person
+	// 通过字段去赋值
+	p.name = "sam"
+	p.age = 18
+	p.hobby = []string{"ft", "bt"}
+	fmt.Printf("%v\n", p) // {sam 18 [ft bt]}
+	fmt.Printf("%T\n", p) // main.person
+}
+```
+
+#### 3.3 访问结构体字段
+
+> 使用点的方式来访问结构体的字段
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 定义结构体
+type person struct {
+	name string
+	age int
+	hobby []string
+}
+
+func main() {
+	var p person
+	// 通过字段去赋值
+	p.name = "sam"
+	p.age = 18
+	p.hobby = []string{"ft", "bt"}
+	fmt.Printf("%v\n", p) // {sam 18 [ft bt]}
+	fmt.Printf("%T\n", p) // main.person
+	
+	fmt.Printf("p.age=%v\n", p.age) // 18
+	fmt.Printf("p.hobby=%v\n", p.hobby) // [ft bt]
+}
+```
+
+#### 3.4 匿名结构体
+
+> 没有名字的匿名结构体，需要先声明，再初始化，常用与临时场景：
+>
+> - 只用一次就可以使用匿名结构体
+> - 匿名结构体的类型是:`struct { name string; age int }`
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var s struct{
+		name string
+		age int
+	}
+	s.name = "哈哈"
+	s.age = 1
+	fmt.Printf("s=%v\n",s) // {哈哈 1}
+	fmt.Printf("s=%T\n",s) // struct { name string; age int }
+	fmt.Printf("s.name=%v\n", s.name) // 哈哈
+}
+
+```
+
+#### 3.5 结构体是值类型
+
+> 值类型就是表示是原有值的复制和拷贝，`go`语言中函数的形参传值都是值拷贝，就是通过形参传进来的值的一个副本，二者的内存地址是不一样的，修改了函数内的变量的值，函数外的值是不会变得，所以想要变化的话，需要传入内存地址，也就是指针，才可以进行修改
+
+> 下面代码就可以看到，`f1`函数里对`person`类型的结构体的`age`值重新赋值，但是`f1`函数外面的`p.age`和`f1`函数内的`x.age`内存地址是不一样的，所以无法进行修改
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct {
+	name string
+	age int
+}
+
+func f1(x person){
+	fmt.Printf("x.age=%p\n", &x.age) // x.age=0xc00000c058
+	x.age = 19
+}
+
+func main() {
+	var p person
+	p.name = "sam"
+	p.age = 10
+	f1(p)
+	fmt.Printf("p=%v\n", p) // p={sam 10}
+	fmt.Printf("p.age=%v\n", p.age) // p.age=10
+	fmt.Printf("p.age=%p\n", &p.age) // p.age=0xc00000c040
+}
+```
+
+> 所以一定要修改`age`的值，必须在`f1`函数x的类型必须是`person`的指针类型，因为`person`类型的结构体的内存地址的类型就是`*person`
+>
+> - `f2`函数中`(*x).age=19`：表示根据内存地址找到原始变量，然后修改的就是原始的变量
+> - 并且`go`语言中，有语法糖，所以`(*x).age=19`也可以写成`x.age=19`
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct {
+	name string
+	age int
+}
+
+func f1(x person){
+	x.age = 19
+}
+
+func f2(x *person){
+	fmt.Printf("x.age addr=%p\n", &(x.age))
+	(*x).age = 19 
+}
+
+func main() {
+	var p person
+	p.name = "sam"
+	p.age = 10
+	f2(&p)
+	fmt.Printf("p=%v\n", p) // p={sam 19}
+	fmt.Printf("p.age addr=%p\n", &(p.age)) // p.age=19
+	fmt.Printf("p.age=%v\n", p.age) // p.age=19
+}
+```
+
+#### 3.6 指针类型结构体(new)
+
+> 可以通过`new`关键字对结构体进行实例化，得到结构体的地址
+
+```go
+```
+
+
 
