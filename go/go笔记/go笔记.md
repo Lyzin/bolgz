@@ -2954,6 +2954,8 @@ func main() {
 > - 最后输出`数组s1`和`数组s2`的元素都为一致
 >
 > 由此可以看出切片是引用类型，不管是修改了切片的某个元素值，还是修改了原始数组的某个元素值，原始数组或切片共同位置的元素也会进行同步修改
+>
+> 对于引用类型，若使用var进行声明变量，`必须使用make函数对其进行分配内存,`若不初始化，该变量默认值为nil，向其添加元素时会导致panic。
 
 ```go
 package main
@@ -3065,6 +3067,10 @@ func strStrip(s string) string {
 
 ### 3、指针
 
+> https://studygolang.com/articles/29273
+>
+> https://blog.csdn.net/yonggeit/article/details/102521391
+
 > `go`语言中不存在指针运算，仅可以操作指针
 >
 > - `指针`：
@@ -3135,6 +3141,10 @@ func main() {
         age重新赋值后的内存地址没有变:true
 */
 ```
+
+
+
+
 
 > 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型
 
