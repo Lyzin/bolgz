@@ -5176,6 +5176,25 @@ func main() {
 > 可以通过`new`关键字对结构体进行实例化，得到结构体的地址
 
 ```go
+package main
+
+import "fmt"
+
+type person struct {
+	name string
+	age int
+}
+
+func main() {
+	// new返回的是对应类型的指针
+	var p1 = new(person)
+	p1.name = "age"  // 这里的p1本写全了应该是(*p1).name = "age",但是go语言有语法糖，所以可以省略简写: p1.name = "age"
+	p1.age = 12
+	fmt.Printf("p1:%#v\n", p1) // &main.person{name:"age", age:12}  这是打印p1变量的类型和他所表示值，但是要真正打印出内存地址，需要使用%p
+	fmt.Printf("p1 type:%T\n", p1) // *main.person
+	fmt.Printf("p1:%p\n", p1) // 因为new返回的是对应类型的指针，所以这里p1保存的值就是一个内存地址:0xc000068420
+	fmt.Printf("%p\n", &p1) // 这是求出p1变量的内存地址:0xc00009e018
+}
 ```
 
 
