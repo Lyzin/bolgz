@@ -3941,7 +3941,6 @@ func f3(x int, y string) int{
 	return ret
 }
 
-
 func main() {
 	f1 := f1
 	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
@@ -3971,7 +3970,6 @@ import (
 	"fmt"
 )
 
-
 func f1() {
 	fmt.Printf("这是f1")
 }
@@ -3987,19 +3985,18 @@ func f3(x func() int) int{
 	return ret
 }
 
-
 func main() {
 	f1 := f1
 	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
 	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
-	
+
 	f2 := f2
 	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
 	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
-	
+
 	f3 := f3(f2)
 	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
-	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+	fmt.Printf("f3 Type is:%T\n", f3)// f3的类型: int
 }
 ```
 
@@ -4016,7 +4013,6 @@ import (
 	"fmt"
 )
 
-
 func f1() int{
 	return 33
 }
@@ -4032,19 +4028,18 @@ func f3(x func() int) func() int{
 	return f1
 }
 
-
 func main() {
 	f1 := f1
 	fmt.Printf("f1 = %v\n", f1) // f1的内存地址：0x108b480
-	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func()
-	
+	fmt.Printf("f1 Type is:%T\n", f1) // f1函数的类型: func() int
+
 	f2 := f2
 	fmt.Printf("f2 = %v\n", f2) // f2的内存地址：0x108b4e0
 	fmt.Printf("f2 Type is:%T\n", f2)// f2函数的类型: func() int
-	
+
 	f3 := f3(f2)
 	fmt.Printf("f3 = %v\n", f3) // f3的内存地址：0x108b4e0
-	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func(int, string) int
+	fmt.Printf("f3 Type is:%T\n", f3)// f3函数的类型: func() int
 }
 ```
 
@@ -4071,6 +4066,7 @@ func main() {
 		c := a + b
 		return c
 	}
+    
 	ret := f1(10,20)
 	fmt.Printf("ret: %v\n", ret)
 	
@@ -4608,7 +4604,6 @@ func main() {
 	a = 0
 	defer calc("20", a, calc("20", a, b))
 	b = 1
-	
 }
 
 func calc(index string, a, b int) int{
@@ -4778,7 +4773,6 @@ func main() {
 
 ```go
 // fmt.Scan代码
-
 package main
 
 import "fmt"
@@ -4963,6 +4957,7 @@ func main() {
 > 在`go`语言中，基础数据类型只能表示单一的属性，当我们需要表示复杂数据属性时，就显得不够用了，所以`go`语言中有一个自定义数据类型，可以用来封装多个基础数据类型，这种类型被称为`结构体(struct)，用来表示混合数据类型
 >
 > - 结构体用来对标其他语言的面向对象
+>   - 结构体是一片连续的内存地址	
 > - 结构体类似于其他语言的面向对象编程，有`构造函数`、`方法`这种语法
 > - 内置的基础数据类型是用来描述一个值的，而结构体是用来描述一组值的
 >   - 比如一个人有名字、年龄、兴趣爱好等属性，本质上是一种聚合型的数据类型，就可以用结构体来表示
@@ -5009,11 +5004,38 @@ func main() {
 
 ![image-20220117183743359](go%E7%AC%94%E8%AE%B0.assets/image-20220117183743359.png)
 
+> 结构体定义时，类型一样的多个值可以写在一行，和函数定义多个类型一样的形参一样
+>
+> 比如下面的`name`,`gender`都是`string`类型，所以可以定义在一行
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name, gender string
+	age int
+}
+
+func main() {
+	var p1 person
+	p1 = person{
+		name: "lily",
+		gender: "boy",
+		age: 19,
+	}
+	fmt.Printf("%v\n", p1) // {lily boy 19}
+}
+```
+
 #### 3.2 结构体初始化
 
 > 初始化以后的结构体的类型是当前包的类型，比如下面的代码就是`main.person`
 >
-> 如果初始化时没有给值，那么就是该类型的零值(默认值)
+> `如果初始化时没有给值，那么就是该类型的零值(默认值)`
 
 ```go
 package main
@@ -5042,7 +5064,7 @@ func main() {
 
 #### 3.3 访问结构体字段
 
-> 使用点的方式来访问结构体的字段
+> 使用点(`.`)的方式来访问结构体的字段
 
 ```go
 package main
@@ -5097,12 +5119,14 @@ func main() {
 	fmt.Printf("s=%T\n",s) // struct { name string; age int }
 	fmt.Printf("s.name=%v\n", s.name) // 哈哈
 }
-
 ```
 
 #### 3.5 结构体是值类型
 
-> 值类型就是表示是原有值的复制和拷贝，`go`语言中函数的形参传值都是值拷贝，就是通过形参传进来的值的一个副本，二者的内存地址是不一样的，修改了函数内的变量的值，函数外的值是不会变得，所以想要变化的话，需要传入内存地址，也就是指针，才可以进行修改
+> 值类型就是表示是`原有值的复制和拷贝`
+>
+> - `go`语言中函数的形参传值都是值拷贝，就是通过形参传进来的值的一个副本，二者的内存地址是不一样的，修改了函数内的变量的值，函数外的值是不会变得
+> - 所以想要变化的话，需要传入内存地址，也就是指针，才可以进行修改
 
 > 下面代码就可以看到，`f1`函数里对`person`类型的结构体的`age`值重新赋值，但是`f1`函数外面的`p.age`和`f1`函数内的`x.age`内存地址是不一样的，所以无法进行修改
 
@@ -5137,7 +5161,7 @@ func main() {
 > 所以一定要修改`age`的值，必须在`f1`函数x的类型必须是`person`的指针类型，因为`person`类型的结构体的内存地址的类型就是`*person`
 >
 > - `f2`函数中`(*x).age=19`：表示根据内存地址找到原始变量，然后修改的就是原始的变量
-> - 并且`go`语言中，有语法糖，所以`(*x).age=19`也可以写成`x.age=19`
+> - 并且`go`语言中，有语法糖，所以`(*x).age=19`也可以写成`x.age=19`，语法糖会自动根据指针找到对应的变量
 
 ```go
 package main
@@ -5171,9 +5195,11 @@ func main() {
 }
 ```
 
-#### 3.6 指针类型结构体(new)
+#### 3.6 结构体指针
 
-> 可以通过`new`关键字对结构体进行实例化，得到结构体的地址
+##### 3.6.1 new关键字创建结构体指针
+
+> 可以通过`new`关键字对结构体进行实例化，得到的是结构体的地址
 
 ```go
 package main
@@ -5197,5 +5223,423 @@ func main() {
 }
 ```
 
+> 指针的存储示意图
+>
 
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var a int
+	a = 100
+	b := &a
+	// a type: int, b type: *int，b的类型是 int类型的指针
+	fmt.Printf("type a:%T\t type b:%T\n", a, b)
+	// 将a的十六进制内存地址打印
+	fmt.Printf("%p\n", &a) // 0xc000072080表示a的内存地址
+	fmt.Printf("%v\n", b) // b本身的值是0xc000072080，也是a的内存地址
+	fmt.Printf("%p\n", &b) // 0xc00009e018表示b的值(0xc000072080)的内存地址
+}
+```
+
+![image-20220130225728855](go%E7%AC%94%E8%AE%B0.assets/image-20220130225728855.png)
+
+##### 3.6.2 结构体指针2(初始化结构体)
+
+> 声明变量和初始化一步完成，以`key-value`形式初始化
+>
+> - 它的值是结构体定义的值
+> - 但是类型是一个结构体类型
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	var p1 = person{
+		name: "sam",
+		age: 19,
+	}
+	fmt.Printf("%v\n", p1) // {jom 19}
+	fmt.Printf("%T\n", p1) // main.person
+}
+```
+
+##### 3.6.3 结构体指针3(初始化结构体)
+
+> 通过值列表的形式初始化，值的顺序和结构体定义式字段的顺序一致
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	p1 := person{
+		"sam",
+		19,
+	}
+	fmt.Printf("%v\n", p1) // {jom 19}
+	fmt.Printf("%T\n", p1) // main.person
+}
+```
+
+##### 3.6.4 快速获取结构体指针
+
+> 一般在`go`中，快速获取结构体指针的方式就可以在初始化结构体的时候加一个`取址符号(&)`,就可以快速获取到结构体的指针
+>
+> 可以看到下面代码就是在初始化定义结构体的时候加了一个取址符号：
+>
+> - p1的值就是一个十六进制的内存地址
+> - p1的类型就是对应person类型的指针类型
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	p1 := &person{
+		"sam",
+		19,
+	}
+	fmt.Printf("%p\n", p1) // 0xc000004480
+	fmt.Printf("%T\n", p1) // *main.person
+}
+```
+
+#### 3.7 结构体在内存是连续的
+
+> 结构体在内存中占用的内存空间是连续的
+>
+> 从下面代码可以看到`a、b、c`是连续的，`d`没有连续，这是因为`go`语言中有内存地址对齐的概念，后面再解释
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type number struct{
+	a int8
+	b int8
+	c int8
+	d string
+}
+
+func main() {
+	p1 := number {
+		a: 10,
+		b: 20,
+		c: 30,
+		d: "kim",
+	}
+
+	fmt.Printf("%p\n", &(p1.a)) // 0xc000068420
+	fmt.Printf("%p\n", &(p1.b)) // 0xc000068421
+	fmt.Printf("%p\n", &(p1.c)) // 0xc000068422
+	fmt.Printf("%p\n", &(p1.d)) // 0xc000068428
+}
+// 执行结果
+/*
+	0xc000068420
+    0xc000068421
+    0xc000068422
+    0xc000068428
+*/
+```
+
+#### 3.8 构造函数
+
+> 结构体初始化的时候，除了可以使用变量初始化，也可以使用函数初始化，这个函数就是构造函数，在其他语言里有这个内置的函数
+>
+> 构造函数返回一个结构体变量的函数
+>
+> 构造函数的存在就是为了简化结构体初始化过程，将重复要写的一些代码简化，通过函数来实现结构体初始化
+>
+> - 核心思想：调用构造函数时，可以立刻返回一个定义好的结构体类型的变量
+>
+> 构造函数一般是以`new和结构体变量首字母大写`的函数，返回的也是结构体变量
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+// 构造函数
+func newPerson(name string, age int) person{
+	return person{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+}
+```
+
+> 构造函数什么时候返回结构体变量，什么时候返回结构体指针
+>
+> - 当结构体比较大的时候，就是说结构体里定义的变量特别多的时候，占用内存也很大，所以尽量使用结构体指针
+> - 其他情况都可以返回结构体变量
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+	age1 int
+	age2 int
+	age3 int
+	age4 int
+	age5 int
+}
+
+// 构造函数
+func newPerson(name string, age int) *person{
+	return &person{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+}
+```
+
+#### 3.9 方法和接收者
+
+> 结构体里的方法对标的是其他语言中面向对象的方法，比如`python`面向对象里的方法
+>
+> - 方法是作用于特定类型的函数
+>   - 特定类型就是需要限定类型，限定的类型就是我们定义的结构体类型
+>
+> - 接收者是调用该方法的具体类型变量，多用类型名首字母小写
+>
+> 下面代码里的`方法(p person)就是接收者`,`p`就是表示接收者，表示传入的是结构体对象，一般是用定义的结构体的首字母来作为形参
+
+> 格式：
+>
+> func (结构体首字母 结构体类型) 函数名(参1，参2){
+>
+> }
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+// 构造函数
+func newPerson(name string, age int) person{
+	return person{
+		name: name,
+		age: age,
+	}
+}
+
+// 方法(p person)就是接收者
+func (p person) walk() {
+	fmt.Printf("%s年龄是%d岁\n", p.name, p.age)
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+	p1.walk()
+}
+```
+
+> 如果定义的结构体首字母大写，那么这个结构体对外部暴露可见，共有的，其他`go`文件可以用来导入这个结构体
+>
+> 如果一个包里定义的结构体首字母是小写的，那么其他`go`文件是访问不到小写开头的结构体的
+>
+> 需要注意的点：
+>
+> - 并且对首字母大写的需要有格式要求
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+// 下面的格式必须是需要空格隔开
+// Person 这是一个人的结构体
+type Person struct{
+	name string
+	age int
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+	p1.walk()
+}
+```
+
+##### 3.9.1 值接收者
+
+> 结构体方法里的接收者如果是值类型时，即使在方法里对结构体对象的某个属性进行了修改，但是这个结构体本身的这个属性是不会变化的，因为值接收者就是复制拷贝，值拷贝的内存地址是完全不一样的两个
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func newPerson(name string, age int) person {
+	return person{
+		name: name,
+		age: age,
+	}
+}
+
+func (p person) newYear() {
+	p.age += 1
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+	p1.newYear()
+	fmt.Printf("过了一年, p1.age:%v\n", p1.age)
+}
+
+// 结果
+/*
+	p1={sam 19}
+	过了一年, p1.age:19
+*/
+```
+
+##### 3.9.2 指针接收者
+
+> 在值接收者里，对应方法修改了结构体对象的某个值，因为值拷贝的原因，还是不会进行变化，那么如果真要修改，就要用到了指针接收者
+>
+> 下面代码可以看到方法`newYear()`里传入的`p`的内存地址就是`main`方法里定义的`p1`，所以`newYear`方法里修改的`age`属性就是修改的`p1`的属性，所以会把`age`加1
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func newPerson(name string, age int) person {
+	return person{
+		name: name,
+		age: age,
+	}
+}
+
+func (p *person) newYear() {
+	fmt.Printf("p inside addr: %p\n", p)
+	(*p).age += 1
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+	fmt.Printf("p1 outter addr: %p\n", &p1)
+	p1.newYear()
+	fmt.Printf("过了一年, p1.age:%v\n", p1.age)
+}
+/* 执行结果:
+    p1={sam 19}
+    p1 outter addr: 0xc000068420
+    p inside addr: 0xc000068420
+    过了一年, p1.age:20
+*/ 
+```
+
+> 什么时候应该使用指针类型接收者
+>
+> - 需要修改接收者中的值
+> - 接收者是拷贝比较大的对象
+> - 保证一致性，如果有某个方法用了指针接收者，那么其他方法也应该如此
+
+#### 3.10 自定义类型加方法
+
+> 方法只能给自定义的类型加方法，比如想给基础类型`int`加一个方法，就需要先创建一个属于自己的`myint`类型，然后对这个类型加方法
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+type myInt int
+
+func (m myInt) hello() {
+	fmt.Printf("this is buildt int func")
+}
+
+func main() {
+    m := myInt(12) // 这里myInt(12)表示是强制类型转换
+	m.hello()
+}
+```
 
