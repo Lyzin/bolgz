@@ -5628,7 +5628,7 @@ func main() {
 package main
 
 import (
-"fmt"
+	"fmt"
 )
 
 type myInt int
@@ -5641,5 +5641,37 @@ func main() {
     m := myInt(12) // 这里myInt(12)表示是强制类型转换
 	m.hello()
 }
+```
+
+#### 3.11 结构体匿名字段
+
+> 在定义结构体时只定义变量类型，不写变量名，用的较少
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type dog struct{
+	string
+	int
+}
+
+func main() {
+	m := dog{
+		"sam",
+		111,
+	}
+	fmt.Printf("m=%v\n", m) // {sam 111}
+}
+```
+
+#### 3.12 结构体嵌套
+
+> 结构体里可以再嵌套另一个结构体
+
+```go
 ```
 
