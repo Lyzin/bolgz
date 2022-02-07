@@ -5487,7 +5487,7 @@ func newPerson(name string, age int) person{
 	}
 }
 
-// 方法(p person)就是接收者
+// 方法walk，(p person)就是接收者
 func (p person) walk() {
 	fmt.Printf("%s年龄是%d岁\n", p.name, p.age)
 }
@@ -5574,6 +5574,8 @@ func main() {
 > 在值接收者里，对应方法修改了结构体对象的某个值，因为值拷贝的原因，还是不会进行变化，那么如果真要修改，就要用到了指针接收者
 >
 > 下面代码可以看到方法`newYear()`里传入的`p`的内存地址就是`main`方法里定义的`p1`，所以`newYear`方法里修改的`age`属性就是修改的`p1`的属性，所以会把`age`加1
+>
+> 指针接受者后面用的比较多
 
 ```go
 package main
@@ -5655,22 +5657,247 @@ import (
 )
 
 type dog struct{
-	string
-	int
+	name string
+	age int
 }
 
 func main() {
 	m := dog{
 		"sam",
-		111,
+		19,
 	}
-	fmt.Printf("m=%v\n", m) // {sam 111}
+	
+	fmt.Printf("m=%v\n", m)
+	fmt.Printf("m.name=%v\n", m.name)
+	fmt.Printf("m.age=%v\n", m.age)
 }
+
+/*
+m={sam 19}
+m.name=sam
+m.age=19
+*/
 ```
 
 #### 3.12 结构体嵌套
 
-> 结构体里可以再嵌套另一个结构体
+> 结构体里可以再嵌套另一个结构体，这样的结构体称作结构体嵌套
+>
+> 代码分析
+>
+> - `specs`结构体是一个公共结构体，用来表示其他结构体都包含它的所有属性
+> - `clothes`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
+> - `car`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
+> - 对`clothes`结构体写构造函数，需要对`clothes`里的`specs`结构体进行初始化赋值，通过`newClothes`传入的形参值进行传入，最终将`clothes`结构体返回，同理`car`结构体也是一样的
+> - 通过`clothes`结构体的构造函数初始化了一个`c1`变量，传入了`name`、`price`、`color`、`size`变量以后，就可以对`c1`进行属性访问了
+>   - 需要访问`c1`的`color`属性，不能直接`c1.color`，这样是找不到的，会提示报错：` c1.color undefined (type clothes has no field or method color)`,因为`c1`本身是没有`color`属性的，`c1`的`color`属性在`specs`这个结构体里，所以需要`c1.specs.color`这样一级一级去找，`c1.specs.color`里的`specs`是`clothes`结构体里定义的`specs`这个变量名，不是`specs`这个结构体类型
+>   - 这样去访问嵌套结构体里的属性是比较清晰明了的
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 需要被嵌套的结构体
+type specs struct{
+	color	string
+	size	string
+}
+
+// 衣服结构体。里面嵌套了一个specs这个结构体
+type clothes struct{
+	name	string
+	price	int
+	specs	specs
+}
+
+// 汽车结构体，里面嵌套了一个specs这个结构体
+type car struct{
+	name 	string
+	price 	int
+	specs 	specs
+}
+
+func newClothes(name, color, size string, price int) clothes{
+	return clothes{
+		name: name,
+		price: price,
+		specs: specs{
+			color: color,
+			size: size,
+		},
+	}
+}
+
+func newCar(name, color, size string, price int) car {
+	return car{
+		name: name,
+		price: price,
+		specs: specs{
+			color: color,
+			size: size,
+		},
+	}
+}
+
+func (c *clothes) wear(userName string) {
+	fmt.Printf("%s is wear %s\n", userName, c.name)
+}
+
+func (c *car) drive(userName string) {
+	fmt.Printf("%s drive a %s\n", userName, c.name)
+}
+
+func main() {
+	c1 := newClothes("NaKe", "red", "XL", 33)
+	fmt.Printf("c1=%v\n", c1)
+	fmt.Printf("c1.name=%v\n", c1.name)
+	fmt.Printf("c1.price=%v\n", c1.price)
+	fmt.Printf("c1.specs.color=%v\n", c1.specs.color)
+	fmt.Printf("c1.specs.size=%v\n", c1.specs.size)
+	c1.wear("jason")
+	
+	fmt.Println()
+	
+	c2 := newCar("BMW", "pink", "2HX", 1999999)
+	fmt.Printf("c2=%v\n", c2)
+	fmt.Printf("c2.name=%v\n", c2.name)
+	fmt.Printf("c2.price=%v\n", c2.price)
+	fmt.Printf("c2.specs.color=%v\n", c2.specs.color)
+	fmt.Printf("c2.specs.size=%v\n", c2.specs.size)
+	c2.drive("sam")
+}
+/*
+    c1={NaKe 33 {red XL}}
+    c1.name=NaKe
+    c1.price=33
+    c1.specs.color=red
+    c1.specs.size=XL
+    jason is wear NaKe
+
+    c2={BMW 1999999 {pink 2HX}}
+    c2.name=BMW
+    c2.price=1999999
+    c2.specs.color=pink
+    c2.specs.size=2HX
+    sam drive a BMW
+*/
+```
+
+> 上面访问嵌套结构体时，不能直接通过`c1.color`进行访问`color`属性，其实也可以进行访问，需要对`clothes`里的嵌套结构体改造成`匿名嵌套结构体`
+>
+> `匿名嵌套结构体`：
+>
+> - 就是在嵌套结构体里对于被嵌套的结构体，不显式的写一个变量名，而是直接写该被嵌套的结构体
+> - 那么在构造函数时，类比到结构体匿名字段，那么这个被嵌套结构体的变量名就是它自己的名字，因为没有给名字，所以用的是自己的名字
+> - 那么这样定义的嵌套结构体就是可以通过`c1.color`进行直接访问`color`属性了
+> - 下面代码验证该结论
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type specs struct{
+	color	string
+	size	string
+}
+
+type clothes struct{
+	name	string
+	price	int
+	specs // 匿名嵌套结构体，不写嵌套体的变量名
+}
+
+type car struct{
+	name 	string
+	price 	int
+	specs // 匿名嵌套结构体，不写嵌套体的变量名
+}
+
+func newClothes(name, color, size string, price int) clothes{
+	return clothes{
+		name: name,
+		price: price,
+		// 冒号前面的specs就是specs这个结构体的名字，因为是匿名嵌套结构体来的，使用了该结构体的名字作为变量名
+		specs: specs{
+			color: color,
+			size: size,
+		},
+	}
+}
+
+func newCar(name, color, size string, price int) car {
+	return car{
+		name: name,
+		price: price,
+		specs: specs{
+			color: color,
+			size: size,
+		},
+	}
+}
+
+func (c *clothes) wear(userName string) {
+	fmt.Printf("%s is wear %s\n", userName, c.name)
+}
+
+func (c *car) drive(userName string) {
+	fmt.Printf("%s drive a %s\n", userName, c.name)
+}
+
+func main() {
+	c1 := newClothes("NaKe", "red", "XL", 33)
+	fmt.Printf("c1=%v\n", c1)
+	fmt.Printf("c1.name=%v\n", c1.name)
+	fmt.Printf("c1.price=%v\n", c1.price)
+     // 直接使用c1.color、c1.size进行访问嵌套结构体里的属性
+	fmt.Printf("c1.color=%v\n", c1.color)
+	fmt.Printf("c1.size=%v\n", c1.size)
+	c1.wear("jason")
+	
+	fmt.Println()
+	
+	c2 := newCar("BMW", "pink", "2HX", 1999999)
+	fmt.Printf("c2=%v\n", c2)
+	fmt.Printf("c2.name=%v\n", c2.name)
+	fmt.Printf("c2.price=%v\n", c2.price)
+    // 直接使用c2.color、c2.size进行访问嵌套结构体里的属性
+	fmt.Printf("c2.color=%v\n", c2.color)
+	fmt.Printf("c2.size=%v\n", c2.size)
+	c2.drive("sam")
+}
+
+/*
+    c1={NaKe 33 {red XL}}
+    c1.name=NaKe
+    c1.price=33
+    c1.color=red
+    c1.size=XL
+    jason is wear NaKe
+
+    c2={BMW 1999999 {pink 2HX}}
+    c2.name=BMW
+    c2.price=1999999
+    c2.color=pink
+    c2.size=2HX
+    sam drive a BMW
+*/
+```
+
+> 嵌套结构体查找属性时，先从自己内部的属性字典里去找，找不到再去嵌套结构体里找，这样一层一层去找元素
+>
+> 匿名嵌套结构体多适用于只有一个嵌套结构体
+>
+> 当有多个嵌套结构体时，建议还是对嵌套的结构体写不同的变量名，并且在访问时一级一级的去写访问属性，如`c1.specs.color`
+
+#### 3.13 结构体模拟继承
+
+> `go`本身是没有继承的，但是用结构体可以来模拟继承
 
 ```go
 ```
