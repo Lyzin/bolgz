@@ -5681,6 +5681,8 @@ m.age=19
 
 #### 3.12 结构体嵌套
 
+##### 3.12.1 显式结构体嵌套
+
 > 结构体里可以再嵌套另一个结构体，这样的结构体称作结构体嵌套
 >
 > 代码分析
@@ -5785,6 +5787,8 @@ func main() {
     sam drive a BMW
 */
 ```
+
+##### 3.12.2 匿名嵌套结构体
 
 > 上面访问嵌套结构体时，不能直接通过`c1.color`进行访问`color`属性，其实也可以进行访问，需要对`clothes`里的嵌套结构体改造成`匿名嵌套结构体`
 >
@@ -5898,7 +5902,402 @@ func main() {
 #### 3.13 结构体模拟继承
 
 > `go`本身是没有继承的，但是用结构体可以来模拟继承
+>
+> 继承：
+>
+> - 在其他语言中，有一个父类，然后有一个子类，子类可以继承父类的属性和方法
+> - 在`go`语言中可以使用结构体嵌套来模拟继承，当一个结构体A嵌套了结构体B，那么这个结构体A就拥有了结构体B的所有属性和方法，也就实现了模拟继承
+>
+> 如下代码：
+>
+> - `father`结构体类比为一个父类，`son`结构体类比为一个子类，`father`结构体有个`house`方法
+> - `son`结构体中嵌套了`father`结构体，那么就拥有了`father`结构体的所有属性和方法，`son`结构体就可以进行访问`father`结构体的`house`方法和`name`属性
+> - 从执行结果里可以看到`s1=main.son{age:19, father:main.father{name:"hupe"}}`，就说明了`s1`结构体里嵌套的`father`结构体，那么就可以访问`father`结构体的所有的属性和方法
 
 ```go
+package main
+
+import (
+	"fmt"
+)
+
+// father结构体
+type father struct{
+	name string
+}
+
+// father的构造函数
+func newFather(name string) father{
+	return father{
+		name: name,
+	}
+}
+
+// father结构体的方法
+func (f *father) house() {
+	fmt.Printf("father init func, name [%v] have a house\n", f.name)
+}
+
+// son结构体
+type son struct{
+	age int
+	father
+}
+
+// son结构体的构造函数
+func newSon(age int, name string) son {
+	return son{
+		age: age,
+		father: father{
+			name: name,
+		},
+	}
+}
+
+// son结构体的方法
+func (s *son) goWalk() {
+	fmt.Printf("father is %v\n", s.name)
+	fmt.Printf("son age is %v\n", s.age)
+}
+
+func main() {
+	f1 := newFather("opim")
+	fmt.Printf("f1=%#v\n", f1)
+	
+	s1 := newSon(19, "hupe")
+	fmt.Printf("s1=%#v\n", s1)
+	
+	s1.goWalk()
+	s1.house()
+}
+
+
+/*	
+	执行结果：
+	f1=main.father{name:"opim"}
+	s1=main.son{age:19, father:main.father{name:"hupe"}}
+	father is hupe
+	son age is 19
+	father init func, name [hupe] have a house
+*/
 ```
+
+#### 3.14 结构体和json
+
+##### 3.14.1 json解释
+
+> 结构体中支持json格式输出
+>
+> `JSON`简介
+>
+> - JSON的全称是”JavaScript Object Notation”，意思是JavaScript对象表示法，它是一种基于文本，独立于语言的轻量级数据交换格式。
+>
+> - JSON语法
+>
+>   - 数据在名称/值对中
+>   - 数据由逗号分隔
+>   - 大括号保存对象
+>   - 中括号保存数组
+>
+> - JSON值
+>
+>   - 数字(整数/浮点数)
+>
+>   - 字符串(双引号)
+>   - [布尔值](https://www.zhihu.com/search?q=布尔值&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A627916260})(true/false)
+>
+>   - 数组(中括号中)
+>
+>   - 对象(大括号中)
+>
+>   - null
+>
+>   - 实例
+>
+> - JSON 数据的书写格式
+>
+>   - 名称/值对组合中的名称写在前面（在双引号中），值对写在后面，中间用冒号隔开
+>   - 其中`值`可以是：数字（整数或浮点数）、字符串（在双引号中）、布尔值（true或false）、数组（在方括号中）、对象（在花括号中）、null
+
+##### 3.14.2 序列化和反序列化
+
+> 知乎解释：[序列化和反序列化](https://zhuanlan.zhihu.com/p/40462507)
+>
+> 百度百科解释：
+>
+> - 序列化 (Serialization)是将对象的状态信息转换为可以存储或传输的形式的过程
+>   - 把对象转化为可传输的字节序列过程称为序列化，比如`json`、`bytes`等形式
+>   - 在序列化期间，对象将其当前状态写入到临时或持久性存储区
+> - 反序列化
+>   - 可以通过从存储区中读取或反序列化对象的状态，重新创建该对象
+>   - 把字节序列还原为对象的过程称为反序列化
+
+##### 3.14.3 go序列化
+
+> 序列化：
+>
+> - 将go语言中的结构体变量 --> json格式的字符串
+>
+> `go`序列化:
+>
+> - 使用到了内置包`encoding/json`，需要先引入
+>
+> - 输出序列化的值：
+>   - 需要使用内置函数`string`
+
+```go
+// 语法
+ret, err := json.Marshal(d1)
+
+/* 
+	json.Marshal(需要序列化的对象)
+	输出时使用string对ret进行转化成字符串，否则会直接输出会显示为空
+	返回两个值，ret是序列化的结果，err是错误信息，没有错误的话都是nil，表示空值，可以用来进行判断序列化是否转化成功
+*/
+```
+
+> 直接输出序列化的变量，是一个字节类型的
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	name string
+	age int
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	d1 := newDog("bom", 3)
+	fmt.Printf("d1=%v\n", d1)
+	
+	// 序列化：将go语言中的结构体变量 --> json格式的字符串
+	ret, err := json.Marshal(d1)
+	
+	if err != nil {
+		fmt.Printf("json转化失败")
+		return
+	}
+	fmt.Printf("ret=%#v\n", ret)
+}
+```
+
+![image-20220208180705196](go%E7%AC%94%E8%AE%B0.assets/image-20220208180705196.png)
+
+> 使用string转化输出,但是输出是空的json
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	name string
+	age int
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	d1 := newDog("bom", 3)
+	fmt.Printf("d1=%v\n", d1)
+	
+	// 序列化：将go语言中的结构体变量 --> json格式的字符串
+	ret, err := json.Marshal(d1)
+	
+	if err != nil {
+		fmt.Printf("json转化失败")
+		return
+	}
+	fmt.Printf("ret=%#v\n", string(ret))
+}
+
+```
+
+![image-20220208180821232](go%E7%AC%94%E8%AE%B0.assets/image-20220208180821232.png)
+
+> 上面可以看到使用`string`转化序列化的变量以后，输出的空字符串，没有d1里的name和age属性
+>
+> 这里就是字段的可见性的原因：
+>
+> - 因为在`go`字段名是小写的，那么其他包导入的时候，是访问不到的，属于隐藏变量
+> - 在上面的代码中，定义的`d1`的结构体的`name`和`age`属性都是小写，那么在`json`这个包序列化`d1`的时候，由于`d1`属性名都是小写，所以`json`包访问不到，所以出现了空字符串
+> - 所以修改`dog`结构体的`name`和`age`字段名首字母大写，构造函数中也进行对应的字段名首字母大写就可以正确输出`json`字符串了
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	Name string
+	Age int
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		Name: name,
+		Age: age,
+	}
+}
+
+func main() {
+	d1 := newDog("bom", 3)
+	fmt.Printf("d1=%v\n", d1)
+	
+	// 序列化：将go语言中的结构体变量 --> json格式的字符串
+	// 需要注意的是结构体的字段名首字母必须大写，因为这是需要json包需要访问d1的name和age属性，小写的字段在其他包都是没法访问到的
+	ret, err := json.Marshal(d1)
+	
+	if err != nil {
+		fmt.Printf("json转化失败")
+		return
+	}
+	fmt.Printf("ret=%#v\n", string(ret))
+}
+```
+
+![image-20220208181655186](go%E7%AC%94%E8%AE%B0.assets/image-20220208181655186.png)
+
+
+
+> 下图是将上面的结果`"{\"Name\":\"bom\",\"Age\":3}"`放到`json`格式转化的网站进行了转化，可以看到是一个正确的`json`字符串，反斜杠是表示转义符号
+
+![image-20220208181803156](go%E7%AC%94%E8%AE%B0.assets/image-20220208181803156.png)
+
+> 但是有个问题，序列化出来的`json`字段名首字母都是大写，但是传给前端的时候需要都是小写的，就需要使用`tag`，`tag`是在定义结构体的位置添加，tag表示给字段名起了一个别名
+
+```go
+// 添加tag
+type dog struct{
+	// 首字母不大写，没法进行序列化
+    // 反斜杠，json表示使用的包，用冒号隔开，后面要写的字段用小写，有多个用空格隔开
+    // 可以理解未是给首字母大写的字段名通过tag起了一个别名
+	Name string `json:"name"`
+	Age int `json:"age"`
+}
+```
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	Name string `json:"name"`
+	Age int `json:"age"`
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		Name: name,
+		Age: age,
+	}
+}
+
+func main() {
+	d1 := newDog("bom", 3)
+	fmt.Printf("d1=%v\n", d1)
+	
+	// 序列化：将go语言中的结构体变量 --> json格式的字符串
+	// 需要注意的是结构体的字段名首字母必须大写，因为这是需要json包需要访问d1的name和age属性，小写的字段在其他包都是没法访问到的
+	ret, err := json.Marshal(d1)
+	
+	if err != nil {
+		fmt.Printf("json转化失败")
+		return
+	}
+	fmt.Printf("ret=%#v\n", string(ret))
+}
+```
+
+![image-20220208184714283](go%E7%AC%94%E8%AE%B0.assets/image-20220208184714283.png)
+
+##### 3.14.4 go反序列化
+
+> 反序列化：
+>
+> - 将json格式的字符串 --> go语言中的结构体变量
+
+```go
+// 语法
+var 变量 对应结构体类型
+err := json.Unmarshal([]byte(反序列化字符串)， 变量指针)
+
+/* 
+	接收的第一个参数是字节类型的切换，那么可以值接使用[]byte(反序列化字符串)进行强制转化
+	第二个参数是定义一个变量用来存储反序列化的值，一般都是需要传入指针，因为go语言的函数传值都是拷贝，如果不传指针，定义的变量传给Unmarshal函数一直都是副本，所以需要传递指针，变量在反序列化以后，值才会接收为反序列化的值
+	返回1个值，err是错误信息，没有错误的话都是nil，表示空值，可以用来进行判断反序列化是否成功
+*/
+```
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	Name string `json:"name"`
+	Age int `json:"age"`
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		Name: name,
+		Age: age,
+	}
+}
+
+func main() {
+	// 反序列化
+	var d1 dog
+	// 反引号表示将字符串的内容会原样输出
+	jsonStrData := `{"name":"lpm","age":13}`
+	fmt.Printf("%#v\n", jsonStrData)
+	
+	err := json.Unmarshal([]byte(jsonStrData), &d1)
+	fmt.Printf("err=%v\n", err)
+	if err != nil {
+		fmt.Println("反序列化失败！！！")
+	}
+}
+// "{\"name\":\"lpm\",\"age\":13}"
+```
+
+
+
+
 
