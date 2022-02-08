@@ -6297,7 +6297,44 @@ func main() {
 // "{\"name\":\"lpm\",\"age\":13}"
 ```
 
+> 反序列化时，传递的`json`字段值一定要和结构体里定义的一致，否则会出现空值的情况
+>
+> 比如将下方的`jsonStrData`里的"name"字段写成`uname`,那么反序列化出来d1的`Name`字段值就是空值
 
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type dog struct{
+	// 首字母不大写，没法进行序列化
+	Name string `json:"name"`
+	Age int `json:"age"`
+}
+
+func newDog(name string, age int) dog{
+	return dog{
+		Name: name,
+		Age: age,
+	}
+}
+
+func main() {
+	// 反序列化
+	var d1 dog
+	// 反引号表示将字符串的内容会原样输出
+	jsonStrData := `{"uname":"lpm","age":13}`
+	
+	err := json.Unmarshal([]byte(jsonStrData), &d1)
+	if err != nil {
+		fmt.Println("反序列化失败！！！")
+	}
+	fmt.Printf("d1=%#v\n", d1) // d1=main.dog{Name:"", Age:13}
+}
+```
 
 
 
