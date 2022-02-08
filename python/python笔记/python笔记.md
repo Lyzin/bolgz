@@ -2500,6 +2500,8 @@ print(A.drive) # <function A.drive at 0x00000000028B9B70>
 
 #### 2、类的三大属性
 
+> [https://www.cnblogs.com/peng104/p/9550305.html](https://www.cnblogs.com/peng104/p/9550305.html)
+>
 > - 封装
 > - 继承
 > - 多态
