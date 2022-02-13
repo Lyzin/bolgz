@@ -6336,5 +6336,175 @@ func main() {
 }
 ```
 
+#### 3.15 结构体案例
 
+> 下面是通过一个学生管理系统来复习学习过的结构体、`map`等知识点
+>
+> 需要注意的是在编辑学生时，当修改完学生姓名/年龄，一定要重新赋值给学生管理系统的map，否则修改会不生效
 
+```go
+// main.go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	// excute select func
+	selectEvent()
+}
+
+func showMenu(){
+	fmt.Print("wellcome to student  manager system:")
+	fmt.Println(`
+		1. showStu
+		2. addStu
+		3. delStu
+		4. editStu
+		5. quit
+	`)
+}
+
+func selectEvent(){
+	smr := newStuMr(100)
+	for {
+		// lopp show menu
+		showMenu()
+		
+		// input user choice
+		var choice int
+		fmt.Print("input your choice:")
+		fmt.Scan(&choice)
+		fmt.Printf("your choice is:%v\n", choice)
+		
+		switch choice{
+		case 1:
+			smr.showStu()
+		case 2:
+			smr.addStu()
+		case 3:
+			smr.delStu()
+		case 4:
+			smr.editStu()
+		case 5:
+			fmt.Println("bye~")
+			os.Exit(1)
+		default:
+			fmt.Println("your choice is wrong, pls input age...")
+		}
+	}
+}
+```
+
+```go
+// stuMgr.go
+package main
+
+import (
+	"fmt"
+)
+
+// student struct
+type student struct{
+	name 	string
+	age 	int
+}
+
+func newStudent(name string, age int) student{
+	return student{
+		name: name,
+		 age: age,
+	}
+}
+
+func (s *student) alterStu(newName string, newAge int) {
+	s.name = newName
+	s.age  = newAge
+}
+
+// studentManager struct
+type stuMr struct{
+	studentData map[int]student
+}
+
+func newStuMr(stuSize int) stuMr{
+	return stuMr{
+		studentData: make(map[int]student, stuSize),
+	}
+}
+
+func (s *stuMr) showStu() {
+	if len(s.studentData) == 0 {
+		fmt.Println("student data is empty, pls add first!!!")
+		return
+	}
+	fmt.Println("Id\tname\tage")
+	for k,v := range s.studentData{
+		fmt.Printf("%v\t%v\t%v\n",k, v.name, v.age)
+	}
+}
+
+// define globle virable
+
+var (
+	id, age		int
+	name		string
+)
+
+func (s *stuMr) addStu() {
+	fmt.Print("pls input name:")
+	fmt.Scan(&name)
+	
+	fmt.Print("pls input age:")
+	fmt.Scan(&age)
+	
+	id++
+	s.studentData[id] = newStudent(name, age)
+}
+
+func (s *stuMr) delStu() {
+	if len(s.studentData) == 0 {
+		fmt.Println("student data is empty, pls add first!!!")
+		return
+	}
+	fmt.Print("pls input Id:")
+	fmt.Scan(&id)
+	_, ok := s.studentData[id]
+	if !ok {
+		fmt.Printf("id[%v] don't exists!!!", id)
+		return
+	}
+	delete(s.studentData, id)
+}
+
+func (s *stuMr) editStu() {
+	if len(s.studentData) == 0 {
+		fmt.Println("student data is empty, pls add first!!!")
+		return
+	}
+	fmt.Print("pls input Id:")
+	fmt.Scan(&id)
+	qStuData, ok := s.studentData[id]
+	if !ok {
+		fmt.Printf("id[%v] don't exists!!!\n", id)
+		return
+	}
+	fmt.Printf("query stu data:%+v\n", qStuData)
+	fmt.Print("pls input new name:")
+	fmt.Scan(&name)
+	fmt.Print("pls input new age:")
+	fmt.Scan(&age)
+	qStuData.alterStu(name, age)
+	
+	// give new qStuData to student map, ottherwise new data can't be effctive
+	s.studentData[id] = qStuData
+}
+```
+
+## 十、接口
+
+### 1、接口概念
+
+> 
