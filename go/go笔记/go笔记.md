@@ -6848,11 +6848,227 @@ func main() {
 }
 ```
 
-#### 1.8  空接口
+```go
+package main
 
-> 
+import (
+	"fmt"
+)
+
+// 定义接口嵌套
+type animal interface{
+	speaker
+	eater
+}
+
+// 定义第二层接口实现dog的speak接口
+type speaker interface{
+	speak()
+}
+
+// 定义第二层接口实现dog的eater接口
+type eater interface{
+	eat()
+}
+
+type dog struct{
+	name string
+	age int
+}
+
+func newDog(name string, age int) dog {
+	return dog{
+		name: name,
+		 age: age,
+	}
+}
+
+func (d *dog) speak() {
+	fmt.Printf("%s is speak...\n", d.name)
+}
 
 
+func (d *dog) eat() {
+	fmt.Printf("%s is eating...\n", d.name)
+}
+
+// 接口方法调用
+func dfSpeak(x animal) {
+	x.speak()
+}
+
+func dfEat(x animal) {
+	x.eat()
+}
+
+func main() {
+	d1 := newDog("sam", 19)
+	d2 := newDog("jam", 29)
+	fmt.Printf("d1=%v\n", d1)
+	fmt.Printf("d2=%v\n", d2)
+	
+	dfSpeak(&d1)
+	dfEat(&d2)
+}
+```
+
+#### 1.7  空接口
+
+> 空接口是指没有定义任何方法的接口
+>
+> 所以任何类型都实现了空接口
+>
+> 那么空接口的变量可以存任何类型的变量，也就是说，只要变量的类型是空接口，那么就可以接收任意类型的变量
+
+##### 1.7.1 空接口变量
+
+> 空接口变量本身的值和类型都是`nil`，所以可以是任意类型
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var s1 interface{}
+	fmt.Printf("s1=%v\t s1 type=%T\n", s1, s1)
+	
+	s1 = 19
+	fmt.Printf("s1=%v\t s1 type=%T\n", s1, s1)
+	
+	s1 = "sam"
+	fmt.Printf("s1=%v\t s1 type=%T\n", s1, s1)
+	
+	s1 = true
+	fmt.Printf("s1=%v\t s1 type=%T\n", s1, s1)
+}
+```
+
+![image-20220214143852695](go%E7%AC%94%E8%AE%B0.assets/image-20220214143852695.png)
+
+##### 1.7.2 函数形参/返回值为空接口
+
+> 鉴于空接口变量可以接收任意数据类型的值，那么就可以用来给函数传参
+>
+> - 因为之前函数的形参变量类型都是固定，只允许传入固定类型的形参，有了空接口，就可以接收任意类型的形参
+> - 返回值也是同理，返回值可以返回任意类型的值，当然返回值有空接口的不多
+>   - 从下面代码可以看出，返回值是`interface{}`类型，表示可以返回任意类型的返回值
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 形参为空接口类型，表示可以接口任意类型的变量
+func showVal(x interface{}) interface{} {
+	fmt.Printf("showVal函数内：x:%v\t | x type:%T\n", x, x)
+	return x
+}
+
+
+func main() {
+	s1 := showVal(19)
+	fmt.Printf("main方法：%v\t %T\n", s1, s1)
+	
+	s2 := showVal("sam")
+	fmt.Printf("main方法：%v\t %T\n", s2, s2)
+	
+	s3 := showVal(true)
+	fmt.Printf("main方法：%v\t %T\n", s3, s3)
+}
+```
+
+![image-20220214145120632](go%E7%AC%94%E8%AE%B0.assets/image-20220214145120632.png)
+
+##### 1.7.3 函数空接口接收可变长参数
+
+> 函数可以接收可变长参数，那么可变长参数既可以是`int`/`string`/`slice`/`map`等类型，那么也可以接收空接口类型
+>
+> 传进来多个值，都可以被空接口形参接收，并且是`空接口类型的切片`
+
+```go
+// 复习下可变长参数函数的格式
+// 格式
+func 函数名(形参 ...T)
+
+// 形参: 形参名
+// ...T: 可变长参数的类型
+```
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 形参为空接口类型，表示可以接口任意类型的变量
+func showVal(x ...interface{}) {
+	fmt.Printf("showVal函数内x的值:%v\n", x)
+	fmt.Printf("showVal函数内x的type:%T\n", x)
+	// 遍历可以空接口类型的可变长参数
+	for _, v := range x {
+		fmt.Printf("v=%v\n", v)
+	}
+}
+
+func main() {
+	sf := []string{"huge", "bob"}
+	mf := make(map[string]int, 10)
+	mf["age1"] = 19
+	mf["age2"] = 29
+	mf["age3"] = 39
+	// 可以看到showVal函数可以接收任意类型的形参
+	showVal(19, "sam", true, sf, mf)
+}
+```
+
+##### 1.7.4 接口类型判断
+
+> 空接口可以接收任意类型的变量，那么可以对传进来的变量类型进行判断
+
+```go
+// 接口类型判断
+x.(T)
+
+// x表示空接口变量，T表示需要判断的数据类型
+// 这个判断接口类型返回两个值，一个是传进来的值本身，一个是错误码(布尔类型)，当传入的值的类型是判断里指定的类型，则返回true，否则返回false
+```
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// 形参为空接口类型，表示可以接口任意类型的变量
+func showVal(x interface{}) {
+	v, ok := x.(string)
+	fmt.Printf("v=%v\tv type=%T\n", v, v) // v=sam   v type=string
+	fmt.Printf("ok=%v\tok type=%T\n", ok, ok) // ok=true ok type=bool
+	if ok{
+		fmt.Printf("%v\t%T\n", v, v)
+	} else{
+		fmt.Printf("x[%v] type[%T] is not a string type\n", ok, ok)
+	}
+	
+}
+
+func main() {
+	// 可以看到showVal函数可以接收任意类型的形参
+	showVal("sam")
+	
+	// 传入一个不是string类型的变量
+	showVal(19)
+}
+```
+
+![image-20220214151505455](go%E7%AC%94%E8%AE%B0.assets/image-20220214151505455.png)
 
 
 
