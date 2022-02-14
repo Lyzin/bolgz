@@ -6505,6 +6505,358 @@ func (s *stuMr) editStu() {
 
 ## 十、接口
 
-### 1、接口概念
+### 1、接口介绍
+
+#### 1.1 接口定义
+
+> 接口是一种抽象的类型，一种特殊的类型
+>
+> 接口是一组`method`的集合，不关心属性，只关心方法
+>
+> 接口用于`不关心变量类型，只关心调用它的什么方法`
+
+```go
+// 接口定义
+type 接口名 interface {
+    接口方法1(参数1， 参数2...)(返回值1，返回值2...)
+    接口方法2(参数1， 参数2...)(返回值1，返回值2...)
+}
+
+// 所有定义了接口方法的类型，都必须实现接口方法
+// 只要实现了接口方法的变量都是speaker类型
+// 接口方法也叫方法签名
+```
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import "fmt"
+
+type dog struct{}
+type cat struct{}
+type pig struct{}
+
+func (d dog) speak() {
+	fmt.Printf("狗在叫\n")
+}
+
+func (c cat) speak() {
+	fmt.Printf("猫在叫\n")
+}
+
+func (p pig) speak() {
+	fmt.Printf("猪在叫\n")
+}
+
+type speaker interface {
+	speak()
+}
+
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	var c1 cat
+	var p1 pig
+
+	sp(d1)
+	sp(c1)
+	sp(p1)
+}
+/*
+	狗在叫
+    猫在叫
+    猪在叫
+*/
+```
+
+#### 1.2 接口实现
+
+> 一个变量如果实现了接口类型中规定的所有方法，那么这个变量就实现了这个接口，所以可以称为这个接口类型的变量
+>
+> 接口类型的变量的值是`nil`，类型也是`nil`，这表示空接口
+>
+> 接口保存的是值的动态类型和动态值本身
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import "fmt"
+
+type dog struct{}
+
+// 此处表示dog结构体的方法没有实现接口里的speak方法，就会报错
+func (d dog) speak() {
+	fmt.Printf("狗在叫\n")
+}
+
+type speaker interface {
+	speak()
+}
+
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	sp(d1)
+
+	var s1 speaker
+	fmt.Printf("s1=%v\n", s1) // nil
+	fmt.Printf("s1=%T\n", s1) // nil
+}
+```
+
+#### 1.3 接口定义方法未实现
+
+> 如果变量的接口方法未实现，就会报错
+>
+> `implement`: 执行，实施，生效
+>
+> 会提示dog类型缺少speak方法
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+type dog struct{}
+
+// 此处表示dog结构体的方法没有实现接口里的speak方法，就会报错
+//func (d dog) speak() {
+//	fmt.Printf("狗在叫\n")
+//}
+
+type speaker interface {
+	speak()
+}
+
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	sp(d1)
+}
+```
+
+![image-20220213203044074](go%E7%AC%94%E8%AE%B0.assets/image-20220213203044074.png)
+
+#### 1.4 值接收者实现接口
+
+> 值接收者实现接口，结构体类型和结构体指针类型的变量都可以存储
+>
+> 从下面代码可以看出，`s1`是`speaker`类型的变量，但是`s1`既可以接收值类型结构体，也可以接收指针类型结构体
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import "fmt"
+
+type dog struct{
+	name 	string
+	age 	int
+}
+
+// 此处表示dog结构体的方法实现的是值类型
+func (d dog) speak() {
+	fmt.Printf("狗在叫\n")
+}
+
+type speaker interface {
+	speak()
+}
+
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	var d2 dog
+	d1 = dog{name:"tom", age: 19}
+	d2 = dog{name:"yom", age: 29}
+	var s1 speaker
+
+	// 传给s1的是d2的值，接口可以接收到
+	s1 = d1
+	fmt.Printf("s1=%v\n", s1) // s1={tom 19}
+	fmt.Printf("s1=%T\n", s1) // s1=main.dog
+
+	// 传给s1的是d2的指针，接口可以接收到
+	s1 = &d2
+	fmt.Printf("s1=%v\n", s1) // s1=&{yom 29}
+	fmt.Printf("s1=%T\n", s1) // s1=*main.dog
+}
+```
+
+#### 1.5 指针接收者实现接口
+
+> 指针接收者实现接口只能存结构体指针
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import "fmt"
+
+type dog struct{
+	name 	string
+	age 	int
+}
+
+// 此处表示dog结构体的方法实现的是指针类型
+func (d *dog) speak() {
+	fmt.Printf("狗在叫\n")
+}
+
+type speaker interface {
+	speak()
+}
+
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	var d2 dog
+	d1 = dog{name:"tom", age: 19}
+	d2 = dog{name:"yom", age: 29}
+	var s1 speaker
+
+	// 传给s1的是d2的值，但是结构体方法的接收者是指针类型，所以不可以接收到
+	// 报错提示speak方法有指针接收者
+	s1 = d1 // 这样会报错，必须给s1赋值指针类型的结构体对象
+	fmt.Printf("s1=%v\n", s1) 
+	fmt.Printf("s1=%T\n", s1) 
+
+	// 传给s1的是d2的指针，接口可以接收到
+	s1 = &d2
+	fmt.Printf("s1=%v\n", s1) // s1=&{yom 29}
+	fmt.Printf("s1=%T\n", s1) // s1=*main.dog
+}
+```
+
+> 如果结构体实现接口的方法的接收者是指针类型时，那么传给接口类型的方法的变量也必须是指针类型，否则就会报错
+
+![image-20220213213815411](go%E7%AC%94%E8%AE%B0.assets/image-20220213213815411.png)
+
+#### 1.6 多个接口和接口嵌套
+
+> 同一个结构体可以实现多个接口
+>
+> 接口还可以进行嵌套
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/13 20:19
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import "fmt"
+
+// animal 接口嵌套了dog结构体的speaker、eater接口
+type animal interface {
+	speaker
+	eater
+}
+
+// 实现dog的speaker接口
+type speaker interface {
+	speak()
+}
+
+// 实现dog的eater接口
+type eater interface {
+	eat()
+}
+
+
+// dog结构体
+type dog struct{
+	name 	string
+	age 	int
+}
+
+//
+func (d *dog) speak() {
+	fmt.Printf("狗在叫\n")
+}
+
+func (d *dog) eat() {
+	fmt.Printf("狗在吃\n")
+}
+
+// 定义接口调用的方法
+func sp(s speaker) {
+	s.speak()
+}
+
+func main() {
+	var d1 dog
+	var d2 dog
+	d1 = dog{name:"tom", age: 19}
+	d2 = dog{name:"yom", age: 29}
+	var s1 speaker
+
+	// 传给s1的是d2的值，但是结构体方法的接收者是指针类型，所以不可以接收到
+	// 报错提示speak方法有指针接收者
+	// s1 = d1 // 这样会报错，必须给s1赋值指针类型的结构体对象
+	s1 = &d1 // 必须给接口传递结构体的指针
+	fmt.Printf("s1=%v\n", s1) // s1={tom 19}
+	fmt.Printf("s1=%T\n", s1) // s1=main.dog
+
+	// 传给s1的是d2的指针，接口可以接收到
+	s1 = &d2
+	fmt.Printf("s1=%v\n", s1) // s1=&{yom 29}
+	fmt.Printf("s1=%T\n", s1) // s1=*main.dog
+}
+```
+
+#### 1.8  空接口
 
 > 
+
+
+
+
+
+
+
+
+
