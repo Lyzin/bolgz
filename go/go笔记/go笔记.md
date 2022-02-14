@@ -6503,7 +6503,7 @@ func (s *stuMr) editStu() {
 }
 ```
 
-## 十、接口
+## 十、接口和包
 
 ### 1、接口
 
@@ -7072,7 +7072,242 @@ func main() {
 
 
 
+### 2、包
+
+> Go语言中支持模块化的开发理念，在Go语言中使用`包（package）`来支持代码模块化和代码复用。
+>
+> - 一个包是由一个或多个Go源码文件（.go结尾的文件）组成，是一种高级的代码复用方案
+>
+> - Go语言为我们提供了很多内置包，如`fmt`、`os`、`io`等。
+
+#### 2.1 包的组成
+
+> 包类型大致可以分为`自定义包`和`main`两类
+>
+> - `自定义包`：表示这个包是自定义的包，包含一单独的功能，比如注册，登录等
+> - `main`：表示是一个可以执行，可以编译成`可执行文件`的包
+
+#### 2.2 自定义包
+
+> 可以根据自己的需要创建自定义包
+>
+> - 一个包可以简单理解为一个存放`*.go`文件的文件夹
+>   - 该文件夹下面的所有`.go`文件都要在非注释的第一行添加如下声明，声明该文件归属的包
+> - 
+
+```go
+package packagename
+
+/*
+其中：
+	- package：声明包的关键字
+	- packagename：包名，可以不与文件夹的名称一致，不能包含 `-` 符号，最好与其实现的功能相对应
+*/
+```
+
+##### 2.2.1 包可见性
+
+> 在同一个包内部声明的标识符都位于同一个命名空间下
+>
+> - 所以当有大于1个`*.go`文件同属于一个包时，这个包里的`*.go`文件可以互相访问里面的函数、变量、方法等，就相当于是在同一个内存地址里面一样，直接引用就可以
+
+> 在`不同的包`内部声明的标识符就属于`不同的命名空间`
+>
+> - 如果想让一个包中的标识符（如变量、常量、类型、函数等）能被`外部的包`使用，那么标识符必须是对外可见的（public）
+> - 在Go语言中是通过`标识符的首字母大/小写来控制标识符`的`对外可见（public）/不可见（private）`的
+>   - 在一个包内部只有`首字母大写的标识符`才是`对外可见`的。
+>
+> - 想要在包的外部使用包内部的标识符就需要添加包名前缀
+>   - 例如`fmt.Println("Hello world!"`·，就是指调用`fmt`包中的`Println`函数
+
+```go
+/*
+	定义一个名为demo的包，在其中定义了若干标识符。在另外一个包中并不是所有的标识符都能通过demo.前缀访问到，因为只有那些首字母是大写的标识符才是对外可见的
+*/
+package demo
+
+import "fmt"
+
+// 包级别标识符的可见性
+// num 定义一个全局整型变量
+// 首字母小写，对外不可见(只能在当前包内使用)
+var il = 100
+
+// Mode 定义一个常量
+// 首字母大写，对外可见(可在其它包中使用)
+const Mode = 1
+
+// person 定义一个代表人的结构体
+// 首字母小写，对外不可见(只能在当前包内使用)
+type person struct {
+	name string
+	Age  int
+}
+
+// 首字母大写，对外可见(可在其它包中使用)
+type Student struct {
+	Name  string // 可在包外访问的方法
+	class string // 仅限包内访问的字段
+}
+
+// Add 返回两个整数和的函数
+// 首字母大写，对外可见(可在其它包中使用)
+func Add(x, y int) int {
+	return x + y
+}
+
+// sayHi 打招呼的函数
+// 首字母小写，对外不可见(只能在当前包内使用)
+func sayHi() {
+	var myName = "七米" // 函数局部变量，只能在当前函数内使用
+	fmt.Println(myName)
+}
+```
+
+##### 2.2.2 自定义包注意事项
+
+> 参考：
+>
+> [https://studygolang.com/articles/7165](https://studygolang.com/articles/7165)
+>
+> [http://c.biancheng.net/view/5394.html](http://c.biancheng.net/view/5394.html)
+>
+> 
+
+> 注意:
+>
+> - 一个文件夹下面直接包含的文件只能归属一个包，同一个包的文件不能存在于多个文件夹下
+>   - 也就是说一个文件夹只能有一个包，同一个包的文件不能分散与多个文件夹中
+> - 包名一般是小写的，使用一个简短且有意义的名称
+> - 自定义包名常规都和包含`*.go`文件的文件夹名字一致
+>   - 也可以不和文件夹的名字一样，可以自己起一个包名字，然后所有`*.go`文件都声明为该包名
+>     - 文件夹名可以和该包名不一致，但`*.go`文件中使用的包名必须要和自定义包名一致
+>   - 包名不能包含`-`符号，需要符合标识符定义规则
+> - 包一般使用域名作为目录名称，这样能保证包名的唯一性
+>   - 比如 GitHub 项目的包一般会放到`GOPATH/src/github.com/userName/projectName `目录下
+
+#### 2.3 main包
+
+> 包名为`main`的包是应用程序的入口包，这种包编译后会得到一个可执行文件
+>
+> 而编译不包含`main`包的源代码则不会得到可执行文件
+
+#### 2.4 包的导入
+
+> 要在代码中引用其他包的内容，需要使用`import`关键字导入使用的包
+>
+> 注意事项：
+>
+> - `import`导入语句通常放在源码文件开头包声明语句的下面
+> - 导入的包名需要使用双引号包裹起来
+> - 导入的包名是从`GOPATH/src/ `后开始计算的，使用`/ `进行路径分隔
+
+```go
+// 具体语法如下：
+import "包的路径"
+```
+
+##### 2.4.1 包导入案例讲解
+
+> 导入的包名是从`GOPATH/src/ `后开始计算的
+>
+> 那么当`day09`里的`import_demo.go`需要导入下图中的`day08`包里有两个`*.go`文件时，在`import_demo.go`中写的导入路径就需要从`src`下的`code.zinly.com`开始
+
+![image-20220214174513405](go%E7%AC%94%E8%AE%B0.assets/image-20220214174513405.png)
+
+> day08文件夹中的`cal_data.go`代码
+
+```go
+// day08里的cal_data.go文件
+package jim
+
+import "fmt"
+
+func AddVal(x, y int) int {
+	return x + y
+}
 
 
+// 首字母小写，表示别的包不可以导入使用
+type person struct {
+	name 	string
+	age 	int
+}
 
+// 首字母大写，表示别的包可以导入使用
+func NewPerson(name string, age int) person {
+	return person {
+		name: name,
+		 age: age,
+	}
+}
 
+// 首字母大写，表示别的包可以导入使用
+func (p *person) ShowInfo() {
+	fmt.Printf("name：%v\t age:%v\n", p.name, p.age)
+}
+```
+
+> day08文件夹中的`hibi.go`代码
+
+```go
+package jim
+
+import (
+	"fmt"
+)
+
+var name string
+
+// 首字母大写，表示别的包可以导入使用
+func ShowAge() {
+	name := "hibi"
+	f.Printf("name=%v\n", name)
+}
+```
+
+> day09文件夹中的`import_demo.go`代码
+>
+> 这个导入代码里导入day08里的所有go文件，导入路径需要从src下的目录开始写，jimx是导入路径的别名，建议与导入的包名一致，这样也方便查找
+>
+> - 导入路径没有别名，那么在下面代码引用时，用已导入的包的包名来引用，也就是导入的代码里的包名来引用所有的方法、函数、变量等
+> - 导入路径有别名，那么在下面代码引用时，用声明的包别名来引用所有的方法、函数、变量等
+
+```go
+// day09文件夹中的`import_demo.go`文件
+package main
+
+import (
+    // 导入day08里的所有go文件，需要从src下的目录开始写，jimx是导入的别名，建议与导入的包名一致，这样也方便查找
+	 jimx "code.zinly.com/goLearning/day08"  
+	"fmt"
+)
+
+func main() {
+	ret := jimx.AddVal(1, 2)
+	fmt.Printf("ret=%v\n", ret)
+	
+	// 实例化结构体
+	p1 := jimx.NewPerson("sam", 12)
+	fmt.Printf("p1=%v\n", p1)
+	
+	// 调用实例化的方法，首字母也必须大写
+	p1.ShowInfo()
+	
+	jimx.ShowAge()
+}
+```
+
+> 从上面代码可以看出，
+>
+> - `day09`文件夹导入了`day08`这个包，并且`day08`这个文件夹里所有`*.go`文件声明的包名没有和`day08`这个文件名字`day08`一样，而是叫`jim`，这里也就可以看出`包名`可以自定义
+>
+> - `day08`里的所有`*.go`文件只有首字母大写的方法、变量等标识符才可以被`day09`里引用
+> - `day08`里的所有`*.go`文件的包名都必须一致，否则就会报错，从下图可以看出：
+>   - day08文件中当`cal_data.go`和`bal_data_bak.go`声明为`jims`包
+>   - day08文件中当`hibi.go`声明为`jim`包
+>   - 在`day09`的`import_demo.go`导入后执行，报错提示了在`day08`文件中
+>     - `found packages jims (bal_data_bak.go) and jim (hibi.go)`表示发现了2个包在`bal_data_bak.go`和`hibi.go`文件中
+>     - 而且在`import_demo.go`即使将调用`Him()`写到很下面，仍然会优先检测`bal_data_bak.go`文件，而不是`cal_data.go`文件，说明导入时，是按文件名的顺序进行导入的
+
+![image-20220214182104927](go%E7%AC%94%E8%AE%B0.assets/image-20220214182104927.png)
