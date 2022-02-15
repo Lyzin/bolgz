@@ -7093,7 +7093,6 @@ func main() {
 >
 > - 一个包可以简单理解为一个存放`*.go`文件的文件夹
 >   - 该文件夹下面的所有`.go`文件都要在非注释的第一行添加如下声明，声明该文件归属的包
-> - 
 
 ```go
 package packagename
@@ -7118,13 +7117,13 @@ package packagename
 >   - 在一个包内部只有`首字母大写的标识符`才是`对外可见`的。
 >
 > - 想要在包的外部使用包内部的标识符就需要添加包名前缀
->   - 例如`fmt.Println("Hello world!"`·，就是指调用`fmt`包中的`Println`函数
+>   - 例如`fmt.Println("Hi go~")`，就是指调用`fmt`包中的`Println`函数
 
 ```go
 /*
-	定义一个名为demo的包，在其中定义了若干标识符。在另外一个包中并不是所有的标识符都能通过demo.前缀访问到，因为只有那些首字母是大写的标识符才是对外可见的
+	定义一个名为demo_test的包，在其中定义了若干标识符。在另外一个包中并不是所有的标识符都能通过demo_test.前缀访问到，因为只有那些首字母是大写的标识符才是对外可见的
 */
-package demo
+package demo_test
 
 import "fmt"
 
@@ -7171,8 +7170,6 @@ func sayHi() {
 > [https://studygolang.com/articles/7165](https://studygolang.com/articles/7165)
 >
 > [http://c.biancheng.net/view/5394.html](http://c.biancheng.net/view/5394.html)
->
-> 
 
 > 注意:
 >
@@ -7185,7 +7182,14 @@ func sayHi() {
 >   - 包名不能包含`-`符号，需要符合标识符定义规则
 > - 包一般使用域名作为目录名称，这样能保证包名的唯一性
 >   - 比如 GitHub 项目的包一般会放到`GOPATH/src/github.com/userName/projectName `目录下
-> - `go`语言中禁止包的循环导入
+
+##### 2.2.3 包禁止循环引用
+
+> `go`语言中禁止包的循环导入
+>
+> `jim`包和`kop`包互相引用，最后`main`包导入`jim`包、`kop`包后运行提示`import cycle not allowed`
+
+![image-20220215132419145](go%E7%AC%94%E8%AE%B0.assets/image-20220215132419145.png)
 
 #### 2.3 main包
 
@@ -7252,6 +7256,7 @@ func (p *person) ShowInfo() {
 > day08文件夹中的`hibi.go`代码
 
 ```go
+// day08里的hibi.go
 package jim
 
 import (
@@ -7320,6 +7325,7 @@ func main() {
 > 后面学习数据库时才会用到，表示只会执行包的`init`函数
 
 ```go
+// 匿名导包，在导入包的路径前面加一个下划线即可
 import (
 	_  "包的路径"
 )
