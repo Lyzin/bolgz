@@ -7353,7 +7353,233 @@ import (
 
 > 在`go`语言中，可以对文件进行读写操作
 
-### 1、打开关闭文件
+### 1、读取文件
+
+#### 1.1 打开关闭文件
+
+> `go`语言中使用`os`模块进行打开文件，获得文件句柄，也叫文件指针
+
+```go
+os.Open()
+// 用来打开文件，返回两个值，一个是os.File指针，另一个是错误码err
+```
+
+```go
+fileHandler, err := os.Open("./name.txt")
+if err != nil {
+		fmt.Printf("打开文件错误:%v\n", err)
+		return
+}
+fmt.Printf("fileHandler=%#v\n", fileHandler)
+fmt.Printf("fileHandler=%p\n", fileHandler)
+fmt.Printf("fileHandler type=%T\n", fileHandler)
+
+/*
+    fileHandler=&{0xc0000a4780}
+    fileHandler=0xc0000a2018
+    fileHandler type=*os.File
+*/
+```
+
+```go
+// 上面获取到的文件的指针，那么就可以对该指针进行操作了
+
+// 关闭文件
+fileHandler.Close()
+```
+
+> 关闭文件一般是在`defer`语句来定义
+
+#### 1.2 读取文件内容
+
+##### 1.2.1 较为底层方法 
+
+> 较为底层的方法就是使用上面打开文件获取到的文件指针，调用`Read()`方法，`Read()`传入一个可以一个字节类型的切片，并且指定字节切片长度，就可以来读取文件内容
+
+```go
+// 读取文件内容
+fileHandler.Read([]byte, 字节长度)
+```
+
+> 上面的方法是返回两个值
+>
+> - 第一个值n是按照Read()函数传入的字节切片长度，开始读取文件，然后返回读取到文件内容的字节数
+>   - 如果返回的n小于定义的切片长度，那么表示文件内容全部被读出来
+>   - 如果返回的n大于定义的切片长度，那么表示文件内容只被读出来字节长度的文件内容，剩余的没有被读出来，那就需要使用`for`循环不断读取文件内容
+>     - 每次循环读取的都是从上一次读取的结尾作为开始进行读取
+> - 第二个值就是err
+>   - err会有两种情况：
+>     - 读取内容错误，结果不等nil
+>     - 文件内容都读取完成后，err会有一个`EOF(end of file)`的结束标识符，所以需要进行判断接收，如果是EOF，那就表示文件读取结束
+>     - `EOF`需要使用`io`的`io.EOF`来接收
+
+```go
+// readFile.go
+package main
+
+import (
+	"fmt"
+	"os" // 读取文件的包
+	"io" // 接收EOF结束符
+)
+
+func readFileContent(fileName string) {
+	// 打开文件
+	fileHandler, err := os.Open("./name.txt")
+	if err != nil {
+		fmt.Printf("打开文件错误:%v\n", err)
+		return
+	}
+	fmt.Printf("fileHandler=%#v\n", fileHandler)
+	fmt.Printf("fileHandler=%p\n", fileHandler)
+	fmt.Printf("fileHandler type=%T\n", fileHandler)
+	// 等待函数执行结束前，再执行文件关闭操作
+	defer fileHandler.Close()
+
+	readTimes := 1
+	AllTimes := 3
+	for {
+		fmt.Printf("\n第%v次读取文件内容\n", readTimes)
+		// 开始读取文件内容
+		var tmp = make([]byte, 128)
+		byteNums, err := fileHandler.Read(tmp)
+
+		// 判断文件读取结束
+		if err == io.EOF {
+			fmt.Println("读取文件结束~")
+			return
+		}
+
+		// 判断错误是不是nil
+		if err != nil {
+			fmt.Printf("读取文件内容失败:%v\n", err)
+			return
+		}
+
+		if readTimes > AllTimes {
+			fmt.Printf("读取超过%v次，再见~\n", AllTimes)
+			break
+		}
+		readTimes++
+		fmt.Printf("读取到的文件内容字节个数:%v\n", byteNums)
+		fmt.Printf("读取到的文件内容:%v\n", string(tmp[:byteNums]))
+	}
+}
+
+func main() {
+	readFileContent("./name.txt")
+}
+```
+
+> 注意：
+>
+> - 如果文件在`Open`函数中写的是绝对路径，最好不要在`goland`中直接右键执行该读取文件内容的`go`文件，因为会提示找不到需要读取文件路径
+>   - 代码里如果写的是相对路径，那么就可以在终端里是使用`go run`/`go build`运行就可以
+
+![image-20220215234301296](go%E7%AC%94%E8%AE%B0.assets/image-20220215234301296.png)
+
+##### 1.2.2 稍显优雅的方法
+
+> 使用`bufio`读取，`bufio`是在`file`的基础上封装了一层API，支持更多的功能
+
+```go
+// 导入bufio
+
+import "bufio"
+
+// 第一步
+// 使用bufio.NewReader传入打开文件获得的文件指针
+readObj := bufio.NewReader(fileHandler)
+
+// 上面的readObj调用ReadString方法，需要传入字符格式的分隔符，比如：`\n`，' '等
+line, err := readObj.ReadString('\n')
+// line的值是根据分隔符获得到的每一行
+// err是读取的错误码
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"bufio"
+	"io"
+)
+
+func readFileContent(fileName string) {
+	// 打开文件
+	fileHandler, err := os.Open("./name.txt")
+	if err != nil {
+		fmt.Printf("打开文件错误:%v\n", err)
+		return
+	}
+	fmt.Printf("fileHandler=%#v\n", fileHandler)
+	fmt.Printf("fileHandler=%p\n", fileHandler)
+	fmt.Printf("fileHandler type=%T\n", fileHandler)
+	// 等待函数执行结束前，再执行文件关闭操作
+	defer fileHandler.Close()
+
+	// 实例化bufio对象，并将打开的文件指针传入
+	readObj := bufio.NewReader(fileHandler)
+	for {
+		// ReadSting里传入的是字符，表示以什么分隔开
+		readLine, err := readObj.ReadString('\n')
+
+		// 判断文件读取结束
+		if err == io.EOF {
+			fmt.Println("读取文件结束~")
+			break
+		}
+		// 判断错误是不是nil
+		if err != nil {
+			fmt.Printf("读取文件内容失败:%v\n", err)
+			break
+		}
+		// 以换行，将每一行读出来
+		fmt.Printf("readline:%v\n", readLine)
+	}
+}
+
+func main() {
+	readFileContent("./name.txt")
+}
+```
+
+![image-20220215235504007](go%E7%AC%94%E8%AE%B0.assets/image-20220215235504007.png)
+
+##### 1.2.3 更简洁的方法
+
+> 使用`io/ioutil`的`ReadFile`方法读取完整文件内容，只需要传入文件名既可
+
+```go
+// 导入io/ioutil
+import "io/ioutil"
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+)
+
+func readFileContent(fileName string) {
+	// 打开读取文件
+	fileData, err := ioutil.ReadFile("./name.txt")
+	if err != nil {
+		fmt.Printf("读取文件错误:%v\n", err)
+		return
+	}
+	fmt.Printf("fileData:%v\n", string(fileData))
+}
+
+func main() {
+	readFileContent("./name.txt")
+}
+```
+
+#### 1.3 写入文件内容
 
 > 
-
