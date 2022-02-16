@@ -7525,8 +7525,11 @@ func readFileContent(fileName string) {
 	for {
 		// ReadSting里传入的是字符，表示以什么分隔开
 		readLine, err := readObj.ReadString('\n')
-
-		// 判断文件读取结束
+		
+    // 将每一行读出来
+		fmt.Printf("readline:%v\n", readLine)
+		
+    // 判断文件读取结束
 		if err == io.EOF {
 			fmt.Println("读取文件结束~")
 			break
@@ -7536,8 +7539,7 @@ func readFileContent(fileName string) {
 			fmt.Printf("读取文件内容失败:%v\n", err)
 			break
 		}
-		// 以换行，将每一行读出来
-		fmt.Printf("readline:%v\n", readLine)
+	
 	}
 }
 
@@ -7551,10 +7553,19 @@ func main() {
 ##### 1.2.3 更简洁的方法
 
 > 使用`io/ioutil`的`ReadFile`方法读取完整文件内容，只需要传入文件名既可
+>
+> 
 
 ```go
 // 导入io/ioutil
 import "io/ioutil"
+
+ioutil.ReadFile(fileName string)
+/* 
+	返回两个值:
+		第一个值的类型：[]uint8，可以用string强制转换成`string`
+		第二个值是返回错误码
+*/
 ```
 
 ```go
@@ -7577,6 +7588,113 @@ func readFileContent(fileName string) {
 
 func main() {
 	readFileContent("./name.txt")
+}
+```
+
+##### 1.2.4 练习汇总
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"io"
+	"io/ioutil"
+	"bufio"
+)
+
+func readFileByLowType(fileName string) {
+	// 底层方式
+	fileHandler, err := os.Open(fileName)
+	if err != nil {
+		fmt.Printf("打开文件失败:%v\n", err)
+		return
+	}
+	defer fileHandler.Close()
+	
+	times := 1
+	allTimes := 5
+	for {
+		fmt.Printf("\n第%v次读取文件内容\n", times)
+		var tmp = make([]byte, 128)
+		readNums, err := fileHandler.Read(tmp)
+		
+		fmt.Printf("读取到的文件内容:\n%v\n", string(tmp[:readNums]))
+		
+		// 判断读到结尾，需要优先进行判断，否则会报错读取文件内容失败
+		if err == io.EOF {
+			fmt.Printf("文件读完了\n")
+			break
+		}
+		
+		// 判断读取文件内容错误码
+		if err != nil {
+			fmt.Printf("读取文件内容失败:%v\n", err)
+			break
+		}
+
+		if times > allTimes {
+			fmt.Printf("读取文件超过最大%v次数\n", allTimes)
+			break
+		}
+		times++
+		
+	}
+}
+
+func readFileByBufio(fileName string) {
+	// 使用bufio读取，不需要控制读取的切片长度
+	fileHandler, err := os.Open(fileName)
+	if err != nil {
+		fmt.Printf("打开文件失败:%v\n", err)
+		return
+	}
+	defer fileHandler.Close()
+	
+	reader := bufio.NewReader(fileHandler)
+	for {
+		line, err := reader.ReadString('\n')
+		fmt.Printf("读取到的文件内容:%v\n", line)
+		// 判断读到结尾，需要优先进行判断，否则会报错读取文件内容失败
+		if err == io.EOF {
+			fmt.Printf("文件读完了\n")
+			break
+		}
+		
+		// 判断读取文件内容错误码
+		if err != nil {
+			fmt.Printf("读取文件内容失败:%v\n", err)
+			break
+		}
+		
+	}
+}
+
+func readFileByIOUtil(fileName string) {
+	// 使用ioutil读取，直接读取全部内容
+	// readData类型：[]uint8
+	readData, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		fmt.Printf("读取文件内容错误:%v\n", err)
+		return
+	}
+	fmt.Printf("读取到的内容:%v\n", string(readData))
+}
+
+func main(){
+	fileName := "./userinfo.txt"
+	// 底层方式读取文件内容
+	fmt.Println("\n>>>>>>底层方式读取文件内容<<<<<<")
+	readFileByLowType(fileName)
+	
+	// 以bufio读取
+	fmt.Println("\n>>>>>>以bufio读取文件内容<<<<<<")
+	readFileByBufio(fileName)
+	
+	// 以io/ioutil读取
+	fmt.Println("\n>>>>>>以io/ioutil读取文件内容<<<<<<")
+	readFileByIOUtil(fileName)
 }
 ```
 
