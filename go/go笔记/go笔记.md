@@ -137,6 +137,10 @@
 
 ![image-20211026115327001](go%E7%AC%94%E8%AE%B0.assets/image-20211026115327001.png)
 
+### 9、最新配置Go开发
+
+> https://www.bilibili.com/video/BV1bV41177KD?spm_id_from=333.999.0.0
+
 ## 二、运行代码
 
 ### 1、第一行代码
