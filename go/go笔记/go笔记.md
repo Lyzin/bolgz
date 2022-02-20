@@ -7702,6 +7702,188 @@ func main(){
 }
 ```
 
-#### 1.3 写入文件内容
+### 2 写入文件
 
-> 
+#### 2.1 写入文件模式
+
+> `go`可以使用指定模式打开写入内容到文件中
+>
+> 需要注意的是flag是可以用位运算的`或(|)`来表示文件没有的话就可以先创建
+
+```go
+func OpenFile(name string, flag int, perm FileMode) (*File, err) {
+    ...
+}
+/* 
+	name: 要打开的文件名
+	flag: 打开文件的模式
+	perm: 文件权限，是一个八进制数
+		  r(读) ： 04
+		  w(写) ： 02
+		x(执行) ： 01
+*/
+```
+
+> flag支持的模式：
+>
+> - os.O_WRONLY	只写
+> - os.O_CREATE    创建文件
+> - os.O_RDONLY    只读
+> - os.O_RDWR      读写
+> - os.O_TRUNC     清空
+> - os.O_APPEND    追加内容到文件
+
+> 关于文件权限的解释
+>
+> 在终端输入:
+> `ls -l xxx.xxx （xxx.xxx是文件名）`查看的是`xxx文件`之中的文件权限
+>
+> 那么就会出现相类似的信息，主要都是这些`-rw-rw-r--`
+>
+> - 一共有十位数，其中：最前面那个 - 代表的是类型
+> - 中间那三个 rw- 代表的是所有者（user）拥有的权限
+> - 然后那三个 r-- 代表的是组群（group）拥有的权限
+> - 最后那三个 r-- 代表的是其他人（other）拥有的权限
+>
+> 那么CNAME文件的操作权限就是-rw-r-r-- = 644
+>
+> - rw为什么是6，因为是连在一起，所以是r=4加上w=2所以是6
+
+![image-20220220210813699](go%E7%AC%94%E8%AE%B0.assets/image-20220220210813699.png)
+
+```go
+func writeFile(fileName string) {
+	fileHandler, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		fmt.Printf("openFile failed: %v\n", err)
+		return
+	}
+	fmt.Printf("fileHandler:%v\n", fileHandler)
+}
+//  os.O_APPEND|os.O_CREATE这是位运算，表示添加文件时，文件不存在，需要现金向创建，后面的0644是文件操作权限，表示文件时可读可写
+```
+
+#### 2.2 write写入内容到文件
+
+> 可以将字节或字符串写入到文件中
+>
+> 可以写入字节和字符串
+>
+> - `write`可以写入字节
+> - `writestring`可以写入字符串
+
+```go
+// 写入文件实例代码
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func writeFile(fileName string, fileContent string) {
+	fileHandler, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Printf("openFile failed: %v\n", err)
+		return
+	}
+	defer fileHandler.Close()
+
+	// write写入字节
+	fileHandler.Write([]byte(fileContent))
+	// writeString写入字符串
+	fileHandler.WriteString(fileContent)
+}
+
+func main() {
+	// 写入内容到文件
+	fileName := "./xx.txt"
+	writeFile(fileName, "我是学习go语言")
+}
+```
+
+#### 2.3 bufio写入内容到文件
+
+> 需要注意的是，写完一定要使用`Flush函数`将写入缓存的内容保存到文件里
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"os"
+	"bufio"
+)
+
+func writeFile(fileName string, fileContent string) {
+	fileHandler, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Printf("openFile failed: %v\n", err)
+		return
+	}
+	defer fileHandler.Close()
+
+	// bufio写入文件
+	wr := bufio.NewWriter(fileHandler)
+
+	// 这里是将文件内容写到缓存里
+	wr.WriteString(fileContent)
+
+	// 写完需要将写入到缓存里的东西存到文件中
+	wr.Flush()
+}
+
+func main() {
+	// 写入内容到文件
+	fileName := "./xx.txt"
+	writeFile(fileName, "我是学习go语言222")
+}
+```
+
+#### 2.4 ioutil写入内容到文件
+
+> 需要注意`WriteFile`里写入文件时字节切片类型
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+)
+
+func writeFile(fileName string, fileContent string) {
+	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
+	if err != nil {
+		fmt.Printf("write file err:%v\n", err)
+		return
+	}
+}
+
+func main() {
+	// 写入内容到文件
+	fileName := "./xx.txt"
+	writeFile(fileName, "我是学习go语言ioutil")
+}
+```
+
+
+
