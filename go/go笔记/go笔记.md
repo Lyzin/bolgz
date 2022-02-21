@@ -4800,6 +4800,39 @@ func main() {
 
 ![image-20220114000247128](go%E7%AC%94%E8%AE%B0.assets/image-20220114000247128.png)
 
+##### 1.13.3 输入有空格问题解决
+
+> 当标准输入的有空白符时，就会在输出时，只展示第一个空白符的前面的内容
+>
+> 为了解决这个问题，可以用ioutil包来解决
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"bufio"
+	"os"
+)
+
+func main() {
+	var s string
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("请输入内容:")
+	// 注意这里不需要短变量声明，而是直接用定义的s变量进行接收输入的内容
+	s, _ = reader.ReadString('\n')
+	fmt.Printf("你输入了: %v\n", s)
+}
+```
+
+![image-20220220213806001](go%E7%AC%94%E8%AE%B0.assets/image-20220220213806001.png)
+
 #### 1.14 递归函数
 
 > 递归就是函数自己调用自己
@@ -7702,7 +7735,7 @@ func main(){
 }
 ```
 
-### 2 写入文件
+### 2、写入文件
 
 #### 2.1 写入文件模式
 
@@ -7885,5 +7918,332 @@ func main() {
 }
 ```
 
+#### 2.5 插入内容到文件
 
+> 这一部分先待定，目前暂时用不到
 
+### 3、time模块
+
+> `time`模块比较重要
+
+#### 3.1 当前时间
+
+> 用来表示时间，可以通过`time.Now()`函数获取当前的时间对象，以及年、月、日等对象信息
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	now := time.Now()
+	fmt.Printf("now:%v\n", now) // now:2022-02-20 22:00:21.9037896 +0800 CST m=+0.002991401
+	year := now.Year()
+	fmt.Printf("year:%v\n", year) 
+	
+	month := now.Month()
+	fmt.Printf("month:%v\n", month)
+	
+	day := now.Day()
+	fmt.Printf("day:%v\n", day)
+	
+	hour := now.Hour()
+	fmt.Printf("hour:%v\n", hour)
+	
+	minute := now.Minute()
+	fmt.Printf("minute:%v\n", minute)
+	
+	second := now.Second()
+	fmt.Printf("second:%v\n", second)
+}
+```
+
+#### 3.2 获取时间戳
+
+> 时间戳是最长用的一个时间格式
+>
+> 表示从1970年至当前时间的总毫秒数，被称为`unix时间戳`
+>
+> 使用`now.Unix()`获取当前时间戳
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	now := time.Now()
+	// 秒时间戳
+	timeStamp1 := now.Unix()
+	fmt.Printf("timeStamp1:%v\n", timeStamp1)
+
+	// 毫秒时间戳
+	timeStamp2 := (now.Unix()) * 1000
+	fmt.Printf("timeStamp2:%v\n", timeStamp2)
+	
+	// 纳秒时间戳
+	timeStamp3 := now.UnixNano()
+	fmt.Printf("timeStamp3:%v\n", timeStamp3)
+}
+```
+
+#### 3.4 时间间隔常量
+
+> `time`包可以用来快速获取一个时间的常量
+>
+> 时间间隔是有时分秒，没有天、年
+
+![image-20220220221753457](go%E7%AC%94%E8%AE%B0.assets/image-20220220221753457.png)
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// 时间间隔秒数, 1秒
+	sec := time.Second
+	fmt.Printf("sec:%v\n", sec) // 1s
+
+	// 时间间隔分, 1分
+	min := time.Minute
+	fmt.Printf("min:%v\n", min) // 1m0s
+
+	// 时间间隔小时, 1小时
+	hour := time.Hour
+	fmt.Printf("hour:%v\n", hour) // 1h0m0s
+}
+```
+
+#### 3.5 时间后延
+
+> 时间可以往后延续
+>
+> `now.Add()`函数传参里就是对应的时间数，可以是时分秒
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// 时间间隔小时, 1小时
+	hour := time.Hour
+	fmt.Printf("hour:%v\n", hour) // 1h0m0s
+
+	// 24小时以后，需要先拿到当前时间，再去当前时间的基础上再添加
+	now := time.Now()
+	afterTime := now.Add(24 * (time.Hour))
+	fmt.Printf("afterTime:%v\n", afterTime)
+}
+```
+
+#### 3.6 时间格式化
+
+##### 3.6.1 将当前时间转换为字符串时间
+
+> `go`语言中使用时间模块的`Format`进行格式化，但是不是常见的`%Y-%m-%d %X`，而是用`20061234`来表示，因为`go`语言诞生于2006年1月2号15点04分
+>
+> 时间格式化是将时间对象转换为字符串类型时间
+
+```go
+// 于常见格式对比
+Y   		m		d		H		M		S
+2006		1		2		3		4		5
+
+// 15:04:05表示24小时计时法
+// 03:04:05表示12小时计时法，可以添加AM/PM用来表示上午或下午
+```
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// 当前时间
+	now := time.Now()
+
+	// 格式化时间
+	str1 := now.Format("2006-01-02 03:04")
+	fmt.Printf("str1:%v\n", str1)
+
+	// 15:04:05表示24小时计时法
+	// 03:04:05表示12小时计时法，可以添加AM/PM用来表示上午或下午
+	str2 := now.Format("2006/01/02 15:04:05")
+	fmt.Printf("str2:%v\n", str2)
+}
+```
+
+##### 3.6.2 将字符串时间转换为时间戳
+
+> `time.Parse()` 按照对应的格式解析字符串类型的时间，再转换为时间戳
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// timeObj 是返回了字符串类型的时间格式
+	timeObj, err := time.Parse("2006-01-02", "2010-10-10")
+	if err != nil {
+		fmt.Printf("parse time failed:%v\n", err)
+	}
+	fmt.Printf("timeObj:%v\n", timeObj) // 2010-10-10 00:00:00 +0000 UTC
+	fmt.Printf("timeObj:%v\n", timeObj.Unix()) // 1286668800
+}
+```
+
+##### 3.6.3 将时间戳转换为字符串时间
+
+> 使用`time.Unix(时间戳, 0)`转为字符串可读的时间格式
+>
+> - `0`表示一个标志位
+> - `time.Unix()`函数返回的对象继续可以调用`Format`函数进行时间格式化
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// 当前时间
+	now := time.Now()
+
+	// 时间戳
+	timeStamp1 := now.Unix()
+	fmt.Printf("timeStamp1:%v\n", timeStamp1)
+
+	// 时间戳转换为字符串时间
+	cu := time.Unix(timeStamp1, 0)
+	fmt.Printf("cu:%v\n", cu) // 2022-02-20 22:50:47 +0800 CST
+
+	// cu对象继续调用Format方法进行格式化时间
+	fcu := cu.Format("2006/01/02 15:04:05")
+	fmt.Printf("fcu:%v\n", fcu) // 2022/02/20 22:50:47
+}
+```
+
+#### 3.7 time.Sleep
+
+> 下面是`Sleep`的源码
+
+```go
+// Sleep源码
+// Sleep pauses the current goroutine for at least the duration d.
+// A negative or zero duration causes Sleep to return immediately.
+func Sleep(d Duration)
+
+// Duration源码
+// A Duration represents the elapsed time between two instants
+// as an int64 nanosecond count. The representation limits the
+// largest representable duration to approximately 290 years.
+type Duration int64
+
+const (
+	minDuration Duration = -1 << 63
+	maxDuration Duration = 1<<63 - 1
+)
+```
+
+> 从源码可以看出来，Sleep函数需要传入的形参类型是`Duration`，所以不能将一个`int`类型的变量传给它，需要进行转换
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/17 22:51
+    @File: basic_study
+    @Desc: 
+*/
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	// 时间间隔
+	n := 5
+	// 不能直接给Sleep里传入time.Sleep(n)，需要先进行类型转换
+	// 下面是休息了5s
+	fmt.Printf("5s前开始了:%v\n", time.Now())
+	time.Sleep(time.Duration(n) * time.Second)
+	fmt.Printf("5s后结束了:%v\n", time.Now())
+
+	fmt.Printf("3s前开始了:%v\n", time.Now())
+	time.Sleep(3 * time.Second)
+	fmt.Printf("3s后结束了:%v\n", time.Now())
+}
+
+```
+
+![image-20220220230924765](go%E7%AC%94%E8%AE%B0.assets/image-20220220230924765.png)
+
+### 4、strconv标准库
+
+> 
