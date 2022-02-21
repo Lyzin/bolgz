@@ -7870,7 +7870,10 @@ func writeFile(fileName string, fileContent string) {
 
 	// bufio写入文件
 	wr := bufio.NewWriter(fileHandler)
-
+	
+  // 写入字节，将文件内容写到缓存里
+	writer.Write([]byte(fileContent))
+  
 	// 这里是将文件内容写到缓存里
 	wr.WriteString(fileContent)
 
@@ -7924,11 +7927,32 @@ func main() {
 
 ### 3、time模块
 
-> `time`模块比较重要
+> 时间概念解释
+
+> **GMT**：Greenwich Mean Time [[1\]
+>
+> 格林威治标准时间 ; 英国伦敦格林威治定为0°经线开始的地方，地球每15°经度 被分为一个时区，共分为24个时区，相邻时区相差一小时；例: 中国北京位于东八区，GMT时间比北京时间慢8小时。
+
+> **UTC**: Coordinated Universal Time
+>
+> 世界协调时间；经严谨计算得到的时间，精确到秒，误差在0.9s以内， 是比GMT更为精确的世界时间
+
+> **DST**: Daylight Saving Time
+>
+> 夏季节约时间，即夏令时；是为了利用夏天充足的光照而将时间调早一个小时，北美、欧洲的许多国家实行夏令时；
+
+> **CST**:
+>
+> 四个不同时区的缩写：
+>
+> 1. Central Standard Time (USA) UT-6:00   美国标准时间
+> 2. Central Standard Time (Australia) UT+9:30  澳大利亚标准时间
+> 3. China Standard Time UT+8:00     中国标准时间
+> 4. Cuba Standard Time UT-4:00     古巴标准时间
 
 #### 3.1 当前时间
 
-> 用来表示时间，可以通过`time.Now()`函数获取当前的时间对象，以及年、月、日等对象信息
+> 用来表示时间，可以通过`time.Now()`函数获取本地的时间(东八区)，以及年、月、日等对象信息
 
 ```go
 /*
@@ -8009,7 +8033,7 @@ func main() {
 
 > `time`包可以用来快速获取一个时间的常量
 >
-> 时间间隔是有时分秒，没有天、年
+> 时间间隔只有时、分、秒，没有天、年、日
 
 ![image-20220220221753457](go%E7%AC%94%E8%AE%B0.assets/image-20220220221753457.png)
 
@@ -8123,6 +8147,12 @@ func main() {
 ##### 3.6.2 将字符串时间转换为时间戳
 
 > `time.Parse()` 按照对应的格式解析字符串类型的时间，再转换为时间戳
+>
+> `Parse`函数：
+>
+> - 解析一个格式化的时间字符串并返回它代表的时间
+> - 如果缺少表示时区的信息，Parse会将时区设置为UTC
+>   - 当解析具有时区缩写的时间字符串时，如果该时区缩写具有已定义的时间偏移量，会使用该偏移量。如果时区缩写是"UTC"，会将该时间视为UTC时间，不考虑Location
 
 ```go
 /*
@@ -8147,6 +8177,26 @@ func main() {
 	fmt.Printf("timeObj:%v\n", timeObj) // 2010-10-10 00:00:00 +0000 UTC
 	fmt.Printf("timeObj:%v\n", timeObj.Unix()) // 1286668800
 }
+```
+
+> `time.ParseInLocation()`和`time.Parse()`的区别
+>
+> - 第一，当缺少时区信息时，Parse将时间解释为UTC时间，而ParseInLocation将返回值的Location设置为loc
+> - 第二，当时间字符串提供了时区偏移量信息时，Parse会尝试去匹配本地时区，而ParseInLocation会去匹配loc
+
+```go
+// ParseInLocation源码
+func ParseInLocation(layout, value string, loc *Location) (Time, error)
+
+/* 
+	layout: 布局;安排，用来指定时间的格式
+	 value: 需要转换的时间字符串
+		 loc: 指定时区
+*/
+```
+
+```go
+
 ```
 
 ##### 3.6.3 将时间戳转换为字符串时间
@@ -8211,6 +8261,8 @@ const (
 ```
 
 > 从源码可以看出来，Sleep函数需要传入的形参类型是`Duration`，所以不能将一个`int`类型的变量传给它，需要进行转换
+>
+> 直接在`Sleep()`函数里写数字，表示单位是`纳秒`
 
 ```go
 /*
@@ -8243,6 +8295,122 @@ func main() {
 ```
 
 ![image-20220220230924765](go%E7%AC%94%E8%AE%B0.assets/image-20220220230924765.png)
+
+#### 3.8 时间案例练习
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+// 获取当前时间
+func getNowTime() time.Time {
+	now := time.Now()
+	return now
+}
+
+// 获取年月日
+func getYearMonthDay() {
+	now := getNowTime()
+	// 获取年月日
+	fmt.Printf("Year:%v\n", now.Year())
+	fmt.Printf("Month:%v\n", now.Month())
+	fmt.Printf("Day:%v\n", now.Day())
+	fmt.Printf("Hour:%v\n", now.Hour())
+	fmt.Printf("Minute:%v\n", now.Minute())
+	fmt.Printf("Second:%v\n", now.Second())
+}
+
+// 获取当前时间戳
+func getCurrentTimeStamp(stampType int) int64 {
+	var timeStamp int64
+	now := time.Now()
+	switch stampType {
+	case 1:
+		timeStamp = now.Unix()
+	case 2:
+		timeStamp = (now.Unix()) * 1000
+	case 3:
+		timeStamp = now.UnixNano()
+	default:
+		panic("input type err, only support 1/2/3!!!")
+	}
+	return timeStamp
+}
+
+// 获取时间间隔值
+func getTimeDuration() {
+	oneHour := time.Hour
+	oneMinute := time.Minute
+	oneSecond := time.Second
+	fmt.Printf("oneHour:%v\n", oneHour)
+	fmt.Printf("oneMinute:%v\n", oneMinute)
+	fmt.Printf("oneSecond:%v\n", oneSecond)
+}
+
+// 时间延后
+func getThreeDaysBefore() {
+	now := getNowTime()
+	threeDayHours := 24 * time.Hour
+	beforeTime := now.Add(-3 * threeDayHours)
+	fmt.Printf("Three days before time:%v\n", beforeTime)
+}
+
+// 时间使用指定格式化
+func formatTimeData() {
+	now := getNowTime()
+	str1 := now.Format("2006*01*02-03:04:05 PM")
+	fmt.Printf("str1:%v\n", str1)
+}
+
+// 时间戳-->字符串时间
+// -->字符串时间时间戳
+func timeConvert() {
+	// 时间戳-->字符串时间
+	nowTime := time.Now()
+	nowTimeStamp := nowTime.Unix()
+	newTimeStr := time.Unix(nowTimeStamp, 0)
+	fmt.Printf("newTimeStr:%v\n", newTimeStr)
+	newTimeStrFmt := newTimeStr.Format("2006*01*02 15_04_05")
+	fmt.Printf("newTimeStrFmt:%v\n\n", newTimeStrFmt)
+	
+	// 字符串时间-->时间戳
+	strTime := "2022-01-01 22:23:33"
+	getFmtTime, err := time.Parse("2006-01-02 15:04:05", strTime)
+	if err != nil {
+		fmt.Println("parse time err:", err)
+	}
+	fmt.Printf("getFmtTime:%v\n", getFmtTime)
+	getFmtTimeStamp := getFmtTime.Unix()
+	fmt.Printf("getFmtTimeStamp:%v\n", getFmtTimeStamp)
+}
+
+func main() {
+	nowObj := getNowTime()
+	fmt.Printf("nowObj:%v\n", nowObj)
+	fmt.Printf("nowObj type:%T\n", nowObj)
+	
+	// 获取年月日
+	getYearMonthDay()
+	
+	
+	// 转为时间戳
+	timeStamp := getCurrentTimeStamp(2)
+	fmt.Printf("timeStamp:%v\n", timeStamp)
+	
+	// 获取时间间隔
+	getTimeDuration()
+	
+	// 获取三天后时间
+	getThreeDaysBefore()
+	
+	// 时间使用指定格式化
+	timeConvert()
+}
+```
 
 ### 4、strconv标准库
 
