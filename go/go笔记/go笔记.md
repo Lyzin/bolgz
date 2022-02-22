@@ -4804,7 +4804,7 @@ func main() {
 
 > 当标准输入的有空白符时，就会在输出时，只展示第一个空白符的前面的内容
 >
-> 为了解决这个问题，可以用ioutil包来解决
+> 为了解决这个问题，可以用bufio包来解决
 
 ```go
 /*
@@ -8066,7 +8066,7 @@ func main() {
 }
 ```
 
-#### 3.5 时间后延
+#### 3.5 时间后延Add
 
 > 时间可以往后延续
 >
@@ -8100,7 +8100,7 @@ func main() {
 
 #### 3.6 时间格式化
 
-##### 3.6.1 将当前时间转换为字符串时间
+##### 3.6.1 当前时间转换为字符串时间
 
 > `go`语言中使用时间模块的`Format`进行格式化，但是不是常见的`%Y-%m-%d %X`，而是用`20061234`来表示，因为`go`语言诞生于2006年1月2号15点04分
 >
@@ -8144,7 +8144,7 @@ func main() {
 }
 ```
 
-##### 3.6.2 将字符串时间转换为时间戳
+##### 3.6.2 字符串时间转换为时间戳(parse/ParseInLocation)
 
 > `time.Parse()` 按照对应的格式解析字符串类型的时间，再转换为时间戳
 >
@@ -8181,7 +8181,7 @@ func main() {
 
 > `time.ParseInLocation()`和`time.Parse()`的区别
 >
-> - 第一，当缺少时区信息时，Parse将时间解释为UTC时间，而ParseInLocation将返回值的Location设置为loc
+> - 第一，当缺少时区信息时，Parse将时间解释为UTC时间，而ParseInLocation将返回值的Location设置为loc，即作为本地的时区
 > - 第二，当时间字符串提供了时区偏移量信息时，Parse会尝试去匹配本地时区，而ParseInLocation会去匹配loc
 
 ```go
@@ -8195,11 +8195,40 @@ func ParseInLocation(layout, value string, loc *Location) (Time, error)
 */
 ```
 
-```go
+> 下面代码可以看出来:
+>
+> - `Parse`函数转换出来的时区是`+0000 UTC`时间，不是东八区
+> - `time.LoadLocation`先加载时区，再将获取的时区值传递给`ParseInLocation`函数，这样转换出来的就是东八区时间
 
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	nowTime := time.Now()
+	fmt.Printf("nowTime:%v\n\n", nowTime)
+	
+	// 手动指定一个时间，计算差值
+	specTime := "2019-12-22 12:12:12"
+	specTimeFmt, _ := time.Parse("2006-01-02 15:04:05", specTime)
+	
+	// 可以看到specTimeFmt:2022-02-22 13:12:12 +0000 UTC， 默认不是东八区时间
+	fmt.Printf("specTimeFmt:%v\n", specTimeFmt)
+	
+	// 先加载时区，东八区
+	loc, _ := time.LoadLocation("Asia/ShangHai")
+	
+	// 再将时区传递给ParseInLoaction函数，这样转换出来的时间格式时区也是东八区
+	specTimeFmtNew, _ := time.ParseInLocation("2006-01-02 15:04:05", specTime, loc)
+	fmt.Printf("\nspecTimeFmtNew:%v\n", specTimeFmtNew)
+}
 ```
 
-##### 3.6.3 将时间戳转换为字符串时间
+##### 3.6.3 时间戳转换为字符串时间
 
 > 使用`time.Unix(时间戳, 0)`转为字符串可读的时间格式
 >
@@ -8262,7 +8291,7 @@ const (
 
 > 从源码可以看出来，Sleep函数需要传入的形参类型是`Duration`，所以不能将一个`int`类型的变量传给它，需要进行转换
 >
-> 直接在`Sleep()`函数里写数字，表示单位是`纳秒`
+> 直接在`Sleep()`函数里只写数字，表示单位是`纳秒`
 
 ```go
 /*
@@ -8296,7 +8325,26 @@ func main() {
 
 ![image-20220220230924765](go%E7%AC%94%E8%AE%B0.assets/image-20220220230924765.png)
 
-#### 3.8 时间案例练习
+#### 3.8 时间差Sub
+
+> 利用`Sub`函数可以快速计算出两个时间的差值
+>
+> 需要注意的是，`Sub`时，开始时间、结束时间的时区一定要一致
+
+```go
+时间差值 := 结束时间.Sub(开始时间)
+```
+
+```go
+	nowTime := time.Now()
+	fmt.Printf("nowTime:%v\n", nowTime)
+	
+	// 今天和两天后的时间差
+	dt := afterTime.Sub(nowTime)
+	fmt.Printf("dt:%v\n", dt)
+```
+
+#### 3.9 时间案例练习
 
 ```go
 package main
