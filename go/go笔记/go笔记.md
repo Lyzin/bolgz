@@ -6234,7 +6234,7 @@ func main() {
 type dog struct{
 	// 首字母不大写，没法进行序列化
     // 反斜杠，json表示使用的包，用冒号隔开，后面要写的字段用小写，有多个用空格隔开
-    // 可以理解未是给首字母大写的字段名通过tag起了一个别名
+    // 可以理解为是给首字母大写的字段名通过tag起了一个别名
 	Name string `json:"name"`
 	Age int `json:"age"`
 }
