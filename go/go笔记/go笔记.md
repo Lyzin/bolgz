@@ -8463,3 +8463,283 @@ func main() {
 ### 4、strconv标准库
 
 > 
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/26 20:31
+    @File: basic_study
+    @Desc: 
+*/
+package hiclog
+
+import (
+	"fmt"
+	"os"
+	"path"
+	"time"
+)
+
+type FileLog struct {
+	level             LogLevel
+	filePath          string   // 日志保存的文件路径
+	normalFileName    string   // 正常日志文件名
+	normalFileHandler *os.File // 正常日志的对象，用来写入文件中
+	errorFileName     string   // 错误日志文件名
+	errorFileHandler  *os.File // 错误日志的对象，用来写入文件中
+	fileSize          int64    // 文件大小
+}
+
+// 文件日志结构体，需要传的字段比较多，所以用指针作为返回值
+func NewFileLog(levelStr string, filePath, normalFileName, errorFileName string, fileSize int64) *FileLog {
+	level, err := parseInLogLevel(levelStr)
+	if err != nil {
+		panic(err)
+	}
+	fObj := &FileLog{
+			     level: level,
+			  filePath: filePath,
+		normalFileName: normalFileName,
+		 errorFileName: errorFileName,
+		      fileSize:	fileSize,
+	}
+
+	// 通过下面两个正常和错误日志对象的初始化函数，给normalFileHandler和errorFileHandler赋值，拿到初始化的值
+	fObj.initNormalFileHandler()
+	fObj.initErrorFileHandler()
+	return fObj
+}
+
+// 打开文件获取正常日志的文件指针
+func (f *FileLog) initNormalFileHandler() {
+	fullFileName := path.Join(f.filePath, f.normalFileName)
+	normalFileHandler, err := os.OpenFile(fullFileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Printf("打开正常日志文件错误:%v\n", err)
+	}
+	f.normalFileHandler = normalFileHandler
+}
+
+// // 打开文件获取错误日志的文件指针
+func (f *FileLog) initErrorFileHandler() {
+	fullFileName := path.Join(f.filePath, f.errorFileName)
+	errorFileHandler, err := os.OpenFile(fullFileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Printf("打开错误日志文件错误:%v\n", err)
+		return
+	}
+	f.errorFileHandler = errorFileHandler
+}
+
+// 关闭日志文件的句柄
+func (f *FileLog) CloseFileLog() {
+	f.normalFileHandler.Close()
+	f.errorFileHandler.Close()
+}
+
+// 用来判断在调用NewFileLog返回的logLevel的数字值是多少
+// 如果初始化时传入的日志级别大于等于本身的，那么在这个等级之前的
+// 都返回了false，所以也不会打印，也就做到了日志等级隔离
+func (f *FileLog) enableFileLog(logLevel LogLevel) bool {
+	return logLevel >= f.level
+}
+
+func (f *FileLog) saveFileLogMsg(lvVal LogLevel, msg string, a ...interface{}) {
+	if f.enableFileLog(lvVal) {
+		// 判断下，如果是传进来的日志等级数值大于等于ERROR，则写入错误日志里面，其他等级日志写到正常日志文件中
+		funcName, fileName, lineNu := GetFuncInfo(3)
+		nowTime := time.Now().Format("2006-01-02 15:04:05")
+
+		// 获取字符串的日志，传递给下面的输出
+		lvLogStr := parseOutLogLevel(lvVal)
+		msg = fmt.Sprintf(msg, a...)
+		if lvVal >= ERROR {
+			fmt.Fprintf(f.errorFileHandler, "[%v] [%v] [%v::%v] [line:%v] %v\n", nowTime, lvLogStr, fileName, funcName, lineNu, msg)
+		} else {
+			fmt.Fprintf(f.normalFileHandler, "[%v] [%v] [%v::%v] [line:%v] %v\n", nowTime, lvLogStr, fileName, funcName, lineNu, msg)
+		}
+	}
+}
+
+// Debug 日志
+func (f *FileLog) Debug(msg string, a ...interface{}) {
+	f.saveFileLogMsg(DEBUG, msg, a...)
+}
+
+// Info 日志
+func (f *FileLog) Info(msg string, a ...interface{}) {
+	f.saveFileLogMsg(INFO, msg, a...)
+}
+
+// Warning 日志
+func (f *FileLog) Warning(msg string, a ...interface{}) {
+	f.saveFileLogMsg(WARNING, msg, a...)
+}
+
+// Error 日志
+func (f *FileLog) Error(msg string, a ...interface{}) {
+	f.saveFileLogMsg(ERROR, msg, a...)
+}
+
+// Fatal 日志
+func (f *FileLog) Fatal(msg string, a ...interface{}) {
+	f.saveFileLogMsg(FATAL, msg, a...)
+}
+```
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/22 22:00
+    @File: basic_study
+    @Desc: 
+*/
+package hiclog
+
+import (
+	"fmt"
+	"time"
+)
+
+
+// Logger 结构体
+type ConsoleLog struct{
+	level LogLevel
+}
+
+func NewConsoleLog(levelStr string) ConsoleLog {
+	level, err := parseInLogLevel(levelStr)
+	if err != nil {
+		panic(err)
+	}
+	return ConsoleLog{
+		level: level,
+	}
+}
+
+// 用来判断在调用NewConsoleLog返回的logLevel的数字值是多少
+// 如果初始化时传入的日志级别大于等于本身的，那么在这个等级之前的
+// 都返回了false，所以也不会打印，也就做到了日志等级隔离
+func (c ConsoleLog) enableConsoleLog(logLevel LogLevel) bool {
+	return logLevel >= c.level
+}
+
+// 这个函数用来统一处理日志信息格式的展示
+// 使用空接口，来表示可以接收任意类型的值，更全面展示错误信息
+func (c ConsoleLog)showConsoleLogMsg(lvVal LogLevel, msg string, a ...interface{}) {
+	if c.enableConsoleLog(lvVal) {
+		funcName, fileName, lineNu := GetFuncInfo(3)
+		nowTime := time.Now().Format("2006-01-02 15:04:05")
+
+		// 获取字符串的日志，传递给下面的输出
+		lvLogStr := parseOutLogLevel(lvVal)
+		msg = fmt.Sprintf(msg, a...)
+		fmt.Printf("[%v] [%v] [%v::%v] [line:%v] %v\n", nowTime, lvLogStr, fileName, funcName, lineNu, msg)
+	}
+}
+
+// Debug 日志
+func (c ConsoleLog) Debug(msg string, a ...interface{}) {
+	c.showConsoleLogMsg(DEBUG, msg, a...)
+}
+
+// Info 日志
+func (c ConsoleLog) Info(msg string, a ...interface{}) {
+	c.showConsoleLogMsg(INFO, msg, a...)
+}
+
+// Warning 日志
+func (c ConsoleLog) Warning(msg string, a ...interface{}) {
+	c.showConsoleLogMsg(WARNING, msg, a...)
+}
+
+// Error 日志
+func (c ConsoleLog) Error(msg string, a ...interface{}) {
+	c.showConsoleLogMsg(ERROR, msg, a...)
+}
+
+// Fatal 日志
+func (c ConsoleLog) Fatal(msg string, a ...interface{}) {
+	c.showConsoleLogMsg(FATAL, msg, a...)
+}
+```
+
+```go
+/*
+  @Author: lyzin
+    @Date: 2022/02/22 22:00
+    @File: basic_study
+    @Desc: 
+*/
+package hiclog
+
+import (
+	"strings"
+	"errors"
+	"runtime"
+)
+
+// 参照time包里的duration类型来写，定义log数字类型
+type LogLevel int16
+
+const (
+	UNKNOW  LogLevel = iota
+	DEBUG   LogLevel = iota
+	INFO    LogLevel = iota
+	WARNING LogLevel = iota
+	ERROR   LogLevel = iota
+	FATAL   LogLevel = iota
+)
+
+// 将输入的字符串日志等级转换为LogLevel对应的常量值
+func parseInLogLevel(s string) (LogLevel, error) {
+	s = strings.ToLower(s)
+	switch s {
+	case "debug":
+		return DEBUG, nil
+	case "info":
+		return INFO, nil
+	case "warning":
+		return WARNING, nil
+	case "error":
+		return ERROR, nil
+	case "fatal":
+		return FATAL, nil
+	default:
+		err := errors.New("未知日志级别")
+		return UNKNOW, err
+	}
+}
+
+// 将输入的字符串日志等级转换为LogLevel对应的常量值
+func parseOutLogLevel(lv LogLevel) (string) {
+	switch lv {
+	case DEBUG:
+		return "DEBUG"
+	case INFO:
+		return "INFO"
+	case WARNING:
+		return "WARNING"
+	case ERROR:
+		return "ERROR"
+	case FATAL:
+		return "FATAL"
+	default:
+		return "DEBUG"
+	}
+}
+
+// 获取日志函数名，文件名，行号
+func GetFuncInfo(skip int) (funcName, fileName string, lineNu int){
+	// Caller里面的1表示跳出当前调用Caller函数的层数
+	pc, fileName, lineNu, ok := runtime.Caller(skip)
+	if !ok {
+		panic("获取函数信息失败")
+	}
+	funcName = runtime.FuncForPC(pc).Name()
+	return
+}
+
+
+```
+
