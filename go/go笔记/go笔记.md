@@ -3773,7 +3773,7 @@ func add(x, y int) (ret int) {
 
 #### 1.3 可变长参数
 
-> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`
+> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`,切片的类型依据传进函数的值类型是什么就是什么类型切片
 >
 > 可变长参数使用三个点(`...`)表示,如下面的形参的`y`
 >
@@ -3807,6 +3807,31 @@ func add(x int, y ...int) (int, []int){
 	return x,y
 }
 ```
+
+> 可变长参数的函数，在别的函数内部调用他的时候，因为a是一个切片，所以需要将他打散再传进去，否则传递进去的是一个切片套切片
+
+```go
+package main
+
+
+import (
+	"fmt"
+)
+
+func reciveArgs(a ...interface{}) {
+	fmt.Printf("a=%v\n", a)
+}
+
+func useReciveArgs(a ...interface{}) {
+	reciveArgs(a...)
+}
+
+func main() {
+	useReciveArgs(19, "bob", []int{1,2,3,4})
+}
+```
+
+
 
 #### 1.4 形参没有默认值
 
