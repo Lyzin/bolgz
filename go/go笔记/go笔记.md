@@ -8526,3 +8526,60 @@ func main() {
 >
 > [https://www.cnblogs.com/chnmig/p/11806609.html](https://www.cnblogs.com/chnmig/p/11806609.html)
 
+## 十三、网络编程
+
+### 1、goroutine
+
+> https://blog.csdn.net/weixin_30662849/article/details/99204899
+>
+> https://copyfuture.com/blogs-details/20200320101635503bdzfgguc31qanmg
+>
+> https://studygolang.com/articles/28128
+>
+> https://www.shangmayuan.com/a/d78964ae10c749b4a8df619c.html
+>
+> https://blog.csdn.net/weixin_44282540/article/details/107692526
+>
+> https://blog.csdn.net/busai2/article/details/82501634
+>
+> https://www.cnblogs.com/alin-qu/p/10740748.html
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func no_var() {
+	for i := 0; i < 30; i++ {
+		fmt.Println("\n===>>>START<<<")
+		fmt.Printf("i=%v\n", i)
+		go func() {
+			fmt.Printf("non func i:%v\n", i)
+		}()
+		fmt.Printf("goroutine num: %v\n", runtime.NumGoroutine())
+		fmt.Println("===>>>END<<<\n")
+	}
+}
+
+func use_var() {
+	for i := 0; i < 30; i++ {
+		fmt.Println("\n===>>>START<<<")
+		fmt.Printf("i=%v\n", i)
+		go func(i interface{}) {
+			fmt.Printf("non func i:%v\n", i)
+		}(i)
+		fmt.Printf("goroutine num: %v\n", runtime.NumGoroutine())
+		fmt.Println("===>>>END<<<\n")
+	}
+}
+
+func main() {
+	no_var()
+	// use_var()
+}
+
+```
+
