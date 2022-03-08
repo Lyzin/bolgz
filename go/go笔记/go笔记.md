@@ -141,6 +141,46 @@
 
 > https://www.bilibili.com/video/BV1bV41177KD?spm_id_from=333.999.0.0
 
+### 10、Goland配置go root
+
+> 低版本的`goland`配置高版本的`go sdk`会提示报错：
+>
+> `"The selected directory is not a valid home for Go Sdk"`
+>
+> 比如
+>
+> - goland版本是2018.1
+> - go sdk是1.17.8
+>
+> 此时goland添加go sdk就会报错，可按如下解决
+
+> 找到go sdk安装目录下的`go\src\runtime\internal\sys\zversion.go`
+>
+> 添加如下代码保存
+
+```go
+// zversion.go ,TheVersion 为安装的go sdk版本
+const TheVersion = `go1.17.8`
+```
+
+> 保存后重启goland编辑器，然后就可以配置go sdk了
+
+### 11、goproxy设置
+
+> 参照七牛云设置即可
+>
+> [https://goproxy.cn/](https://goproxy.cn/)
+
+```go
+// windows打开PowerShell并执行
+C:\> $env:GO111MODULE = "on"
+C:\> $env:GOPROXY = "https://goproxy.cn"
+
+// 但是这样设置在goland中使用的终端是普通的命令行.exe，不是powershell，可能不会生效，所以需要这样设置
+go env -w GO111MODULE=on
+go env -w GOPROXY="https://goproxy.cn"
+```
+
 ## 二、运行代码
 
 ### 1、第一行代码
@@ -3773,7 +3813,7 @@ func add(x, y int) (ret int) {
 
 #### 1.3 可变长参数
 
-> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`
+> 很像`python`里的可变长参数`args`和`kwargs`,可以接收`n`个参数进来，接收进来是一个`切片类型`,切片的类型依据传进函数的值类型是什么就是什么类型切片
 >
 > 可变长参数使用三个点(`...`)表示,如下面的形参的`y`
 >
@@ -3805,6 +3845,36 @@ func add(x int, y ...int) (int, []int){
 	fmt.Printf("y: %v\n", y) //[2, 3]
 	fmt.Printf("y type: %T\n", y) // []int
 	return x,y
+}
+```
+
+> 可变长参数的函数，在别的函数内部调用他的时候，因为a是一个切片，所以需要将他打散再传进去，否则传递进去的是一个切片套切片
+>
+> 参数打散传递进去，需要对切片使用`切片…`
+
+```go
+package main
+
+
+import (
+	"fmt"
+)
+
+func reciveArgs(a ...interface{}) {
+	fmt.Printf("a=%v\n", a)
+}
+
+func useReciveArgs(a ...interface{}) {
+	// 因为a是一个空接口类型的切片，传递给reciveArgs需要打散传递进去，使用a...
+	reciveArgs(a...) // a=[19 bob [1 2 3 4]]
+	
+	// 如果不打散，直接传递a进去，就是会把a作为一个整体给递给reciveArgs，这不是我们想要的
+	reciveArgs(a) // a=[[19 bob [1 2 3 4]]]
+	
+}
+
+func main() {
+	useReciveArgs(19, "bob", []int{1,2,3,4})
 }
 ```
 
@@ -6234,7 +6304,7 @@ func main() {
 type dog struct{
 	// 首字母不大写，没法进行序列化
     // 反斜杠，json表示使用的包，用冒号隔开，后面要写的字段用小写，有多个用空格隔开
-    // 可以理解未是给首字母大写的字段名通过tag起了一个别名
+    // 可以理解为是给首字母大写的字段名通过tag起了一个别名
 	Name string `json:"name"`
 	Age int `json:"age"`
 }
@@ -7925,7 +7995,9 @@ func main() {
 
 > 这一部分先待定，目前暂时用不到
 
-### 3、time模块
+## 十二、常用模块
+
+### 1、time模块
 
 > 时间概念解释
 
@@ -7950,7 +8022,7 @@ func main() {
 > 3. China Standard Time UT+8:00     中国标准时间
 > 4. Cuba Standard Time UT-4:00     古巴标准时间
 
-#### 3.1 当前时间
+#### 1.1 当前时间
 
 > 用来表示时间，可以通过`time.Now()`函数获取本地的时间(东八区)，以及年、月、日等对象信息
 
@@ -7991,7 +8063,7 @@ func main() {
 }
 ```
 
-#### 3.2 获取时间戳
+#### 1.2 获取时间戳
 
 > 时间戳是最长用的一个时间格式
 >
@@ -8029,7 +8101,7 @@ func main() {
 }
 ```
 
-#### 3.4 时间间隔常量
+#### 1.3 时间间隔常量
 
 > `time`包可以用来快速获取一个时间的常量
 >
@@ -8066,7 +8138,7 @@ func main() {
 }
 ```
 
-#### 3.5 时间后延Add
+#### 1.4 时间后延Add
 
 > 时间可以往后延续
 >
@@ -8098,9 +8170,9 @@ func main() {
 }
 ```
 
-#### 3.6 时间格式化
+#### 1.5 时间格式化
 
-##### 3.6.1 当前时间转换为字符串时间
+##### 1.5.1 当前时间转换为字符串时间
 
 > `go`语言中使用时间模块的`Format`进行格式化，但是不是常见的`%Y-%m-%d %X`，而是用`20061234`来表示，因为`go`语言诞生于2006年1月2号15点04分
 >
@@ -8144,7 +8216,7 @@ func main() {
 }
 ```
 
-##### 3.6.2 字符串时间转换为时间戳(parse/ParseInLocation)
+##### 1.5.2 字符串时间转换为时间戳(parse/ParseInLocation)
 
 > `time.Parse()` 按照对应的格式解析字符串类型的时间，再转换为时间戳
 >
@@ -8228,7 +8300,7 @@ func main() {
 }
 ```
 
-##### 3.6.3 时间戳转换为字符串时间
+##### 1.5.3 时间戳转换为字符串时间
 
 > 使用`time.Unix(时间戳, 0)`转为字符串可读的时间格式
 >
@@ -8267,7 +8339,7 @@ func main() {
 }
 ```
 
-#### 3.7 time.Sleep
+#### 1.6 time.Sleep
 
 > 下面是`Sleep`的源码
 
@@ -8325,7 +8397,7 @@ func main() {
 
 ![image-20220220230924765](go%E7%AC%94%E8%AE%B0.assets/image-20220220230924765.png)
 
-#### 3.8 时间差Sub
+#### 1.7 时间差Sub
 
 > 利用`Sub`函数可以快速计算出两个时间的差值
 >
@@ -8344,125 +8416,150 @@ func main() {
 	fmt.Printf("dt:%v\n", dt)
 ```
 
-#### 3.9 时间案例练习
+### 2、path模块
+
+> https://studygolang.com/pkgdoc
+>
+> path实现了对斜杠分隔的路径的实用操作函数。
+
+### 3、os模块
+
+> os包提供了操作系统函数的不依赖平台的接口。设计为Unix风格的，虽然错误处理是go风格的；失败的调用会返回错误值而非错误码。
+>
+> 通常错误值里包含更多信息:
+>
+> - 例如，如果某个使用一个文件名的调用（如Open、Stat）失败了，打印错误时会包含该文件名，错误类型将为*PathError，其内部可以解包获得更多信息。
+> - os包的接口规定为在所有操作系统中都是一致的。非公用的属性可以从操作系统特定的[syscall](http://godoc.org/syscall)包获取。
+
+### 4、strconv模块
+
+> strconv包实现了基本数据类型和其字符串表示的相互转换。
+
+### 5、rand模块
+
+> rand模块可以用来生成随机数，是`math`包里的`rand`方法
+>
+> 注意：
+>
+> - 生成随机数时，需要有一个种子，否则每次生成的随机数都是一样的
+
+```go
+// rand源码
+// Intn returns, as an int, a non-negative pseudo-random number in the half-open interval [0,n)
+// from the default Source.
+// It panics if n <= 0.
+func Intn(n int) int { return globalRand.Intn(n) }
+
+// Intn用来生成一个整数的随机数，从代码注释来看是属于：左包含右不包含
+```
+
+#### 5.1 生成随机整数
+
+```go
+package main
+
+
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
+
+func getRandNum() int {
+	// 种子为了每次生成的随机数不一样，否则会出现每次运行得到的随机数都是一样的
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(19)
+	return randNum
+}
+
+func getRandEleBySlice(a []int) int {
+	if len(a) == 0 {
+		panic("input slice is empty")
+	}
+	
+	// 获取随机数
+	// 种子为了每次生成的随机数不一样，否则会出现每次运行得到的随机数都是一样的
+	rand.Seed(time.Now().UnixNano())
+	randEle := rand.Intn(len(a))
+	return a[randEle]
+}
+
+func main() {
+	randNum := getRandNum()
+	fmt.Printf("randNum: %v\n", randNum)
+	
+	a := []int{1,2,3,4}
+	randEle := getRandEleBySlice(a)
+	fmt.Printf("a=%v\n", randEle)
+}
+```
+
+#### 5.2 猜数字案例
 
 ```go
 package main
 
 import (
 	"fmt"
+	"math/rand"
+	"os"
 	"time"
 )
 
-// 获取当前时间
-func getNowTime() time.Time {
-	now := time.Now()
-	return now
+func getRandNum() int {
+	// 种子为了每次生成的随机数不一样，否则会出现每次运行得到的随机数都是一样的
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(10)
+	return randNum
 }
 
-// 获取年月日
-func getYearMonthDay() {
-	now := getNowTime()
-	// 获取年月日
-	fmt.Printf("Year:%v\n", now.Year())
-	fmt.Printf("Month:%v\n", now.Month())
-	fmt.Printf("Day:%v\n", now.Day())
-	fmt.Printf("Hour:%v\n", now.Hour())
-	fmt.Printf("Minute:%v\n", now.Minute())
-	fmt.Printf("Second:%v\n", now.Second())
-}
-
-// 获取当前时间戳
-func getCurrentTimeStamp(stampType int) int64 {
-	var timeStamp int64
-	now := time.Now()
-	switch stampType {
-	case 1:
-		timeStamp = now.Unix()
-	case 2:
-		timeStamp = (now.Unix()) * 1000
-	case 3:
-		timeStamp = now.UnixNano()
-	default:
-		panic("input type err, only support 1/2/3!!!")
-	}
-	return timeStamp
-}
-
-// 获取时间间隔值
-func getTimeDuration() {
-	oneHour := time.Hour
-	oneMinute := time.Minute
-	oneSecond := time.Second
-	fmt.Printf("oneHour:%v\n", oneHour)
-	fmt.Printf("oneMinute:%v\n", oneMinute)
-	fmt.Printf("oneSecond:%v\n", oneSecond)
-}
-
-// 时间延后
-func getThreeDaysBefore() {
-	now := getNowTime()
-	threeDayHours := 24 * time.Hour
-	beforeTime := now.Add(-3 * threeDayHours)
-	fmt.Printf("Three days before time:%v\n", beforeTime)
-}
-
-// 时间使用指定格式化
-func formatTimeData() {
-	now := getNowTime()
-	str1 := now.Format("2006*01*02-03:04:05 PM")
-	fmt.Printf("str1:%v\n", str1)
-}
-
-// 时间戳-->字符串时间
-// -->字符串时间时间戳
-func timeConvert() {
-	// 时间戳-->字符串时间
-	nowTime := time.Now()
-	nowTimeStamp := nowTime.Unix()
-	newTimeStr := time.Unix(nowTimeStamp, 0)
-	fmt.Printf("newTimeStr:%v\n", newTimeStr)
-	newTimeStrFmt := newTimeStr.Format("2006*01*02 15_04_05")
-	fmt.Printf("newTimeStrFmt:%v\n\n", newTimeStrFmt)
+func guessNumGame() {
+	// 生成一个随机数
+	guessNum := getRandNum()
+	ops := 3
+	fmt.Printf("请猜一个0-10的数字，只有%v次机会~\n", ops)
+	for i := 1; i <= ops; i++ {
+		fmt.Printf(">>>第%d次猜数字<<<\n", i)
 	
-	// 字符串时间-->时间戳
-	strTime := "2022-01-01 22:23:33"
-	getFmtTime, err := time.Parse("2006-01-02 15:04:05", strTime)
-	if err != nil {
-		fmt.Println("parse time err:", err)
+		var inputNum int
+		fmt.Print("请猜一个数字:")
+		fmt.Scan(&inputNum)
+		
+		if inputNum > 10 {
+			fmt.Println("输入的数字不在0-10之间")
+		} else if inputNum > guessNum {
+			fmt.Println("猜大了")
+		} else if inputNum < guessNum {
+			fmt.Println("猜小了")
+		} else {
+			fmt.Println("猜对了，随机数是:", guessNum)
+			os.Exit(1)
+		}
+		if i >= ops {
+			fmt.Printf("%v次机会已经用完~\n", ops)
+			os.Exit(1)
+		}
 	}
-	fmt.Printf("getFmtTime:%v\n", getFmtTime)
-	getFmtTimeStamp := getFmtTime.Unix()
-	fmt.Printf("getFmtTimeStamp:%v\n", getFmtTimeStamp)
 }
 
 func main() {
-	nowObj := getNowTime()
-	fmt.Printf("nowObj:%v\n", nowObj)
-	fmt.Printf("nowObj type:%T\n", nowObj)
-	
-	// 获取年月日
-	getYearMonthDay()
-	
-	
-	// 转为时间戳
-	timeStamp := getCurrentTimeStamp(2)
-	fmt.Printf("timeStamp:%v\n", timeStamp)
-	
-	// 获取时间间隔
-	getTimeDuration()
-	
-	// 获取三天后时间
-	getThreeDaysBefore()
-	
-	// 时间使用指定格式化
-	timeConvert()
+	// 猜数字
+	guessNumGame()
 }
 ```
 
-### 4、strconv标准库
+## 十二、go module包管理
 
+### 1、go module使用
+
+> [https://zhuanlan.zhihu.com/p/330962571](https://zhuanlan.zhihu.com/p/330962571)
+>
 > 
+>
+> [https://www.cnblogs.com/wongbingming/p/12941021.html](https://www.cnblogs.com/wongbingming/p/12941021.html)
+>
+> 
+<<<<<<< HEAD
 
 ```go
 /*
@@ -8741,5 +8838,69 @@ func GetFuncInfo(skip int) (funcName, fileName string, lineNu int){
 }
 
 
+=======
+>
+> [https://mp.weixin.qq.com/s？__biz=MzUxMDI4MDc1NA==&mid=2247483713&idx=1&sn=817ffef56f8bc5ca09a325c9744e00c7&source=41#wechat_redirect](https://mp.weixin.qq.com/s?__biz=MzUxMDI4MDc1NA==&mid=2247483713&idx=1&sn=817ffef56f8bc5ca09a325c9744e00c7&source=41#wechat_redirect)
+>
+> 
+>
+> [https://www.cnblogs.com/chnmig/p/11806609.html](https://www.cnblogs.com/chnmig/p/11806609.html)
+
+## 十三、网络编程
+
+### 1、goroutine
+
+> https://blog.csdn.net/weixin_30662849/article/details/99204899
+>
+> https://copyfuture.com/blogs-details/20200320101635503bdzfgguc31qanmg
+>
+> https://studygolang.com/articles/28128
+>
+> https://www.shangmayuan.com/a/d78964ae10c749b4a8df619c.html
+>
+> https://blog.csdn.net/weixin_44282540/article/details/107692526
+>
+> https://blog.csdn.net/busai2/article/details/82501634
+>
+> https://www.cnblogs.com/alin-qu/p/10740748.html
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func no_var() {
+	for i := 0; i < 30; i++ {
+		fmt.Println("\n===>>>START<<<")
+		fmt.Printf("i=%v\n", i)
+		go func() {
+			fmt.Printf("non func i:%v\n", i)
+		}()
+		fmt.Printf("goroutine num: %v\n", runtime.NumGoroutine())
+		fmt.Println("===>>>END<<<\n")
+	}
+}
+
+func use_var() {
+	for i := 0; i < 30; i++ {
+		fmt.Println("\n===>>>START<<<")
+		fmt.Printf("i=%v\n", i)
+		go func(i interface{}) {
+			fmt.Printf("non func i:%v\n", i)
+		}(i)
+		fmt.Printf("goroutine num: %v\n", runtime.NumGoroutine())
+		fmt.Println("===>>>END<<<\n")
+	}
+}
+
+func main() {
+	no_var()
+	// use_var()
+}
+
+>>>>>>> 5333f4dfd69925a6d26564397487b30a394ab57e
 ```
 
