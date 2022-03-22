@@ -138,7 +138,7 @@ func main() {
 }
 ```
 
-## 二、gin的用法
+## 二、gin基础用法
 
 ### 1、返回json数据
 
@@ -397,43 +397,6 @@ func main() {
 
 ![image-20220316222032369](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220316222032369.png)
 
-#### 3.2 使用json提交数据（待定）
-
-> 当然除了form表单数据，也可以使用json的格式
->
-> 使用json提交数据，也是经常用的一种方法，比较推荐，在postman中需要选择body->raw->json填写请求的参数键值对
-
-````go
-// 代码不变
-package main
-
-import (
-	"github.com/gin-gonic/gin"
-)
-
-func postMethod(c *gin.Context) {
-	// 获取请求方法
-	method := c.Request.Method
-	// 获取post参数
-	name := c.PostForm("name")
-	age := c.PostForm("name")
-
-	c.JSON(200, gin.H{
-		"status": "ok",
-		"name": name,
-		"age": age,
-		"method": method,
-	})
-
-}
-
-func main() {
-	r := gin.Default()
-	r.POST("/user", postMethod)
-	r.Run(":8090")
-}
-````
-
 ### 4、获取path参数
 
 > 请求的参数通过url路径传输，比如/user/2002/02/02
@@ -516,8 +479,399 @@ func (c *Context) ShouldBind(obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
 }
+
+// shouldBind绑定数据顺序
+1.如果是get请求，只是用form绑定引擎(query)
+2.如果是post请求，先检查content-type是不是JSON/XML，然后再使用form(form-data)
+```
+
+#### 5.1 结构体字段小写
+
+> 使用结构体绑定传过来的参数，当结构体里的字段都是小写的时候，会发现请求时传过来的值获取不到，如下代码
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type UserInfo struct {
+	name string
+	age string
+}
+
+func bindUserData(c *gin.Context) {
+	var userObj UserInfo
+	err := c.ShouldBind(&userObj)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"errNo": 404,
+			"msg": err,
+		})
+	} else{
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": userObj,
+		})
+	}
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/userinfo", bindUserData)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321210054599](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321210054599.png)
+
+#### 5.2 结构体字段大写
+
+> 为什么获取不到呢？因为结构体我们是gin这个包要访问我们定义的结构体里的字段，在go语言中，一个包要访问另一个包里的字段，这个字段首字母必须是大写的才可以被访问到，那么我们将结构体字段改成大写试试
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type UserInfo struct {
+	Name string
+	Age string
+}
+
+func bindUserData(c *gin.Context) {
+	var userObj UserInfo
+	err := c.ShouldBind(&userObj)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"errNo": 404,
+			"msg": err,
+		})
+	} else{
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": userObj,
+		})
+	}
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/userinfo", bindUserData)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321210628756](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321210628756.png)
+
+> 可以看到有返回值了，但是返回值是空的，返回的是结构体字段的零值，那么也就表示在`shouldBind`的时候，传进来的参数`name`和`age`仍然没有找到对应字段进行绑定，因为结构体字段是首字母大写的，那么我们把请求里的`name`和`age`改成首字母大写试试
+
+![image-20220321210841637](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321210841637.png)
+
+#### 5.3 请求字段都小写
+
+> 可以看到有数据返回了，但是我们不想要在请求和返回时的字段值首字母大写，那么就需要添加结构体tag了，tag表示是用了反射
+>
+> gin中：
+>
+> - GET请求大多用`form`这个tag
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type UserInfo struct {
+	Name string `form:"name"`
+	Age string `form:"age"`
+}
+
+func bindUserData(c *gin.Context) {
+	var userObj UserInfo
+	err := c.ShouldBind(&userObj)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"errNo": 404,
+			"msg": err,
+		})
+	} else{
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": userObj,
+		})
+	}
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/userinfo", bindUserData)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321211550814](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321211550814.png)
+
+#### 5.4 响应字段都小写
+
+> 从上图可以看出，请求传进来的小写参数可以被定义的结构体对应字段接收了，但是返回响应里还是大写，因为返回的是json，所以需要再添加一下json这个tag，这样就满足了请求和响应都是小写字段了
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type UserInfo struct {
+	Name string `form:"name" json:"name"`
+	Age string `form:"age" json:"age"`
+}
+
+func bindUserData(c *gin.Context) {
+	var userObj UserInfo
+	err := c.ShouldBind(&userObj)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"errNo": 404,
+			"msg": err,
+		})
+	} else{
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": userObj,
+		})
+	}
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/userinfo", bindUserData)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321211734519](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321211734519.png)
+
+#### 5.5 请求和响应使用的tag总结
+
+> `form`这个tag负责将接收进来的参数进行转化，让内部的结构体可以接收到并赋值
+>
+> `json`这个tag负责将对应结构体字段以小写形式给返回
+
+#### 5.6 json数据请求
+
+> 在前后端分离的项目，前端请求的参数也大多是以json格式来发请求，所以绑定参数也可以来处理json的请求
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type UserInfo struct {
+	Name string `form:"name" json:"name"`
+	Age int `form:"age" json:"age"`
+}
+
+func bindUserData(c *gin.Context) {
+	var userObj UserInfo
+	err := c.ShouldBind(&userObj)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"errNo": 404,
+			"msg": err,
+		})
+	} else{
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": userObj,
+		})
+	}
+}
+
+func main() {
+	r := gin.Default()
+	r.POST("/jsondata", bindUserData)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321212437785](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321212437785.png)
+
+### 6、文件上传
+
+#### 6.1 单个文件上传
+
+> 处理multipart forms提交文件时默认的内存限制是32MiNB
+>
+> 可以通过gin中的MaxMultipartMemory 进行修改
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"path"
+)
+
+func uploadFile(c *gin.Context) {
+	// 从请求中读取文件
+	//fobj, err := c.FormFile("pic")
+	fobj, err := c.FormFile("pic")
+	if err != nil {
+		c.JSON(500, gin.H{
+			"errNo": 500,
+			"action": "读取文件错误",
+			"msg": err.Error(),
+			"fobj": fobj,
+		})
+	} else{
+		fmt.Printf("fobj:%v\n", fobj)
+		// 将读取的文件保存在本地(服务端本地)
+		dst := path.Join("./", fobj.Filename)
+		err := c.SaveUploadedFile(fobj, dst)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"errNo": 500,
+				"action": "保存文件错误",
+				"msg": err,
+			})
+		}
+		c.JSON(200, gin.H{
+			"errNo": 200,
+			"msg": "保存文件成功",
+		})
+
+	}
+}
+
+
+func main() {
+	r := gin.Default()
+	r.POST("/uploadfile", uploadFile)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+> 下图是在postman请求的截图
+>
+> - 第一张是设置`header`里的`Content-Type`为：`multipart/form-data; boundary=<calculated when request is sent>`
+>   - 这个`boundary`一定要有，否则会爆这个错误：`no multipart boundary param in Content-Type`
+> - 第二张图是设置body里的请求，设置`pic`参数的类型为`file`，然后进行上传
+
+![image-20220321220609748](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321220609748.png)
+
+![image-20220321220803728](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321220803728.png)
+
+### 7、重定向
+
+> gin中可以对路由进行重定向，当前这部分是前端需要干的活
+
+#### 7.1 请求重定向
+
+```go
+//表示将`index`这个函数的请求转发到百度
+c.Redirect(301, "http://www.baidu.com")
 ```
 
 ```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+func indexFunc(c *gin.Context) {
+	// 请求重定向
+	c.Redirect(301, "http://www.baidu.com")
+}
+
+
+func main() {
+	r := gin.Default()
+	r.GET("/index", indexFunc)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
 ```
+
+#### 7.2 路由重定向
+
+> 请求时转换到/xx的路由处理函数
+
+```go
+// 路由重定向,将请求转给user这个路由对应的函数
+c.Request.URL.Path = "/user"
+// 用router下的HandleContext处理上下文
+r.HandleContext(c)
+```
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func indexFunc(c *gin.Context) {
+	// 路由重定向
+	c.Request.URL.Path = "/user"
+	r.HandleContext(c)
+}
+
+func userFunc(c *gin.Context) {
+	// 请求重定向
+	c.JSON(200, gin.H{
+		"action": "this is userFunc",
+		"msg": "ok",
+	})
+}
+
+
+func main() {
+	r.GET("/index", indexFunc)
+	r.GET("/user", userFunc)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220321224528484](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321224528484.png)
+
+> 从上图可以看出，访问`/index`返回了`/user`对应函数的结果
+
+## 三、gin的路由
+
+### 1、路由 
 
