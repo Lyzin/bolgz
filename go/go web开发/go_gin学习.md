@@ -873,12 +873,675 @@ func main() {
 
 ### 8、gin的路由
 
-##### 8.1、路由 
+#### 8.1 路由 
 
+> gin中路由使用的就是`httprouter`这个库
 
+> 路由就是访问的`url`，`url`在`gin`中指向了处理的函数
 
+```go
+package main
 
+import (
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userFunc(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"action": "this is userFunc",
+		"msg": "ok",
+	})
+}
+
+func main() {
+	r.GET("/user", userFunc)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322205612475](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322205612475.png)
+
+#### 8.2 路由组
+
+> 路由组就是将一组拥有共同前缀的路由，将公共前缀提取出来，组件一个组，然后这个组里再进行其他路由划分
+
+```go
+// Group前缀
+// Group creates a new router group. You should add all the routes that have common middlewares or the same path prefix.
+// For example, all the routes that use a common middleware for authorization could be grouped.
+// 翻译
+/*
+    组创建一个新的路由器组。你应该添加所有有共同的中间件或相同路径前缀的路由。
+    例如，所有使用共同的中间件进行授权的路由都可以被分组。
+*/
+
+func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *RouterGroup {
+	return &RouterGroup{
+		Handlers: group.combineHandlers(handlers),
+		basePath: group.calculateAbsolutePath(relativePath),
+		engine:   group.engine,
+	}
+}
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userAddr(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"msg": "this is user addr",
+	})
+}
+
+func userInfo(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"msg": "this is user info",
+	})
+}
+
+func main() {
+	userGroup := r.Group("/user")
+	fmt.Printf("userGroup: %+v\n", *userGroup)
+	{
+		userGroup.GET("/addr", userAddr)
+		userGroup.GET("/info", userInfo)
+	}
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+#### 8.3 路由组的值
+
+![image-20220322211113679](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322211113679.png)
+
+> 从启动gin的截图来看，userGroup是RouterGroup结构体类型，里面有`basePath`这个字段，表示是公共的路径，所以访问`/user/info`时，先找`/user`这个路由组，再从`/user`这个路由组里去找`/info`这个路由，找到就返回值，找不到就提示404
+
+![image-20220322211323252](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322211323252.png)
+
+![image-20220322211343422](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322211343422.png)
+
+#### 8.4 路由组嵌套
+
+> 路由组也支持嵌套，就是路由组里继续套用一个路由组，那么访问的链接就是形如：/group1/group2/xxx
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userAddr(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"msg": "this is user addr",
+	})
+}
+
+func userInfo(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"msg": "this is user info",
+	})
+}
+
+func main() {
+	userGroup := r.Group("/user")
+	fmt.Printf("userGroup: %+v\n", *userGroup)
+	{
+		userGroup.GET("/addr", userAddr)
+		infoGroup := userGroup.Group("/info")
+		{
+			infoGroup.GET("/pinfo", userInfo)
+		}
+	}
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322213637665](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322213637665.png)
+
+![image-20220322213650783](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322213650783.png)
+
+#### 8.5 路由组用处
+
+> 可以看到有共同的路由前缀，就可以表示不同的业务线，或者Api版本区分
+
+### 9、Any任意请求
+
+> any函数可以接收任意请求方法，下面是代码和截图可以看出来不管是get还是post都可以来请求
+>
+> 从源代码可以看出来，any包装了所有的请求方式
+
+```go
+// any源代码
+// Any registers a route that matches all the HTTP methods.
+// GET, POST, PUT, PATCH, HEAD, OPTIONS, DELETE, CONNECT, TRACE.
+func (group *RouterGroup) Any(relativePath string, handlers ...HandlerFunc) IRoutes {
+	group.handle(http.MethodGet, relativePath, handlers)
+	group.handle(http.MethodPost, relativePath, handlers)
+	group.handle(http.MethodPut, relativePath, handlers)
+	group.handle(http.MethodPatch, relativePath, handlers)
+	group.handle(http.MethodHead, relativePath, handlers)
+	group.handle(http.MethodOptions, relativePath, handlers)
+	group.handle(http.MethodDelete, relativePath, handlers)
+	group.handle(http.MethodConnect, relativePath, handlers)
+	group.handle(http.MethodTrace, relativePath, handlers)
+	return group.returnObj()
+}
+```
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userAddr(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"msg": "this is user addr",
+	})
+}
+
+func main() {
+	r.Any("/useraddr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322212449668](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322212449668.png)
+
+![image-20220322212501626](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322212501626.png)
+
+### 10、NoRoute函数
+
+> gin中有一个NoRoute函数，可以定义当路由找不到时的错误信息，表示所有找不到路由都指到这个函数下，当然也可以对路由组设定自己的NoRoute处理函数
+>
+> - NoRoute不需要指定路由，直接传入处理NoRoute的函数即可
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func notFoundErr(c *gin.Context) {
+	c.JSON(404, gin.H{
+		"msg": "router not found in server",
+	})
+}
+
+func main() {
+	r.NoRoute(notFoundErr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322213003931](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322213003931.png)
 
 ## 三、Gin中间件
+
+### 1、中间件简介
+
+> gin可以允许在处理请求过程中，加入开发者自己的处理函数，这些函数就是中间件，中间件适合处理：
+>
+> - 公共的业务逻辑
+>   - 比如登录认证、权限校验、数据分页、记录日志等等
+
+```go
+
+```
+
+![image-20220322215119814](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322215119814.png)
+
+> 从上图就可以看出来，当浏览器发起请求时，先经过中间件处理以后，再转给真正的路由函数处理，最后再将结果返回给浏览器
+>
+> 这样就做到了拦截请求，然后对请求做处理后再转给真正的路由函数，这也是钩子函数
+
+### 2、中间件注册
+
+> `gin`中的中间件必须是`gin.HandlerFunc`类型，这个类型也是路由处理函数的类型
+>
+> 中间件函数是可以有值的
+
+#### 2.1 在路由处理函数中注册
+
+> 可以在每个路由请求前加入中间件注册函数
+>
+> `mw1`函数就是中间件函数
+
+```go
+// mw1 就是中间件函数
+r.GET("/user", mw1, userInfo)
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+}
+
+
+func main() {
+	r.GET("/user", mw1, userInfo)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322220010964](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322220010964.png)
+
+![image-20220322220024407](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322220024407.png)
+
+> 从执行结果来看，中间件函数先执行，再执行的后面的路由函数
+
+#### 2.2 在全局注册
+
+> 当有很多个函数都需要中间件函数的时候，每个路由函数注册的前面都需要写中间件函数就比较麻烦，所以可以设置为全局注册模式
+
+```go
+// 全局注册
+r.Use(中间件函数)
+
+// Use attaches a global middleware to the router. ie. the middleware attached though Use() will be
+// included in the handlers chain for every single request. Even 404, 405, static files...
+// For example, this is the right place for a logger or error management middleware.
+func (engine *Engine) Use(middleware ...HandlerFunc) IRoutes {
+	engine.RouterGroup.Use(middleware...)
+	engine.rebuild404Handlers()
+	engine.rebuild405Handlers()
+	return engine
+}
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+}
+
+func main() {
+	r.Use(mw1)
+	r.GET("/userinfo", userInfo)
+	r.GET("/useraddr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322222144657](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322222144657.png)
+
+![image-20220322222159652](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322222159652.png)
+
+![image-20220322222126918](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322222126918.png)
+
+### 3、中间件函数里的Next
+
+> 既然中间件执行完以后就会执行路由函数，那么为什么还需要`Next`函数呢？从下面的分析可以看出来
+>
+
+#### 3.1 中间件函数里没有Next函数
+
+> 中间函数里没有Next函数，相当于先把中间件函数都执行完以后，再执行后面的路由函数，这样就做不到以一些条件来决定是否要执行后面的路由函数了，因为一股脑的把中间件函数都执行完了，从下面的执行结果图就可以看到
+
+```go
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1开始执行了\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+	fmt.Printf("这是中间件函数mw1执行完了\n")
+}
+```
+
+![image-20220322223206926](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322223206926.png)
+
+#### 3.2 中间件函数里有Next函数
+
+> 中间函数里的Next函数，相当于是遇到Next函数是，会先调用后面的路由处理函数，当后面的路由处理函数处理完成以后，再来执行中间件函数剩余部分代码，这样就可以做到以一些条件来控制是否要执行路由函数，比如权限控制等功能
+>
+> - 从下图也可以看出来，先执行了中间件函数的开始部分，遇到Next函数后去处理后面的userAddr这个路由函数了，当userAddr路由函数处理完成后，并将路由函数处理的基础进行返回，再又回来接着处理中间件函数的剩余代码功能了
+
+```go
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1开始执行了\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+	c.Next()
+	fmt.Printf("这是中间件函数mw1执行完了\n")
+}
+
+```
+
+![image-20220322223410381](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322223410381.png)
+
+![image-20220322224817341](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322224817341.png)
+
+### 4、中间件函数里的Abort
+
+> Abort函数用户`不处理`中间件后面的路由函数，表示放弃执行
+>
+> 从下图可以看出只执行了中间件函数，中间件后面的路由函数并没有执行
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1开始执行了\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+	c.Abort()
+	fmt.Printf("这是中间件函数mw1执行完了\n")
+}
+
+func main() {
+	r.Use(mw1)
+	r.GET("/userinfo", userInfo)
+	r.GET("/useraddr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322230832839](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322230832839.png)
+
+![image-20220322230841974](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322230841974.png)
+
+### 5、多个中间件函数
+
+> 当有多个中间件函数时，执行的顺序如下
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func mw1(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw1开始执行了\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw1",
+	})
+	c.Next()
+	fmt.Printf("这是中间件函数mw1执行完了\n")
+}
+
+// 自定义的中间件函数
+func mw2(c *gin.Context) {
+	fmt.Printf("这是中间件函数mw2开始执行了\n")
+	c.JSON(200, gin.H{
+		"msg": "这是中间件函数mw2",
+	})
+    // 继续调用后面的路由函数
+	c.Next()
+	fmt.Printf("这是中间件函数mw2执行完了\n")
+}
+
+func main() {
+	r.Use(mw1, mw2)
+	r.GET("/userinfo", userInfo)
+	r.GET("/useraddr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220322225047911](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322225047911.png)
+
+![image-20220322225100631](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322225100631.png)
+
+
+
+> 可以看到是按中间件函数注册的顺序，先执行中间件函数开始的代码，遇到Next函数时，转过头去执行路由处理函数，当路由处理函数执行完以后，再来执行和路由函数挨得最近的那个中间件函数，依次往外执行中间件函数，直到执行完成
+
+![image-20220322230038530](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322230038530.png)
+
+> 从上图可以看出
+>
+> - 执行mw1函数开始时，接着遇到Next函数，mw1里的Next函数执行的就是mw2函数里的代码
+> - 接着执行mw2函数里的代码开始，接着遇到Next函数，mw2里的Next函数执行的就是useraddr路由函数的代码
+> - useraddr路由函数执行完成以后，mw2里的Next函数执行完成，接着执行mw2函数结束代码
+> - mw2函数结束代码执行完成以后， mw1的next函数执行完成
+> - 最后执行mw1函数结束代码，请求结束完成
+
+### 6、中间件可以传参
+
+> 定义一个闭包函数，返回一个匿名函数，匿名函数的类型是`gin.HandlerFunc`，这那么这样就做到了一个中间件既可以传参，返回值又符合gin需要的中间件函数类型
+
+```go
+// 中间件函数可以传参的写法
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
+```
+
+```go
+// 完整代码
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
+
+func main() {
+	r.Use(authV1(false))
+	r.GET("/userinfo", userInfo)
+	r.GET("/useraddr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+> 当传参为false是，不会执行路由处理函数
+
+![image-20220322233053545](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322233053545.png)
+
+> 当传参为false是，则执行路由处理函数
+
+![image-20220322233139511](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220322233139511.png)
+
+### 7、路由组注册中间件
+
+> 路由组也可以注册中间件，有两种方式
+
+#### 7.1 注册方式一
+
+> 在生成路由组的时候，将中间件注册进去
+
+
+
+
+
+
+
+#### 7.2 注册方式二
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 四、GORM
 
 1、
