@@ -531,7 +531,7 @@ func main() {
 
 #### 5.2 结构体字段大写
 
-> 为什么获取不到呢？因为结构体我们是gin这个包要访问我们定义的结构体里的字段，在go语言中，一个包要访问另一个包里的字段，这个字段首字母必须是大写的才可以被访问到，那么我们将结构体字段改成大写试试
+> 为什么获取不到呢？因为结构体我们是gin这个包要访问我们在自己包里定义的结构体里的字段，在go语言中，一个包要访问另一个包里的字段，这个字段首字母必须是大写的才可以被访问到，那么我们将结构体字段改成大写试试
 
 ```go
 package main
@@ -625,9 +625,9 @@ func main() {
 
 ![image-20220321211550814](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220321211550814.png)
 
-#### 5.4 响应字段都小写
+#### 5.4 json请求结构体字段小写
 
-> 从上图可以看出，请求传进来的小写参数可以被定义的结构体对应字段接收了，但是返回响应里还是大写，因为返回的是json，所以需要再添加一下json这个tag，这样就满足了请求和响应都是小写字段了
+> 这里处理的json方式请求gin框架时，对所有参数进行小写
 
 ```go
 package main
@@ -1518,29 +1518,304 @@ func main() {
 
 > 在生成路由组的时候，将中间件注册进去
 
+```go
+// 将中间件函数注册到初始化路由组的位置
+userGroup := r.Group("/user", authV1(true))
+```
 
+```go
+package main
 
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
 
+var r = gin.Default()
 
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
 
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
+
+func main() {
+	// 将中间件函数注册到初始化路由组的位置
+	userGroup := r.Group("/user", authV1(true))
+	userGroup.GET("/info", userInfo)
+	userGroup.GET("/addr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+![image-20220324074936707](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220324074936707.png)
+
+![image-20220324075009225](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220324075009225.png)
 
 #### 7.2 注册方式二
 
+> 将中间件注册到路由组的`Use`方法
+
+```go
+// 将中间件函数注册到路由组的Use方法
+userGroup := r.Group("/user")
+userGroup.Use(authV1(true))
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userInfo函数",
+	})
+}
+
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
+
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
+
+func main() {
+	// 将中间件函数注册到路由组的Use方法
+	userGroup := r.Group("/user")
+	userGroup.Use(authV1(true))
+	userGroup.GET("/info", userInfo)
+	userGroup.GET("/addr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
+
+> 执行结果和注册方式一一样
+
+### 8、获取中间件传过来的值
+
+> 可以将中间件获取到的值，传递给中间件后面的路由处理函数，比如用户名，日志，关键参数等
+
+#### 8.1 中间件函数Set值
+
+> 中间件函数用Set函数，进行对请求获取到值传递给后面的路由处理函数
+
+```go
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			var uObj UserData
+			bindErr := c.ShouldBind(&uObj)
+			if bindErr != nil {
+				c.JSON(500, gin.H{
+					"msg": "绑定参数时失败",
+					"binErr": bindErr.Error(),
+				})
+			} else{
+				// 在中间件函数里设置获取到name, password值
+				c.Set("name", uObj.Name)
+				c.Set("password", uObj.Password)
+				c.JSON(500, gin.H{
+					"msg": "绑定参数成功",
+					"setName": uObj.Name,
+					"setPawword": uObj.Password,
+				})
+			}
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
+```
+
+#### 8.2 路由函数Get值
+
+> 中间件设置请求里获取到的参数名和参数值，传递给后面的路由处理函数，使用`GET`获取
+
+```go
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	name, nameOk := c.Get("name")
+	password, pwdOk := c.Get("password")
+	if !nameOk && !pwdOk {
+		c.JSON(500, gin.H{
+			"msg": "获取参数值错误",
+			"name": name,
+			"password": password,
+		})
+	} else {
+		if name == "tom" && password == 123 {
+			c.JSON(200, gin.H{
+				"msg": "获取参数值正确",
+				"name": name,
+				"password": password,
+				"登录状态": true,
+			})
+		} else{
+			c.JSON(500, gin.H{
+				"msg": "获取参数值错误",
+				"name": name,
+				"password": password,
+				"登录状态": false,
+			})
+		}
+	}
+}
+```
+
+#### 8.3 请求示例
+
+> 使用中间件获取请求值，并set进去，然后传递给后面的路由处理函数，路由处理函数获取值以后，做对应的处理
+>
+> 下面是完整代码
+
+```go
+// 完整代码
+package main
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
+
+var r = gin.Default()
+
+type UserData struct{
+	Name string `form:"name"`
+	Password int `form:"password"`
+}
 
 
+func userInfo(c *gin.Context) {
+	fmt.Printf("这是userInfo函数\n")
+	name, nameOk := c.Get("name")
+	password, pwdOk := c.Get("password")
+	if !nameOk && !pwdOk {
+		c.JSON(500, gin.H{
+			"msg": "获取参数值错误",
+			"name": name,
+			"password": password,
+		})
+	} else {
+		if name == "tom" && password == 123 {
+			c.JSON(200, gin.H{
+				"msg": "获取参数值正确",
+				"name": name,
+				"password": password,
+				"登录状态": true,
+			})
+		} else{
+			c.JSON(500, gin.H{
+				"msg": "获取参数值错误",
+				"name": name,
+				"password": password,
+				"登录状态": false,
+			})
+		}
+	}
+}
 
+// 自定义的中间件函数
+func authV1(checkLogin bool) gin.HandlerFunc{
+	return func(c *gin.Context) {
+		if checkLogin {
+			fmt.Println("校验权限通过")
+			var uObj UserData
+			bindErr := c.ShouldBind(&uObj)
+			if bindErr != nil {
+				c.JSON(500, gin.H{
+					"msg": "绑定参数时失败",
+					"binErr": bindErr.Error(),
+				})
+			} else{
+				// 在中间件函数里设置获取到name, password值
+				c.Set("name", uObj.Name)
+				c.Set("password", uObj.Password)
+				c.JSON(500, gin.H{
+					"msg": "绑定参数成功",
+					"setName": uObj.Name,
+					"setPawword": uObj.Password,
+				})
+			}
+			c.Next()
+		} else {
+			fmt.Println("校验权限失败")
+			c.Abort()
+		}
+	}
+}
 
+func userAddr(c *gin.Context) {
+	fmt.Printf("这是userAddr函数\n")
+	c.JSON(200, gin.H{
+		"msg": "这是userAddr函数",
+	})
+}
 
+func main() {
+	// 将中间件函数注册到路由组的Use方法
+	userGroup := r.Group("/user")
+	userGroup.Use(authV1(true))
+	userGroup.GET("/info", userInfo)
+	userGroup.GET("/addr", userAddr)
+	err := r.Run(":8090")
+	if err != nil {
+		return
+	}
+}
+```
 
-
-
-
-
-
-
-
-
-
+![image-20220324081853774](go_gin%E5%AD%A6%E4%B9%A0.assets/image-20220324081853774.png)
 
 ## 四、GORM
 
