@@ -8438,9 +8438,73 @@ func main() {
 > - 例如，如果某个使用一个文件名的调用（如Open、Stat）失败了，打印错误时会包含该文件名，错误类型将为*PathError，其内部可以解包获得更多信息。
 > - os包的接口规定为在所有操作系统中都是一致的。非公用的属性可以从操作系统特定的[syscall](http://godoc.org/syscall)包获取。
 
-### 4、strconv模块
+### 4、数据类型转换
 
-> strconv包实现了基本数据类型和其字符串表示的相互转换。
+> Go语言中可以对基础数据类型与字符串之间进行相互转换
+
+#### 4.1 string方法
+
+> string是go的内置方法，不需要引包，直接调用即可
+>
+> string方法不能将数字转换为string
+>
+> - 下面代码里因为string会拿着传进来的数字根据utf-8编码去找97对应的符号了，所以是a
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	i := int32(97)
+
+	// string方法不能将数字转换为string，因为string会拿着传进来的数字根据utf-8编码去找97对应的符号了，所以是a
+	ret := string(i)
+	fmt.Printf("ret=%v\n", ret) // "a"
+
+	
+}
+```
+
+#### 4.2 fmt.Sprintf方法
+
+> fmt.Sprintf转换数字为string
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	i := int32(97)
+	// fmt.Sprintf转换数字为string
+	ret1 := fmt.Sprintf("%d", i)
+	fmt.Printf("ret1 = %#v\n", ret1) // "97"
+}
+```
+
+#### 4.3 strconv方法
+
+> strconv包实现了基本数据类型和其(其是指基本数据类型)字符串之间的相互转换
+
+```go
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 5、rand模块
 
@@ -8464,7 +8528,6 @@ func Intn(n int) int { return globalRand.Intn(n) }
 
 ```go
 package main
-
 
 import (
 	"fmt"
@@ -8565,9 +8628,316 @@ func main() {
 >
 > [https://www.cnblogs.com/wongbingming/p/12941021.html](https://www.cnblogs.com/wongbingming/p/12941021.html)
 
+## 十三、反射
+
+> **程序编译**：
+>
+> - 程序在编译时，变量的值会被转换为内存地址，变量名不会被编译器写入到可执行部分。
+>
+> **反射**：
+>
+> - 是指在程序运行期对程序本身进行访问和修改的能力。
+>
+> **反射的作用**：
+>
+> - 在运行程序时，程序无法获取自身的信息。
+> - 支持反射的语言可以在程序编译期将变量的反射信息，如字段名称、类型信息、结构体信息等整合到可执行文件中，并给程序提供接口访问反射信息，这样就可以在程序运行期获取类型的反射信息，并且有能力修改它们
+>
+> `GO`语言中使用`reflect`包来进行访问反射信息
+>
+> - reflect包使用`reflect.TypeOf`获取对象的类型
+> - reflect包使用`reflect.ValueOf`获取对象的值
+
+### 1、反射获取对象类型
+
+> Go语言中，使用`reflect.TypeOf()`函数可以获得任意值的类型对象
+>
+> 所以可以看到用来获取任意对象的类型
+
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func reflectType(x interface{}){
+	v := reflect.TypeOf(x)
+	fmt.Printf("%v type:%v\n",x, v)
+}
+
+func main() {
+	var a = 34
+	reflectType(a)
+
+	var b = "sam"
+	reflectType(b)
+
+	var c = true
+	reflectType(c)
+}
+```
+
+![image-20220328223413135](go%E7%AC%94%E8%AE%B0.assets/image-20220328223413135.png)
+
+#### 1.1 类型和种类
+
+> 反射类型其实把类型划分为两种：
+>
+> - 一种是类型Type
+>     - 是指用type关键字创建的自定义类型
+> - 一种是种类Kind
+>     - 是指底层类型，比如指针，结构体等，表示一大类的类型
+
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func reflectType(x interface{}){
+	v := reflect.TypeOf(x)
+	fmt.Printf("type:%v <==> kind:%v\n", v.Name(), v.Kind())
+}
+
+func main() {
+	var a = 34
+	reflectType(a)
+
+	var b = "sam"
+	reflectType(b)
+
+	var c = true
+	reflectType(c)
+
+	d1 := make([]int, 10, 10)
+	d1 = []int{1,2,3,4}
+	reflectType(d1)
+
+	type e struct{
+		name string
+	}
+	e1 := e{
+		name: "sam",
+	}
+	reflectType(e1)
+}
+```
+
+> 从下面的运行结果看出， 结构体的类型是e类型，种类是struct结构体
+>
+> Go语言的反射中像数组、切片、Map、指针等类型的变量，它们的`.Name()`都是返回`空`。
+
+![image-20220328224924305](go%E7%AC%94%E8%AE%B0.assets/image-20220328224924305.png)
+
+### 2、反射获取值
+
+> `reflect.ValueOf()`返回的是`reflect.Value`类型，其中包含了原始值的值信息。`reflect.Value`与原始值之间可以互相转换。
+
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func reflectType(x interface{}){
+	v := reflect.ValueOf(x)
+	fmt.Printf("value:%+v <==> kind:%v\n", v, v.Kind())
+}
+
+func main() {
+	var a = 34
+	reflectType(a)
+
+	var b = "sam"
+	reflectType(b)
+
+	var c = true
+	reflectType(c)
+
+	d1 := make([]int, 10, 10)
+	d1 = []int{1,2,3,4}
+	reflectType(d1)
+
+	type e struct{
+		name string
+	}
+	e1 := e{
+		name: "sam",
+	}
+	reflectType(e1)
+}
+```
+
+![image-20220328225337645](go%E7%AC%94%E8%AE%B0.assets/image-20220328225337645.png)
+
+### 3、结构体反射
+
+> 任意值通过`reflect.TypeOf()`获得反射对象信息后，如果它的类型是结构体，可以通过反射值对象（`reflect.Type`）的两个方法来获取结构体信息
+>
+> - `NumField()`方法：返回结构体成员字段数量
+>     - 所以可以用来统计一个结构体里有多少个字段
+> - `Field()`方法：根据索引，返回索引对应的结构体字段的信息
+>     - 可以获取一个结构体的一个字段的具体详细信息，比如Name，tag， index等
+
+```go
+# Field() 方法源代码， 根据索引，返回索引对应的结构体字段的信息，返回值是StructField类型
+// Field returns the i'th struct field.
+func (t *structType) Field(i int) (f StructField) {
+	if i < 0 || i >= len(t.fields) {
+		panic("reflect: Field index out of bounds")
+	}
+	p := &t.fields[i]
+	f.Type = toType(p.typ)
+	f.Name = p.name.name()
+	f.Anonymous = p.embedded()
+	if !p.name.isExported() {
+		f.PkgPath = t.pkgPath.name()
+	}
+	if tag := p.name.tag(); tag != "" {
+		f.Tag = StructTag(tag)
+	}
+	f.Offset = p.offset()
+
+	// NOTE(rsc): This is the only allocation in the interface
+	// presented by a reflect.Type. It would be nice to avoid,
+	// at least in the common cases, but we need to make sure
+	// that misbehaving clients of reflect cannot affect other
+	// uses of reflect. One possibility is CL 5371098, but we
+	// postponed that ugliness until there is a demonstrated
+	// need for the performance. This is issue 2320.
+	f.Index = []int{i}
+	return
+}
+
+// StructField是一个结构体，可以看到这个结构体里的源代码的字段
+// A StructField describes a single field in a struct.
+type StructField struct {
+	// Name is the field name.
+	Name string
+
+	// PkgPath is the package path that qualifies a lower case (unexported)
+	// field name. It is empty for upper case (exported) field names.
+	// See https://golang.org/ref/spec#Uniqueness_of_identifiers
+	PkgPath string
+
+	Type      Type      // field type 字段类型
+	Tag       StructTag // field tag string 字段标签
+	Offset    uintptr   // offset within struct, in bytes 字段在结构体中的字节偏移量
+	Index     []int     // index sequence for Type.FieldByIndex 用于Type.FieldByIndex时的索引切片
+	Anonymous bool      // is an embedded field 是否匿名字段
+}
+```
+
+```go
+// NumField() 是接口方法
+// NumField returns a struct type's field count.
+// It panics if the type's Kind is not Struct.
+NumField() int
+```
+
+#### 3.1 结构体反射示例
+
+> for循环遍历结构体所有字段信息，返回结构体成员字段数量
+>
+> - for循环会把所有字段的信息获取到
+>
+> - 当然也可以根据字段名，单独获取字段信息
+
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+type person struct{
+	Name string `liu:"name"`
+	Age int `liu:"name"`
+}
+
+func main() {
+	p1 := person{
+		Name: "sam",
+		Age: 19,
+	}
+	// 先生成一个reflect的Type类型，才可以调用Field和NumField方法
+	t := reflect.TypeOf(p1)
+	// t type:person 	 t.kind:struct
+	fmt.Printf("t type:%v \t t.kind:%v\n\n", t.Name(), t.Kind())
+
+	// for循环遍历结构体所有字段信息，返回结构体成员字段数量
+	for i := 0; i < t.NumField(); i++{
+		// Field方法传入索引，返回索引对应的结构体字段的信息，比如Name， Type， Tag等
+		field := t.Field(i)
+		fmt.Printf("field:%v\n", field)
+
+		// 字段的name就是结构体定义的首字母字段名
+		fmt.Printf("name:%v\n", field.Name)
+
+		// 字段的Type就是结构体定义的字段的类型
+		fmt.Printf("type:%v\n", field.Type)
+		
+		// 这里的Tag是我们自己在结构体里定义的liu，使用Get通过tag名获取真正的tag的值
+		fmt.Printf("tag:%v\n\n", field.Tag.Get("liu"))
+	}
+}
+```
+
+![image-20220328232318252](go%E7%AC%94%E8%AE%B0.assets/image-20220328232318252.png)
+
+> 通过字段名获取指定结构体字段信息，可以根据字段名，单独获取字段信息，更灵活一些
+>
+> 使用到了反射值对象（`reflect.Type`）的`FieldByName`方法
+
+```go
+// FieldByName源码也是接口方法，需要统一实现，传入了字段名，然后返回了结构体字段类型和布尔类型，结构体字段类型就和上面的for循环一样，可以获取结构字段的详细信息了，比如name，type，tag等
+// FieldByName returns the struct field with the given name
+// and a boolean indicating if the field was found.
+FieldByName(name string) (StructField, bool)
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+type person struct{
+	Name string `liu:"name"`
+	Age int `liu:"name"`
+}
 
 
+func main() {
+	p1 := person{
+		Name: "sam",
+		Age: 19,
+	}
+	// 先生成一个reflect的Type类型，才可以调用Field和NumField方法
+	t := reflect.TypeOf(p1)
+	// t type:person 	 t.kind:struct
+	fmt.Printf("t type:%v \t t.kind:%v\n\n", t.Name(), t.Kind())
 
+	// 根据字段名，单独获取字段信息, 更灵活
+	field, ok := t.FieldByName("Name")
+	fmt.Printf("fieldObj:%v  ok:%v\n", field, ok)
+	if ok {
+		// 字段的name就是结构体定义的首字母字段名
+		fmt.Printf("name:%v\n", field.Name)
 
+		// 字段的Type就是结构体定义的字段的类型
+		fmt.Printf("type:%v\n", field.Type)
 
+		// 这里的Tag是我们自己在结构体里定义的liu，使用Get通过tag名获取真正的tag的值
+		fmt.Printf("tag:%v\n\n", field.Tag.Get("liu"))
+	}
+}
+```
 
