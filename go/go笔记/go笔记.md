@@ -8491,20 +8491,234 @@ func main() {
 
 > strconv包实现了基本数据类型和其(其是指基本数据类型)字符串之间的相互转换
 
+##### 4.3.1 ParseInt字符串转数字
+
+> 使用`ParseInt`方法进行转换，返回的值的类型都是`int64`
+>
+> - 需要注意的是，`ParseInt`方法里的`bitSize`如果指定为了32位，返回结果是int64，那么可以用int32再把结果从int64强制转换为int32，这样结果精度就不会丢
+> - 当bitSize为0时，表示是int类型
+
 ```go
+// ParseInt interprets a string s in the given base (0, 2 to 36) and
+// bit size (0 to 64) and returns the corresponding value i.
+// ParseInt在给定的base（0，2到36）和 bit 大小（0到64）中解释一个字符串s，并返回相应的值i。
+// 位数（0-64），并返回相应的值i。
+// The string may begin with a leading sign: "+" or "-".
+// 字符串可以以一个前导符号开始。"+"或"-"。
+// If the base argument is 0, the true base is implied by the string's
+// prefix following the sign (if present): 2 for "0b", 8 for "0" or "0o",
+// 16 for "0x", and 10 otherwise. Also, for argument base 0 only,
+// underscore characters are permitted as defined by the Go syntax for
+// integer literals.
+// 如果基数参数为0，则真正的基数是由字符串的
+// 符号后面的前缀（如果存在）：2代表 "0b"，8代表 "0 "或 "0o"。
+// 16代表 "0x"，否则就是10。另外，仅对参数base 0而言。
+// 允许使用下划线字符，这是由Go的语法定义的
+// 整数字元。
+// The bitSize argument specifies the integer type
+// that the result must fit into. Bit sizes 0, 8, 16, 32, and 64
+// correspond to int, int8, int16, int32, and int64.
+// If bitSize is below 0 or above 64, an error is returned.
+// 比特尺寸参数指定了结果必须符合的整数类型。
+// 结果必须符合的整数类型。比特大小为0、8、16、32和64
+// 对应于int、int8、int16、int32和int64。
+// 如果bitSize低于0或高于64，将返回一个错误。
+// The errors that ParseInt returns have concrete type *NumError
+// and include err.Num = s. If s is empty or contains invalid
+// digits, err.Err = ErrSyntax and the returned value is 0;
+// if the value corresponding to s cannot be represented by a
+// signed integer of the given size, err.Err = ErrRange and the
+// returned value is the maximum magnitude integer of the
+// appropriate bitSize and sign.
+// ParseInt返回的错误有具体类型*NumError
+// 如果s是空的或者包含无效的数字，err.Er就会返回错误。
+// err.Err = ErrSyntax，返回值为0。
+// 如果对应于s的值不能由给定的有符号整数表示
+// 如果s对应的值不能由给定大小的有符号整数表示，err.Err = ErrRange，返回值为0。
+// err.Err = ErrRange，并且返回值是最大量级的整数。
+// 适当的bitSize和符号。
+func ParseInt(s string, base int, bitSize int) (i int64, err error) {
+	const fnParseInt = "ParseInt"
+
+	if s == "" {
+		return 0, syntaxError(fnParseInt, s)
+	}
+
+	// Pick off leading sign.
+	s0 := s
+	neg := false
+	if s[0] == '+' {
+		s = s[1:]
+	} else if s[0] == '-' {
+		neg = true
+		s = s[1:]
+	}
+
+	// Convert unsigned and check range.
+	var un uint64
+	un, err = ParseUint(s, base, bitSize)
+	if err != nil && err.(*NumError).Err != ErrRange {
+		err.(*NumError).Func = fnParseInt
+		err.(*NumError).Num = s0
+		return 0, err
+	}
+
+	if bitSize == 0 {
+		bitSize = IntSize
+	}
+
+	cutoff := uint64(1 << uint(bitSize-1))
+	if !neg && un >= cutoff {
+		return int64(cutoff - 1), rangeError(fnParseInt, s0)
+	}
+	if neg && un > cutoff {
+		return -int64(cutoff), rangeError(fnParseInt, s0)
+	}
+	n := int64(un)
+	if neg {
+		n = -n
+	}
+	return n, nil
+}
+
 ```
 
+```go
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+// strconv
+func main() {
+	// 从字符串中解析对应的数字数据，字符串不能有非数字的字符
+	str := "100"
+    
+    // str是需要转换的字符串
+    // 10表示转换成10进制
+    // 64表示结果必须符合的整数类型，也就是10进制的64位
+	ret, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
+		fmt.Printf("转换失败:%v\n", err)
+		return
+	}
+	fmt.Printf("ret=%v ret type=%T\n", ret, ret)
+}
+
+/* 
+	执行结果
+	ret=100 ret type=int64
+*/
+```
+
+> 注意字符串里面不能有非数字的字符，否则会报错
+>
+
+![image-20220331213432391](go%E7%AC%94%E8%AE%B0.assets/image-20220331213432391.png)
+
+##### 4.3.2 Atoi字符串转数字
+
+> strconv包里有个`Atoi`方法，专门用来将字符串转换为数字
+>
+> - `A`表示字符串
+>     - 因为Go语言是从C语言发展出来，C语言中没有字符串，只有字符，A是字符的数组，所以A用来表示字符串
+> - `i`表示int整型
+
+```go
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+// strconv
+func main() {
+	// 从字符串中解析对应的数字数据，字符串不能有非数字的字符
+	str := "100"
+	ret, err := strconv.Atoi(str)
+	if err != nil {
+		fmt.Printf("转换失败:%v\n", err)
+		return
+	}
+	fmt.Printf("ret=%v ret_type=%T\n", ret, ret)
+}
+```
+
+![image-20220331215400222](go%E7%AC%94%E8%AE%B0.assets/image-20220331215400222.png)
 
 
 
+##### 4.3.3 ItoA数字转字符串
 
+> 将数字转换为字符串，只有一个返回值，没有err返回
 
+```go
+package main
 
+import (
+	"fmt"
+	"strconv"
+)
 
+// strconv
+func main() {
+	// 从字符串中解析对应的数字数据，字符串不能有非数字的字符
+	s := 100
+	ret := strconv.Itoa(s)
+	fmt.Printf("ret=%v ret_type=%T\n", ret, ret)
+}
+```
 
+![image-20220331215554288](go%E7%AC%94%E8%AE%B0.assets/image-20220331215554288.png)
 
+##### 4.3.4 ParseBool字符串布尔值转成布尔值
 
+> `ParseBool`将字符串的布尔值转为真正的布尔值
 
+```go
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+// strconv
+func main() {
+	// 从字符串中解析对应的数字数据，字符串不能有非数字的字符
+	s := "true"
+	ret, _ := strconv.ParseBool(s)
+	fmt.Printf("ret=%v ret_type=%T\n", ret, ret)
+}
+```
+
+![image-20220331215741171](go%E7%AC%94%E8%AE%B0.assets/image-20220331215741171.png)
+
+##### 4.3.5 ParseFloat字符串浮点型转为浮点型
+
+> `ParseFloat`需要传入`bitSize`
+
+```go
+package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+// strconv
+func main() {
+	// 从字符串中解析对应的数字数据，字符串不能有非数字的字符
+	s := "3.1415"
+	ret, _ := strconv.ParseFloat(s, 64)
+	fmt.Printf("ret=%v ret_type=%T\n", ret, ret)
+}
+```
+
+![image-20220331220000832](go%E7%AC%94%E8%AE%B0.assets/image-20220331220000832.png)
 
 ### 5、rand模块
 
@@ -8941,3 +9155,10 @@ func main() {
 }
 ```
 
+## 十四、并发编程(重要)
+
+> `go`天生支持并发，所以并发编程很重要，需要好好理解
+
+### 1、并发理解
+
+>  
