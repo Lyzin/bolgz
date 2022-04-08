@@ -9155,10 +9155,204 @@ func main() {
 }
 ```
 
-## 十四、并发编程(重要)
+## 十四、并发编程(非常重要)
 
 > `go`天生支持并发，所以并发编程很重要，需要好好理解
 
-### 1、并发理解
+### 1、并发和并行
 
->  
+> 相关参考资料：
+>
+> [https://laike9m.com/blog/huan-zai-yi-huo-bing-fa-he-bing-xing,61/](https://laike9m.com/blog/huan-zai-yi-huo-bing-fa-he-bing-xing,61/)
+>
+> [https://zhuanlan.zhihu.com/p/145587728](https://zhuanlan.zhihu.com/p/145587728)
+
+> - 并发(Concurrency)
+>   - 并发是同时发生
+>     - 并行指物理上同时执行
+>     - 并发的字面意思指的是线程同时开始执行这个事件，后续的执行是串行，还是并行，不确定，依赖于底层的硬件条件和操作系统的调度
+>   - 并发的“发”
+>     - 这里的发是指，如果有多个线程，都会同一时间先启动，但是线程里内容先不执行，会根据操作系统调度去交替执行
+> - 并行(Parallelism)
+>   - 并行就是同时执行
+>     - 并行是指线程同时执行这个过程
+>     - 并发指能够让多个任务在逻辑上交织执行的程序设计
+> - 注意：
+>   - 并发和并行都必须是多线程的
+>   - 如果这些线程可以被同时执行(执行线程的步骤)，这叫并行
+>   - 如果这些线程可以同时启动，但没有同时执行(执行线程的步骤)，这叫并发
+
+![preview](go%E7%AC%94%E8%AE%B0.assets/v2-674f0d37fca4fac1bd2df28a2b78e633_r.jpg)
+
+> 上图是Erlang之父画的并发、并行的简单理解图
+>
+> - 并发
+>   - 两个队列**`交替`**使用一个咖啡机
+> - 并行
+>   - 两个队列**`同时`**使用两个咖啡机
+> - 注意
+>   - 一个队列对应一个任务(线程)，队列的每个人对应任务的步骤
+>   - 并发要处理的任务必须是可分步骤、任务数量大于等于2的
+>   - 并行要处理的任务必须是多个处理器(也就是图中的多个咖啡机)
+
+### 2、进程、线程、协程
+
+> 进程（process）：程序在操作系统中的一次执行过程，系统进行资源分配和调度的一个独立单位。
+>
+> 线程（thread）：操作系统基于进程开启的轻量级进程，是操作系统调度执行的最小单位。
+>
+> 协程（coroutine）：非操作系统提供而是由用户自行创建和控制的用户态‘线程’，比线程更轻量级。
+
+### 3、GO并发
+
+> Go语言中的并发程序主要是通过基于CSP（communicating sequential processes）的goroutine和channel来实现，当然也支持使用传统的多线程共享内存的并发方式。
+
+#### 3.1 goroutine
+
+> Goroutine是Go语言支持并发的核心
+>
+> - 在go语言中可以**`同时`**创建N个goroutine，非常的简单方便
+> - Goroutine介绍
+>   - 一个goroutine会以很小的生命周期开始，一般只有2KB
+>   - 和操作系统调度线程不同，操作系统是由系统内核调度的，而goroutine是由go在运行时(runtime)调度的
+>   - go在运行时，会进行操作系统资源分配，会把m个goroutine合理地分配给n个操作系统线程，实现m:n的调度机制
+>   - 开发人员不需要为go在代码层面维护一个线程池
+>
+> - Goroutine的特点
+>   - Goroutine 是Go程序中最基本的并发执行单元
+>   - 每一个程序都至少包含一个goroutine，也就是main函数的（main goroutine），当go程序创建时，它会默认创建
+>   - go语言不需要自己单独写进程、线程、协程，只需要利用goroutine就可以实现并发
+>   - 当需要多个任务并发执行的时候，把任务包装成一个函数，然后开启goroutine去执行，就实现了并发
+
+#### 3.2 Go关键字
+
+> Go语言中使用goroutine非常简单，只需要在函数或方法调用前加上`go`关键字就可以创建一个goroutine
+>
+> 从而让该函数或方法（结构体里的定义的函数就叫方法）在新创建的goroutine中执行，而不是在`main goroutine`中执行
+
+```go
+# go 关键字创建goroutine
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func addData(x int) {
+	fmt.Printf("x = %v\n", x)
+}
+
+// main程序启动以后，会创建一个主goroutine去执行
+func main(){
+	x := 33
+	// go关键字单独开启一个goroutine去执行addData函数
+	go addData(x)
+	fmt.Printf("this is main func")
+}
+```
+
+> 执行以后会发现，并没有将addData函数里的Printf内容输出
+>
+> 为什么没有呢？
+>
+> - go addData(x)表示开启了一个goroutine，但是此时只是刚开启，就好比是刚刚把通道打开了，但是里面的内容还没进去执行
+> - 此时代码继续往下走，执行`fmt.Printf("this is main func")`表示main函数结束了，由main函数启动的goroutine就结束了，此时整个函数就执行完毕了，所以就来不及执行`addData`里的printf内容
+>
+> 可以用`time.Sleep(time.Second)`这样等待`go addData()`启动并执行完毕，再执行main函数里`printf`语句，这样就可以看到`addData`函数里的输出了
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func addData(x int) {
+	fmt.Printf("x = %v\n", x)
+}
+
+func main(){
+	x := 33
+	// go关键字单独开启一个goroutine去执行addData函数
+	go addData(x)
+  
+  // 使用sleep强制等待新开的goroutine执行完毕，再执行下面的代码
+	time.Sleep(time.Second)
+	fmt.Printf("this is main func")
+}
+```
+
+![image-20220403220757049](go%E7%AC%94%E8%AE%B0.assets/image-20220403220757049.png)
+
+##### 3.2.1 for循环goroutine
+
+> 上面的都是开启一个goroutine去执行代码，但是我们可以使用for循环开启很多个goroutine
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main(){
+	for i := 0; i<10; i++{
+		// go关键字单独开启一个goroutine去执行匿名函数
+		go func() {
+			fmt.Println(i)
+		}()
+	}
+	time.Sleep(time.Second)
+	fmt.Printf("this is main func")
+}
+```
+
+![image-20220403221849085](go%E7%AC%94%E8%AE%B0.assets/image-20220403221849085.png)
+
+> 从执行结果来看，并不是我们预期的想要的输出1到10，而是输出了`8 10`这些数字
+>
+> 为什么会这样呢？
+>
+> - 从for循环里的`go`关键字后面的匿名函数来看，里面打印了for循环里的`i`变量，对于一个函数内部的变量从函数外部拿，这就是闭包
+> - 由于for循环很快，所以开启10个goroutine的时候，for循环已经执行完了，那么最后传递给匿名函数里的`i`可能是for循环的最后一个，或者是中间的某一个，所以就出现了上图的结果
+>   - 这里也反映出了启动goroutine是需要一定时间的，因为从for循环来看，先启动了10个goroutine，才开始执行goroutine里面匿名函数里的打印`i`功能，那么就表示了goroutine是都先启动，再执行里面任务，此时的时间差for循环已经执行结束了，最后的i是10，所以就会出现了上面的结果
+>   - 如果goroutine能里面启动，立马执行，就不会有这样的问题
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 3.3 Sync
