@@ -1,16 +1,16 @@
-前言：使用Docker 来搭建Redis环境
-
-镜像官网：https://hub.docker.com/_/redis
-
-------
-
 ## 一、搭建Redis环境
+
+> 前言：使用Docker 来搭建Redis环境
+>
+> 镜像官网：[https://hub.docker.com/_/redis](https://hub.docker.com/_/redis)
 
 ### 1. 创建redis容器
 
-1.1 使用redis-cli客户端连接方式创建redis容器
+> 使用redis-cli客户端连接方式创建redis容器
+>
 
 ```bash	
+ # 创建redis容器
  docker run -idt --name redisly -p 6379:6379 redis
  
  # 命令参数解释
@@ -123,7 +123,7 @@ and settings.
 #### 2.2 连接redis
 
 ```shell
-# 连接命令
+# 连接命令，这个命令行工具是单独下载安装的
 redis-cli -h 127.0.0.1
 ```
 
@@ -159,3 +159,15 @@ print(data)
 ## 二、Redis数据类型
 
 ### 1、Redis介绍
+
+> 
+
+### 2、redis持久化
+
+> 
+
+### 3、Redis的数据类型
+
+#### 3.1 string
+
+> 
