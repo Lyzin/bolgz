@@ -1025,6 +1025,7 @@ func main() {
 >
 > - int32的别名，几乎在所有方面等同于int32，一般用来表示字符的
 > - 可以使用`%c`取到对应的字符
+> - 用于区分字符值（rune用来表示字符值）和整数值
 
 ```go
 type rune = int32
@@ -1038,14 +1039,36 @@ import "fmt"
 func main() {
 	
 	var str = "hello 你好"
-	fmt.Println("len(str):", len(str)) // 12
-	
+	fmt.Println("len(str):", len(str)) // 12	
 }
 ```
 
-> - 结果是12
+> - 结果是12，从字符串字面量看 len(str) 的结果应该是8
 >   - 因为`go`是`utf-8`编码，而`go`底层字符串是用`byte`编码的，一个汉字表示3个字符
 >   - 所以`str`的长度是`hello(5个字符)`+`空格(1个字符)`+`你好(6个字符)`=`12个字符`
+> - 所以可以将字符串转为rune类型，来计算字符串长度
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	str := "hello 世界"
+	str1 := []rune(str)
+	for _, v := range str1 {
+		fmt.Printf("v:%c\n", v)
+	}
+	fmt.Printf("str1:%v\n", str1)
+	fmt.Printf("str1 len:%v\n", len(str1))
+}
+```
+
+> 从执行结果来看，返回的字符串长度是8，符合我们的预期了
+
+![image-20220413190349824](go%E7%AC%94%E8%AE%B0.assets/image-20220413190349824.png)
 
 ## 五、流程控制
 
