@@ -5130,9 +5130,14 @@ func main() {
 }
 ```
 
-> 注意结构体不能直接打印，会提示不是一个表达式
+> 注意：
+>
+> - 定义好的结构体不能直接打印，会提示不是一个表达式
+> - 需要使用给一个变量定义为定义好的结构体类型，再去打印就可以正常展示
 
 ![image-20220117183743359](go%E7%AC%94%E8%AE%B0.assets/image-20220117183743359.png)
+
+##### 3.1.1 同类型字段一行定义
 
 > 结构体定义时，类型一样的多个值可以写在一行，和函数定义多个类型一样的形参一样
 >
@@ -5151,21 +5156,119 @@ type person struct{
 }
 
 func main() {
-	var p1 person
-	p1 = person{
-		name: "lily",
-		gender: "boy",
-		age: 19,
-	}
-	fmt.Printf("%v\n", p1) // {lily boy 19}
 }
 ```
+
+##### 3.1.2 结构体字段默认为零值
+
+> 定义好结构体后：
+>
+> - 给一个变量指定为定义好的结构体类型，但是没有对该变量进行结构体的初始化，也就是没有给结构体里面的对应字段给值，那么结构体类型里对应字段的值就是字段定义时类型的零值(默认值)
+> - 比如下面的p1定义为person类型后，此时p1的类型就是person这个结构体类型了，但是没有对p1，而是直接打印p1
+>   - 那么p1的值和类型就是：`main.person{name:"", age:0}`
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	var p1 person
+	fmt.Printf("p1=%#v\n", p1)
+	fmt.Printf("p1=%T\n", p1)
+}
+```
+
+![image-20220421171413351](go%E7%AC%94%E8%AE%B0.assets/image-20220421171413351.png)
+
+> 从上面的结果可以看出：
+>
+> - p1里的name字段的值为string类型的零值(空字符串)
+> - p1里的age字段的值为int类型的零值(0)
+> - p1的类型就是main包的person结构体类型
+
+##### 3.1.3 某个变量为结构体类型理解
+
+> 当某个变量定义为结构体类型的理解：
+>
+> - 将某个变量类型指定为结构体类型，可以类比到其他语言中的面向对象知识
+>   - person结构体就是定义了一个类名为`person`的类，
+>   - 指定p1这个变量的类型为结构体`person`时，就是对`person`这个类的进行了初始化，并且将初始化的结果指向了p1，所以p1也就是`person`类的实例对象
+>   - 这个p1实例对象定义为person类型时，就是生成了p1这个实例对象，并且将p1这个对象里的name、age字段自动设置为字段类型的零值，后面可以对字段值重新赋值，重新赋值就是结构体的初始化了
+> - 从下面的python的面向对象代码对比过来理解
+>   - 对一个变量类型定义为结构体类型，就是在使用这个结构体，也就是将一个变量进行类的实例化，不过是实例化过程中，将结构体定义的字段值默认设置为类型零值
+>   - 最终变量的类型就是结构体的类型，也就是python里定义的类的类型
+>   - 从下面代码可以清晰看出来
+> - 所以针对结构体的理解，就可以对比面向对象的知识
+
+```python
+# 下面是python的面向对象，可以类比来理解变量类型为结构体类型
+class A:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def show_data(self):
+        print(f"name={self.name}, age={self.age}")
+
+# 直接打印定义好的类A，返回的值就是main.A
+print(f"A = {A}") # A = <class '__main__.A'>
+
+# 初始化一个a1对象，可以理解为是将a1的类型指定为类A，并且传入两个预设字段name、age，完成类A的初始化
+a1 = A("sam", 19)
+
+# 打印a1，可以看到a1的值就是通过类A初始化的一个对象，并且a1这个变量有实际的内存地址
+print(f"a1 = {a1}") # a1 = <__main__.A object at 0x7fc748770b70>
+
+# 打印a1类型，可以看到a1的类型就是通过类A这个类
+print(f"a1 = {type(a1)}") # a1 = <class '__main__.A'>
+```
+
+```go
+// go定义结构体
+package main
+
+import (
+	"fmt"
+)
+
+// 定义一个person结构体，也就是定义一个名字叫person的类
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+  // 对变量p1的类型定为person，就表示是在对person类进行初始化，并且将初始化的值给p1
+  // 类比到python就是 p1 = person("", 0)
+  // 传入的是结构体字段类型的零值
+	var p1 person
+  
+  // 可以看到p1是person结构体实例对象，并且name是空，age是0
+	fmt.Printf("p1=%#v\n", p1) // p1=main.person{name:"", age:0}
+	
+  // 可以看到p1的类型就是结构体类型
+  fmt.Printf("p1=%T\n", p1) // p1=main.person
+}
+```
+
+> 综上：
+>
+> - 定义一个结构体就是声明了一个类
+> - 给一个变量声明了类型为定义的结构体，就是在实例化这个结构体，并且结构体的字段值都是对应类型的零值
+> - 这个变量的类型就是定义的结构体的类型
 
 #### 3.2 结构体初始化
 
 > 初始化以后的结构体的类型是当前包的类型，比如下面的代码就是`main.person`
 >
-> `如果初始化时没有给值，那么就是该类型的零值(默认值)`
 
 ```go
 package main
@@ -5506,7 +5609,7 @@ func main() {
 */
 ```
 
-#### 3.8 构造函数
+#### 3.8 结构体构造函数
 
 > 结构体初始化的时候，除了可以使用变量初始化，也可以使用函数初始化，这个函数就是构造函数，在其他语言里有这个内置的函数
 >
@@ -6702,7 +6805,7 @@ func main() {
 	sp(p1)
 }
 /*
-	狗在叫
+		狗在叫
     猫在叫
     猪在叫
 */
@@ -6738,12 +6841,15 @@ type speaker interface {
 	speak()
 }
 
+
 func sp(s speaker) {
 	s.speak()
 }
 
 func main() {
 	var d1 dog
+  
+  // d1里面有speak方法，那么d1这个变量变量就实现 specker这个接口类型，d1就是speaker这个接口类型的变量
 	sp(d1)
 
 	var s1 speaker
@@ -6886,7 +6992,7 @@ func main() {
 	d2 = dog{name:"yom", age: 29}
 	var s1 speaker
 
-	// 传给s1的是d2的值，但是结构体方法的接收者是指针类型，所以不可以接收到
+	// 传给s1的是d1的值，但是结构体方法的接收者是指针类型，所以不可以接收到
 	// 报错提示speak方法有指针接收者
 	s1 = d1 // 这样会报错，必须给s1赋值指针类型的结构体对象
 	fmt.Printf("s1=%v\n", s1) 
@@ -8864,6 +8970,20 @@ func main() {
 > 
 >
 > [https://www.cnblogs.com/wongbingming/p/12941021.html](https://www.cnblogs.com/wongbingming/p/12941021.html)
+>
+> https://golang.google.cn/doc/tutorial/create-module
+>
+> https://golang.google.cn/doc/modules/managing-dependencies#naming_module
+>
+> https://golang.google.cn/doc/tutorial/getting-started
+>
+> https://golang.google.cn/doc/modules/gomod-ref
+>
+> https://www.jianshu.com/p/04dd0d386df2
+>
+> https://www.cnblogs.com/wongbingming/p/12941021.html
+>
+> https://blog.csdn.net/u011069013/article/details/110114319
 
 ## 十三、反射
 
