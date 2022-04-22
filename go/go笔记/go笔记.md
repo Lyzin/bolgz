@@ -3141,25 +3141,20 @@ func strStrip(s string) string {
 > `go`语言中不存在指针运算，仅可以操作指针
 >
 > - `指针`：
->   - 是指某一个指针类型的一个值，也就是说通过`&变量名`获取到的值就是`指针`(也表示是这个`变量名`指向的内存地址)
+>   - 是指某一个指针类型的一个值，通过`&变量名`获取到的值就是`指针`(表示这个`变量名`指向的内存地址)
 >   - 一个指针可以存一个内存地址，所以指针也就是内存地址
 >   - 一个指针中存储的内存地址为另外一个值(也叫变量)的地址
 
-#### 3.1 go中操作指针
+#### 3.1 指针操作
+
+##### 3.1.1 获取变量指针
 
 > `&` : 取变量的内存地址，内存地址是一个16进制数
 >
-> `*` : 根据内存地址取值，获取到的是这个内存地址指向的原始值
+> `%p`:
 >
-> - 注意：
->   - 给函数中传入一个指针类型形参，就表示这个形参是一个内存地址
->   - 所以在函数内部，要取得这个内存地址的值，就需要使用`*变量名`拿到内存地址对应的具体值，然后进行操作
-
-> - 从下图和代码可以看出来
->   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
->   - 那么申请的内存空间的地址永远不会变，但是变量`a`的值可以变，也就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
->
-> - 就是说变量`a`申请好内存地址以后，可以放任意值进去，也可以对放进去的值进行修改(也叫重新赋值)，但是变量`a`的内存地址申请好以后是永远不会变的
+> - 十六进制(前缀0x)表示
+> - 一般是用来打印指针的，`fmt.Printf(“%p\n”, &s1)`
 
 ![image-20211221174834896](go%E7%AC%94%E8%AE%B0.assets/image-20211221174834896.png)
 
@@ -3209,9 +3204,29 @@ func main() {
 */
 ```
 
+##### 3.1.2 根据指针获取值
 
+> `*` : 根据指针(内存地址)取值，获取到的是这个内存地址指向的原始值
+>
+> - 注意：
+>   - 给函数中传入一个指针类型形参，就表示这个形参是一个内存地址
+>   - 所以在函数内部，要取得这个内存地址的值，就需要使用`*变量名`拿到内存地址对应的具体值，然后进行操作
 
+```go
+```
 
+##### 3.1.3 指针重新赋值
+
+> - 从下图和代码可以看出来
+>   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
+>   - 那么申请的内存空间的地址永远不会变，但是变量`a`的值可以变，也就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
+> - 就是说变量`a`申请好内存地址以后，可以放任意值进去，也可以对放进去的值进行修改(也叫重新赋值)，但是变量`a`的内存地址申请好以后是永远不会变的
+
+```go
+
+```
+
+#### 3.2 指针类型
 
 > 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型
 
@@ -5206,11 +5221,11 @@ func main() {
 >   - 对一个变量类型定义为结构体类型，就是在使用这个结构体，也就是将一个变量进行类的实例化，不过是实例化过程中，将结构体定义的字段值默认设置为类型零值
 >   - 最终变量的类型就是结构体的类型，也就是python里定义的类的类型
 >   - 从下面代码可以清晰看出来
-> - 所以针对结构体的理解，就可以对比面向对象的知识
+> - 所以针对结构体的理解，就可以对比面向对象的知识来理解
 
 ```python
 # 下面是python的面向对象，可以类比来理解变量类型为结构体类型
-class A:
+class Person:
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -5218,21 +5233,23 @@ class A:
     def show_data(self):
         print(f"name={self.name}, age={self.age}")
 
-# 直接打印定义好的类A，返回的值就是main.A
-print(f"A = {A}") # A = <class '__main__.A'>
+# 直接打印定义好的类Person，返回的值就是:Person = <class '__main__.Person'>
+print(f"Person = {Person}") 
 
-# 初始化一个a1对象，可以理解为是将a1的类型指定为类A，并且传入两个预设字段name、age，完成类A的初始化
-a1 = A("sam", 19)
+# 初始化一个a1对象，可以理解为是将a1的类型指定为类Person，并且传入两个预设字段name、age，完成类A的初始化
+a1 = Person("sam", 19)
 
-# 打印a1，可以看到a1的值就是通过类A初始化的一个对象，并且a1这个变量有实际的内存地址
-print(f"a1 = {a1}") # a1 = <__main__.A object at 0x7fc748770b70>
+# 打印a1，可以看到a1的值就是通过类Person初始化的一个对象，并且a1这个变量有实际的内存地址
+# a1 = <__main__.Person object at 0x7fa09295a630>
+print(f"a1 = {a1}")
 
-# 打印a1类型，可以看到a1的类型就是通过类A这个类
-print(f"a1 = {type(a1)}") # a1 = <class '__main__.A'>
+# 打印a1类型，可以看到a1的类型就是类Person这个类
+ # a1 = <class '__main__.Person'>
+print(f"a1 = {type(a1)}")
 ```
 
 ```go
-// go定义结构体
+// go语言定义结构体
 package main
 
 import (
@@ -5263,12 +5280,25 @@ func main() {
 >
 > - 定义一个结构体就是声明了一个类
 > - 给一个变量声明了类型为定义的结构体，就是在实例化这个结构体，并且结构体的字段值都是对应类型的零值
+>   - `var p1 person`等价于python面向对象中的`a1 = A("sam", 19)`，表示在实例化对象p1
 > - 这个变量的类型就是定义的结构体的类型
 
 #### 3.2 结构体初始化
 
-> 初始化以后的结构体的类型是当前包的类型，比如下面的代码就是`main.person`
+> 1. `type 结构体 struct{}`
+>    1. 定义结构体，表示声明了一个结构体
+> 2. `var s 结构体`
+>    1. 表示在实例化这个结构体，并将实例化结果赋值给变量s
+>    2. 此时变量s就可以访问这个结构体的属性和方法了
+> 3. 为什么要对结构体初始化?
+>    1. 因为指定变量类型为结构体以后，这个变量就是结构体的实例对象，这个变量实例对象里的属性值都是初始零值，零值不是我们需要的
+>    2. 所以需要进行初始化，给实例对象里对应字段指定我们需要的值
+
+##### 3.2.1 key-value初始化(常用)
+
+> 以key-value进行结构体初始化，类似于python字典的形式来指定结构体字段和值
 >
+> - 指定p1类型为person结构体，然后p1接收person结构体以key-value初始化，最终p1就是初始化好的结构体
 
 ```go
 package main
@@ -5277,27 +5307,123 @@ import (
 	"fmt"
 )
 
-// 定义结构体
-type person struct {
+type person struct{
 	name string
 	age int
-	hobby []string
 }
 
 func main() {
-	var p person
-	// 通过字段去赋值
-	p.name = "sam"
-	p.age = 18
-	p.hobby = []string{"ft", "bt"}
-	fmt.Printf("%v\n", p) // {sam 18 [ft bt]}
-	fmt.Printf("%T\n", p) // main.person
+	var p1 person
+  // 以key-value进行结构体初始化
+	p1 = person{
+		name: "sam",
+		age: 29,
+	}
+	fmt.Printf("p1=%+#v\n", p1)
+}
+
+/* 
+	执行结果:
+	p1=main.person{name:"sam", age:29}	
+*/
+
+```
+
+##### 3.2.2 值列表形式初始化
+
+> 值列表形式进行初始化，值的顺序必需要和结构体定义时字段的顺序一致
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	var p1 person
+  // 值列表形式进行初始化，值的顺序必需要和结构体定义时字段的顺序一致
+	p1 = person{
+		"sam",
+		29,
+	}
+	fmt.Printf("p1=%+#v\n", p1)
+}
+
+/* 
+	执行结果:
+	p1=main.person{name:"sam", age:29}	
+*/
+```
+
+> 值列表初始化结构体的值顺序不能乱写，否则会报错，提示类型不匹配
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	var p1 person
+	p1 = person{
+		29,
+		"sam",
+	}
+	fmt.Printf("p1=%+#v\n", p1)
 }
 ```
 
-#### 3.3 访问结构体字段
+![image-20220422133536902](go%E7%AC%94%E8%AE%B0.assets/image-20220422133536902.png)
 
-> 使用点(`.`)的方式来访问结构体的字段
+##### 3.2.3 注意事项
+
+> key-value初始化和值列表初始化不能混合使用
+>
+> 报错提示：`mixture of field:value and value initializers（混合字段:值和值初始化式）`
+>
+> 结构体初始化除了key-value初始化和值列表初始化，还由比较推荐使用的构造函数初始化，详见3.8
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+func main() {
+	var p1 person
+	p1 = person{
+    // name是key-value初始化
+		name: "sam",
+    // 单独19是值列表初始化
+		19,
+	}
+	fmt.Printf("p1=%+#v\n", p1)
+}
+```
+
+![image-20220422133924394](go%E7%AC%94%E8%AE%B0.assets/image-20220422133924394.png)
+
+#### 3.3 访问结构体定义字段
+
+> 使用点(`.`)的方式来访问结构体定义的字段
 
 ```go
 package main
@@ -5481,62 +5607,7 @@ func main() {
 
 ![image-20220130225728855](go%E7%AC%94%E8%AE%B0.assets/image-20220130225728855.png)
 
-##### 3.6.2 结构体指针2(初始化结构体)
-
-> 声明变量和初始化一步完成，以`key-value`形式初始化
->
-> - 它的值是结构体定义的值
-> - 但是类型是一个结构体类型
-
-```go
-package main
-
-import (
-	"fmt"
-)
-
-type person struct{
-	name string
-	age int
-}
-
-func main() {
-	var p1 = person{
-		name: "sam",
-		age: 19,
-	}
-	fmt.Printf("%v\n", p1) // {jom 19}
-	fmt.Printf("%T\n", p1) // main.person
-}
-```
-
-##### 3.6.3 结构体指针3(初始化结构体)
-
-> 通过值列表的形式初始化，值的顺序和结构体定义式字段的顺序一致
-
-```go
-package main
-
-import (
-	"fmt"
-)
-
-type person struct{
-	name string
-	age int
-}
-
-func main() {
-	p1 := person{
-		"sam",
-		19,
-	}
-	fmt.Printf("%v\n", p1) // {jom 19}
-	fmt.Printf("%T\n", p1) // main.person
-}
-```
-
-##### 3.6.4 快速获取结构体指针
+##### 3.6.2 快速获取结构体指针(常用)
 
 > 一般在`go`中，快速获取结构体指针的方式就可以在初始化结构体的时候加一个`取址符号(&)`,就可以快速获取到结构体的指针
 >
@@ -5558,6 +5629,7 @@ type person struct{
 }
 
 func main() {
+  // 获取结构体的指针
 	p1 := &person{
 		"sam",
 		19,
@@ -5609,17 +5681,14 @@ func main() {
 */
 ```
 
-#### 3.8 结构体构造函数
+#### 3.8 结构体构造函数(推荐初始化方式)
 
-> 结构体初始化的时候，除了可以使用变量初始化，也可以使用函数初始化，这个函数就是构造函数，在其他语言里有这个内置的函数
+> 结构体初始化的时候，除了可以使用变量初始化，也可以使用函数初始化，这个函数就是构造函数，在其他语言里有这个内置的函数，比如python面向对象的`__init__`方法
 >
-> 构造函数返回一个结构体变量的函数
->
-> 构造函数的存在就是为了简化结构体初始化过程，将重复要写的一些代码简化，通过函数来实现结构体初始化
->
-> - 核心思想：调用构造函数时，可以立刻返回一个定义好的结构体类型的变量
->
-> 构造函数一般是以`new和结构体变量首字母大写`的函数，返回的也是结构体变量
+> 1. 构造函数返回一个结构体变量的函数
+>2. 构造函数的存在就是为了简化结构体初始化过程，将重复要写的一些代码简化，通过函数来实现结构体初始化
+> 3. 核心思想：调用构造函数时，可以立刻返回一个定义好的结构体类型的变量
+>4. 构造函数一般是以`new和结构体变量首字母大写`的函数，返回的也是结构体变量
 
 ```go
 package main
@@ -5633,7 +5702,7 @@ type person struct{
 	age int
 }
 
-// 构造函数
+// person结构体构造函数
 func newPerson(name string, age int) person{
 	return person{
 		name: name,
@@ -5647,40 +5716,20 @@ func main() {
 }
 ```
 
-> 构造函数什么时候返回结构体变量，什么时候返回结构体指针
->
-> - 当结构体比较大的时候，就是说结构体里定义的变量特别多的时候，占用内存也很大，所以尽量使用结构体指针
-> - 其他情况都可以返回结构体变量
+##### 3.8.1 构造函数返回结构体指针
+
+> 1. 构造函数什么时候返回结构体变量？
+>    - 当结构体定义的字段个数比较少的时候后，可以考虑在构造函数返回结构体变量
+> 2. 构造函数为什么要返回结构体指针？
+>    - 因为结构体属于值类型，就是赋值和传参的时候都是值拷贝
+>    - 当定义的结构体字段比较多的时候，结构体本身占用的内存资源就比较多，如果构造函数使用值拷贝的形式，在使用构造函数进行初始化结构体的时候，就会出现结构体会拷贝较多份，额外的占用内存资源
+>    - 所以为了减少内存资源占用，推荐在构造函数返回结构体指针
+>    - 因为返回结构体指针，其实就是是返回了一个十六进制的数，对一个十六进制的数来回使用，就不会有很大的内存占用
+> 3. 构造函数什么时候要返回结构体指针？
+>    - 当结构体定义的字段数量比较多的时候，推荐使用构造函数返回结构体指
 
 ```go
-package main
 
-import (
-"fmt"
-)
-
-type person struct{
-	name string
-	age int
-	age1 int
-	age2 int
-	age3 int
-	age4 int
-	age5 int
-}
-
-// 构造函数
-func newPerson(name string, age int) *person{
-	return &person{
-		name: name,
-		age: age,
-	}
-}
-
-func main() {
-	p1 := newPerson("sam", 19)
-	fmt.Printf("p1=%v\n", p1)
-}
 ```
 
 #### 3.9 方法和接收者
@@ -5723,35 +5772,6 @@ func newPerson(name string, age int) person{
 // 方法walk，(p person)就是接收者
 func (p person) walk() {
 	fmt.Printf("%s年龄是%d岁\n", p.name, p.age)
-}
-
-func main() {
-	p1 := newPerson("sam", 19)
-	fmt.Printf("p1=%v\n", p1)
-	p1.walk()
-}
-```
-
-> 如果定义的结构体首字母大写，那么这个结构体对外部暴露可见，共有的，其他`go`文件可以用来导入这个结构体
->
-> 如果一个包里定义的结构体首字母是小写的，那么其他`go`文件是访问不到小写开头的结构体的
->
-> 需要注意的点：
->
-> - 并且对首字母大写的需要有格式要求
-
-```go
-package main
-
-import (
-"fmt"
-)
-
-// 下面的格式必须是需要空格隔开
-// Person 这是一个人的结构体
-type Person struct{
-	name string
-	age int
 }
 
 func main() {
@@ -5806,15 +5826,14 @@ func main() {
 
 > 在值接收者里，对应方法修改了结构体对象的某个值，因为值拷贝的原因，还是不会进行变化，那么如果真要修改，就要用到了指针接收者
 >
-> 下面代码可以看到方法`newYear()`里传入的`p`的内存地址就是`main`方法里定义的`p1`，所以`newYear`方法里修改的`age`属性就是修改的`p1`的属性，所以会把`age`加1
->
-> 指针接受者后面用的比较多
+> 1. 下面代码可以看到方法`newYear()`里传入的`p`的内存地址就是`main`方法里定义的`p1`，所以`newYear`方法里修改的`age`属性就是修改的`p1`的属性，所以会把`age`加1
+>2. 指针接受者以后会用的比较多
 
 ```go
 package main
 
 import (
-"fmt"
+	"fmt"
 )
 
 type person struct{
@@ -5822,8 +5841,8 @@ type person struct{
 	age int
 }
 
-func newPerson(name string, age int) person {
-	return person{
+func newPerson(name string, age int) *person {
+	return &person{
 		name: name,
 		age: age,
 	}
@@ -5836,17 +5855,13 @@ func (p *person) newYear() {
 
 func main() {
 	p1 := newPerson("sam", 19)
+	
 	fmt.Printf("p1=%v\n", p1)
+	fmt.Printf("p1=%T\n", p1)
 	fmt.Printf("p1 outter addr: %p\n", &p1)
 	p1.newYear()
 	fmt.Printf("过了一年, p1.age:%v\n", p1.age)
 }
-/* 执行结果:
-    p1={sam 19}
-    p1 outter addr: 0xc000068420
-    p inside addr: 0xc000068420
-    过了一年, p1.age:20
-*/ 
 ```
 
 > 什么时候应该使用指针类型接收者
@@ -6530,7 +6545,9 @@ func main() {
 // "{\"name\":\"lpm\",\"age\":13}"
 ```
 
-> 反序列化时，传递的`json`字段值一定要和结构体里定义的一致，否则会出现空值的情况
+##### 3.14.5 go反序列化空值问题
+
+> 反序列化时，传递的`json`字段定义的名字值一定要和结构体里定义的一致，否则会出现空值的情况
 >
 > 比如将下方的`jsonStrData`里的"name"字段写成`uname`,那么反序列化出来d1的`Name`字段值就是空值
 
@@ -6566,6 +6583,35 @@ func main() {
 		fmt.Println("反序列化失败！！！")
 	}
 	fmt.Printf("d1=%#v\n", d1) // d1=main.dog{Name:"", Age:13}
+}
+```
+
+#### 3.15 结构体首字母大写
+
+> 1. 如果定义的结构体首字母大写，那么这个结构体对外部暴露可见，公有的变量，其他模块的`go`文件可以用来导入这个结构体
+> 2. 如果一个包里定义的结构体首字母是小写的，那么其他`go`文件是访问不到小写开头的结构体的
+> 3. 需要注意的点：
+>
+> - 并且对首字母大写的结构体有格式要求
+
+```go
+package main
+
+import (
+"fmt"
+)
+
+// 下面的格式必须是需要空格隔开
+// Person 这是一个人的结构体
+type Person struct{
+	name string
+	age int
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%v\n", p1)
+	p1.walk()
 }
 ```
 
