@@ -3147,14 +3147,16 @@ func strStrip(s string) string {
 
 #### 3.1 指针操作
 
-##### 3.1.1 获取变量指针
+##### 3.1.1 获取指针
 
 > `&` : 取变量的内存地址，内存地址是一个16进制数
 >
-> `%p`:
+> `%p`: 是指直接使用`fmt`打印指针值，打印的时候需要在变量前面加`&`符号
 >
 > - 十六进制(前缀0x)表示
 > - 一般是用来打印指针的，`fmt.Printf(“%p\n”, &s1)`
+
+
 
 ![image-20211221174834896](go%E7%AC%94%E8%AE%B0.assets/image-20211221174834896.png)
 
@@ -3164,45 +3166,28 @@ package main
 import "fmt"
 
 func main() {
-	// 查看内存地址：&
+	// 查看内存地址符号：&
 	age := 18
-	ageMemAddr1 := &age
-	fmt.Printf("age的值:%v\n", age) // 18
-	fmt.Printf("age的内存地址: %\vn", ageMemAddr1) // 0xc00001e098
 
-	// 根据内存地址取变量指向的具体值
-	ageVal1 := *ageMemAddr1
-	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal1) // 18
-	
-	
-	fmt.Printf("\n对age重新赋值\n")
-	
-	// 对age重新赋值，但是age的内存地址不变，但是age指向的值会变
-	age = 28
-	ageMemAddr2 := &age
-	fmt.Printf("age的值:%v\n", age) // 28
-	fmt.Printf("age的内存地址: %v\n", ageMemAddr2) // 0xc00001e098
-	
-	ageVal2 := *ageMemAddr2
-	fmt.Printf("根据age的内存地址取对应值:%v\n", ageVal2) // 28
-	
-	fmt.Printf("\nage重新赋值后的内存地址没有变:%v\n", ageMemAddr1 == ageMemAddr2) // true
+	//age的值:18
+	fmt.Printf("age值:%v\n", age)
+
+	//直接打印age的内存地址: 0xc00000a098
+	fmt.Printf("&符号获取age的内存地址: %v\n", &age)
+
+	//直接打印age的内存地址: 0xc00000a098
+	fmt.Printf("&符号获取age的内存地址: %p\n", &age)
+
+	// age的内存地址: *int
+	fmt.Printf("&符号获取age的内存地址类型: %T\n", &age)
 }
-
-/*
-	执行结果:
-        age的值:18
-        age的内存地址: 0xc00001e098
-        根据age的内存地址取对应值:18
-
-        对age重新赋值
-        age的值:28
-        age的内存地址: 0xc00001e098
-        根据age的内存地址取对应值:28
-
-        age重新赋值后的内存地址没有变:true
-*/
 ```
+
+> 从上面代码可以看出来
+>
+> - 使用%v和%p打印变量age的内存地址都可以，因为%v表示接收任意类型的变量，而%p专门打印16进制的值，所以后面打印内存地址都使用%p
+> - 可以看到打印变量age的内存地址的类型是`*int`
+>     - 以后遇到变量类型的前面有个星号，那就表示是该类型对应的指针类型
 
 ##### 3.1.2 根据指针获取值
 
@@ -3213,22 +3198,65 @@ func main() {
 >   - 所以在函数内部，要取得这个内存地址的值，就需要使用`*变量名`拿到内存地址对应的具体值，然后进行操作
 
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	// 查看内存地址符号：&
+	age := 18
+
+	//age的值:18
+	fmt.Printf("age值:%v\n", age)
+
+	//直接打印age的内存地址: 0xc00000a098
+	fmt.Printf("&符号获取age的内存地址: %p\n", &age)
+
+	ageVal := *(&age)
+	// 获取age的原始值: 18
+	fmt.Printf("获取age的原始值: %v\n", ageVal)
+}
 ```
 
-##### 3.1.3 指针重新赋值
+##### 3.1.3 变量重新赋值指针不变
 
-> - 从下图和代码可以看出来
->   - 变量`a`定义以后会申请一块内存空间，用来存变量`a`的值
->   - 那么申请的内存空间的地址永远不会变，但是变量`a`的值可以变，也就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
+> - 从下面代码可以看出来，代码运行期间：
+>   - 变量`a`定义后会申请一块内存空间，用来存变量`a`的值
+>   - 那么申请的内存空间的地址在代码运行期间永远不会变，但是变量`a`的值可以变，就是说变量`a`可以进行重复赋值，但是变量`a`的内存地址永不会变
 > - 就是说变量`a`申请好内存地址以后，可以放任意值进去，也可以对放进去的值进行修改(也叫重新赋值)，但是变量`a`的内存地址申请好以后是永远不会变的
 
 ```go
+package main
 
+import "fmt"
+
+func main() {
+	// 查看内存地址符号：&
+	age := 18
+
+	//age的值:18
+	fmt.Printf("age值:%v\n", age)
+
+	//&符号获取age的内存地址: 0xc00000a098
+	fmt.Printf("&符号获取age的内存地址: %p\n", &age)
+
+	age = 28
+	//age变量重新赋值的内存地址: 0xc00000a098
+	fmt.Printf("age变量重新赋值的内存地址: %p\n", &age)
+}
 ```
+
+##### 3.1.4 指针打印理解
+
+> 在fmt包中，有两种格式都可以打印内存地址
+>
+> `%v`万能打印占位符，什么类型都可以打印
+>
+> `%p`专门打印16进制0x开头的值，所以后面打印内存地址就使用`%p`，专门的占位符打印内存地址
 
 #### 3.2 指针类型
 
-> 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型
+> 如果定义变量的是什么类型，那么他的指针就是什么类型，常见的就是`string`、`int`、`bool`三种指针类型，后面会有结构体类型
 
 ```go
 package main
@@ -3260,7 +3288,52 @@ func main() {
 	boolDataAddr := &boolData
 	fmt.Printf("%v\n", boolDataAddr) // 是bool的内存地址: 0x116bca1
 	fmt.Printf("%T\n", boolDataAddr) // *bool 类型指针
+}
+```
 
+#### 3.3 变量接收内存地址值
+
+> 在一个数据类型获取内存地址时，可以把获取到的内存地址用一个纯新变量来接收
+>
+> 注意：
+>
+> - 此时纯新变量的值就是获取到的内存地址
+> - 而纯新变量自己的内存地址是自己，而不是获取到内存地址
+>
+> 从下图来看：
+>
+> - a变量赋值18
+> - 获取a的内存地址后，赋值给b
+>     - 此时b的值就是a的内存地址
+>     - b的类型就是指针类型，因为b的值是a的内存地址
+> - 但是b自己的内存地址和b的值是两个值，这一块要注意，有时候会搞混
+
+![image-20220424080913306](go%E7%AC%94%E8%AE%B0.assets/image-20220424080913306.png)
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 查看内存地址符号：&
+	age := 18
+
+	//age的值:18
+	fmt.Printf("age值:%v\n", age)
+
+	// &符号获取age的内存地址: 0xc00000a098
+	fmt.Printf("&符号获取age的内存地址: %p\n", &age)
+
+	ageMer := &age
+	// ageMer变量接收age内存地址的值: 0xc00000a098
+	fmt.Printf("ageMer变量接收age内存地址的值: %p\n", ageMer)
+	
+	// ageMer变量接收age内存地址的值: *int
+	fmt.Printf("ageMer变量接收age内存地址的值: %T\n", ageMer)
+
+	// ageMer的内存地址: 0xc000006030
+	fmt.Printf("ageMer的内存地址: %p\n", &ageMer)
 }
 ```
 
@@ -5609,7 +5682,7 @@ func main() {
 
 ##### 3.6.2 快速获取结构体指针(常用)
 
-> 一般在`go`中，快速获取结构体指针的方式就可以在初始化结构体的时候加一个`取址符号(&)`,就可以快速获取到结构体的指针
+> 一般在`go`中，快速获取结构体指针的方式就可以在`初始化结构体`的时候加一个`取址符号(&)`,就可以快速获取到结构体的指针
 >
 > 可以看到下面代码就是在初始化定义结构体的时候加了一个取址符号：
 >
@@ -5729,8 +5802,42 @@ func main() {
 >    - 当结构体定义的字段数量比较多的时候，推荐使用构造函数返回结构体指
 
 ```go
+package main
 
+import (
+	"fmt"
+)
+
+type person struct{
+	name string
+	age int
+}
+
+// person结构体构造函数
+func newPerson(name string, age int) *person{
+	return &person{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	fmt.Printf("p1=%p\n", p1)
+	fmt.Printf("p1=%#+v\n", p1)
+	fmt.Printf("p1=%T\n", p1)
+
+	// 因为p1是指针，所以需要先使用*来拿到p1原始值再访问成员变量
+	fmt.Printf("p1=%v\n", (*p1).name)
+
+	// 推荐：这种方式比较麻烦，Go语言提供了隐式间接引用
+	fmt.Printf("p1=%v\n", p1.name)
+}
 ```
+
+##### 3.8.2 结构体指针访问成员变量
+
+> go语言中做了优化，在Go语言中支持对结构体指针直接使用(`.`)来访问结构体的成员，而不需要显式的加`*`来获取到指针指向的原始值，再来调用成员变量
 
 #### 3.9 方法和接收者
 
