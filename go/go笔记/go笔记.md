@@ -5804,16 +5804,13 @@ func main() {
 ```go
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type person struct{
 	name string
 	age int
 }
 
-// person结构体构造函数
 func newPerson(name string, age int) *person{
 	return &person{
 		name: name,
@@ -5823,21 +5820,69 @@ func newPerson(name string, age int) *person{
 
 func main() {
 	p1 := newPerson("sam", 19)
-	fmt.Printf("p1=%p\n", p1)
-	fmt.Printf("p1=%#+v\n", p1)
-	fmt.Printf("p1=%T\n", p1)
-
-	// 因为p1是指针，所以需要先使用*来拿到p1原始值再访问成员变量
-	fmt.Printf("p1=%v\n", (*p1).name)
-
-	// 推荐：这种方式比较麻烦，Go语言提供了隐式间接引用
-	fmt.Printf("p1=%v\n", p1.name)
+	
+	// 直接打印p1：&{sam 19}
+	fmt.Printf("直接打印p1：%v\n", p1)
+	
+	// p1的类型：*main.person
+	fmt.Printf("p1的类型：%T\n", p1)
+	
+	// p1的内存地址：0xc00000c030
+	fmt.Printf("p1的内存地址：%p\n", p1)
+	
+	// p1原本的值：{sam 19}
+	fmt.Printf("p1原本的值：%v\n", (*p1))
 }
 ```
 
+> 结论：
+>
+> 1. 构造函数返回类型为结构体指针时，初始化的实例变量`p1`的值就是`person`结构体的指针
+>    1. 可以看到打印`p1`的类型就是`*main.person`类型的指针
+>    2. 既然p1是指针，那么就可以通过`%p`读取到p1的内存地址值
+>    3. 并且可以通过`*p1`拿到`p1`这个内存地址对应的原始值：{sam 19}
+> 2. 从上面看出，当构造函数返回指针类型时，初始化的变量本身就是结构体的指针类型
+
 ##### 3.8.2 结构体指针访问成员变量
 
-> go语言中做了优化，在Go语言中支持对结构体指针直接使用(`.`)来访问结构体的成员，而不需要显式的加`*`来获取到指针指向的原始值，再来调用成员变量
+> 从3.8.1可以看到构造函数返回指针类型时，初始化的变量本身就是结构体的指针类型，那么访问该结构体实例对象的成员变量时：
+>
+> - 需要带`(*p1).name`，表示通过p1先拿到p1这个内存地址对应的实际的结构体的值，再来访问`p1`结构体里的name字段
+> - 不过go语言中做了优化
+>   - 在Go语言中支持对结构体指针直接使用(`.`)来访问结构体的成员，而不需要显式的加`*`来获取到指针指向的原始值，再来调用成员变量
+
+```go
+package main
+
+import "fmt"
+
+type person struct{
+	name string
+	age int
+}
+
+func newPerson(name string, age int) *person{
+	return &person{
+		name: name,
+		age: age,
+	}
+}
+
+func main() {
+	p1 := newPerson("sam", 19)
+	
+	// p1原本的值：{sam 19}
+	fmt.Printf("p1原本的值：%v\n", (*p1))
+	
+	// 原始值访问成员变量
+	// p1.name原本的值：sam
+	fmt.Printf("p1.name原本的值：%v\n", (*p1).name)
+	
+  // 指针访问成员变量
+	// p1.name的值：sam
+	fmt.Printf("p1.name的值：%v\n", p1.name)
+}
+```
 
 #### 3.9 方法和接收者
 
@@ -5890,13 +5935,17 @@ func main() {
 
 ##### 3.9.1 值接收者
 
-> 结构体方法里的接收者如果是值类型时，即使在方法里对结构体对象的某个属性进行了修改，但是这个结构体本身的这个属性是不会变化的，因为值接收者就是复制拷贝，值拷贝的内存地址是完全不一样的两个
+> 结构体方法里的接收者如果是值类型时
+>
+> - 表示接受者是以拷贝的形式传进到方法里，那么方法里的接受者(初始化时得到的结构体对象)是一个拷贝的对象
+>   - `拷贝的是实例化的结构体对象`
+> - 即使在方法里对结构体对象的某个属性进行了修改，但是这个结构体本身的这个属性是不会变化的，因为值接收者就是复制拷贝，值拷贝的内存地址是完全不一样
 
 ```go
 package main
 
 import (
-"fmt"
+	"fmt"
 )
 
 type person struct{
@@ -5912,29 +5961,38 @@ func newPerson(name string, age int) person {
 }
 
 func (p person) newYear() {
+	// p1在newYear方法的内存地址：0xc000118030
+	fmt.Printf("p1在newYear方法的内存地址：%p\n", &p)
 	p.age += 1
 }
 
 func main() {
+	// 初始化结构体得到p1对象
 	p1 := newPerson("sam", 19)
-	fmt.Printf("p1=%v\n", p1)
-	p1.newYear()
-	fmt.Printf("过了一年, p1.age:%v\n", p1.age)
-}
+	
+	// p1的值: {sam 19}
+	fmt.Printf("p1的值: %v\n", p1)
 
-// 结果
-/*
-	p1={sam 19}
-	过了一年, p1.age:19
-*/
+	// p1在初始化后的内存地址: 0xc000118000
+	fmt.Printf("p1在初始化后的内存地址: %p\n", &p1)
+
+	p1.newYear()
+	// 过了一年, p1.age:19
+	fmt.Printf("过了一年, p1.age: %v\n", p1.age)
+}
 ```
+
+> 从上面代码可以看出：
+>
+> - p1通过构造函数创建了`person`这个结构体的实例对象
+>   - 在初始化后的内存地址:`0xc000118000`
+>   - 在`person`结构体的`newYear`方法里，传进入`p`的内存地址是:`0xc000118030`，二者内存地址明显不一样
+>   - 所以在`newYear`方法里对`age`字段修改，相当于是修改的`p1`的副本里的`age`字段，所以实际上并没有修改成功
 
 ##### 3.9.2 指针接收者
 
 > 在值接收者里，对应方法修改了结构体对象的某个值，因为值拷贝的原因，还是不会进行变化，那么如果真要修改，就要用到了指针接收者
 >
-> 1. 下面代码可以看到方法`newYear()`里传入的`p`的内存地址就是`main`方法里定义的`p1`，所以`newYear`方法里修改的`age`属性就是修改的`p1`的属性，所以会把`age`加1
->2. 指针接受者以后会用的比较多
 
 ```go
 package main
@@ -5956,26 +6014,37 @@ func newPerson(name string, age int) *person {
 }
 
 func (p *person) newYear() {
-	fmt.Printf("p inside addr: %p\n", p)
-	(*p).age += 1
+	// p1在newYear方法的内存地址：0xc00000c030
+	fmt.Printf("p1在newYear方法的内存地址：%p\n", p)
+	p.age += 1
 }
 
 func main() {
+	// 初始化结构体得到p1对象
 	p1 := newPerson("sam", 19)
 	
-	fmt.Printf("p1=%v\n", p1)
-	fmt.Printf("p1=%T\n", p1)
-	fmt.Printf("p1 outter addr: %p\n", &p1)
+	// p1的值是person实例化后的指针
+	// p1的值: &{sam 19}
+	fmt.Printf("p1的值: %v\n", p1)
+
+	// p1的内存地址值: 0xc00000c030
+	fmt.Printf("p1的内存地址值: %p\n", p1)
+	
 	p1.newYear()
-	fmt.Printf("过了一年, p1.age:%v\n", p1.age)
+	// 过了一年, p1.age: 20
+	fmt.Printf("过了一年, p1.age: %v\n", p1.age)
 }
 ```
 
-> 什么时候应该使用指针类型接收者
+> 从上面代码可以看出：
 >
-> - 需要修改接收者中的值
-> - 接收者是拷贝比较大的对象
-> - 保证一致性，如果有某个方法用了指针接收者，那么其他方法也应该如此
+> - person的构造函数返回是person的指针类型
+>   - p1自身的值是`&{sam 19}`,表示是结构体指针类型
+>   - 那么`%p`就可以打印出`p1`的内存地址值
+> - 在person结构体的`newYear`方法里
+>   - 拿到`p`的内存地址也是和`p1`一样，那就表示将`p1`传进到了`newYear`这个方法里
+>   - 那么执行`p.age += 1`，就表示在修改`p1.age =+ 1`，那就实现了通过结构体方法修改成员变量值的效果
+> - 从这里看出，使用指针结构体可以实现对成员变量的修改，后面使用的场景会很多，所以推荐使用指针结构体
 
 #### 3.10 自定义类型加方法
 
@@ -6002,7 +6071,11 @@ func main() {
 
 #### 3.11 结构体匿名字段
 
-> 在定义结构体时只定义变量类型，不写变量名，用的较少
+> 在定义结构体时只定义变量类型，不写变量名
+>
+> 使用值列表的形式初始化结构体
+>
+> 这种情况容易出现不知字段的用途，所以用的较少
 
 ```go
 package main
@@ -6011,44 +6084,49 @@ import (
 	"fmt"
 )
 
-type dog struct{
-	name string
-	age int
+// 只声明字段类型，不声明字段名，表示匿名结构体
+type person struct{
+	string
+	int
 }
 
 func main() {
-	m := dog{
-		"sam",
+	// 使用值列表的形式初始化结构体
+	p1 := person{
+		"name",
 		19,
 	}
-	
-	fmt.Printf("m=%v\n", m)
-	fmt.Printf("m.name=%v\n", m.name)
-	fmt.Printf("m.age=%v\n", m.age)
+	// {name 19}
+	fmt.Printf("p1=%v\n", p1)
 }
 
-/*
-m={sam 19}
-m.name=sam
-m.age=19
-*/
 ```
 
 #### 3.12 结构体嵌套
 
-##### 3.12.1 显式结构体嵌套
+##### 3.12.1 显式嵌套结构体
 
 > 结构体里可以再嵌套另一个结构体，这样的结构体称作结构体嵌套
 >
-> 代码分析
->
-> - `specs`结构体是一个公共结构体，用来表示其他结构体都包含它的所有属性
-> - `clothes`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
-> - `car`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
-> - 对`clothes`结构体写构造函数，需要对`clothes`里的`specs`结构体进行初始化赋值，通过`newClothes`传入的形参值进行传入，最终将`clothes`结构体返回，同理`car`结构体也是一样的
-> - 通过`clothes`结构体的构造函数初始化了一个`c1`变量，传入了`name`、`price`、`color`、`size`变量以后，就可以对`c1`进行属性访问了
->   - 需要访问`c1`的`color`属性，不能直接`c1.color`，这样是找不到的，会提示报错：` c1.color undefined (type clothes has no field or method color)`,因为`c1`本身是没有`color`属性的，`c1`的`color`属性在`specs`这个结构体里，所以需要`c1.specs.color`这样一级一级去找，`c1.specs.color`里的`specs`是`clothes`结构体里定义的`specs`这个变量名，不是`specs`这个结构体类型
->   - 这样去访问嵌套结构体里的属性是比较清晰明了的
+
+```go
+// 结构体嵌套
+// 被嵌套结构体
+type 结构体1 struct{
+  var1 string
+  var2 strint
+}
+
+// 嵌套结构体，将结构体1嵌套到结构体2中
+type 结构体2 struct{
+  var3 string
+  var4 结构体1
+}
+
+// 实例化结构体2，访问var1，下面是伪代码
+// 通过结构体2找到结构体1，再访问结构体1里的var1字段
+fmt.Printf("var1的值:%v\n", 结构体2.var4.var1)
+```
 
 ```go
 package main
@@ -6067,6 +6145,8 @@ type specs struct{
 type clothes struct{
 	name	string
 	price	int
+  
+  // 嵌套了specs结构体
 	specs	specs
 }
 
@@ -6109,50 +6189,89 @@ func (c *car) drive(userName string) {
 
 func main() {
 	c1 := newClothes("NaKe", "red", "XL", 33)
+  
+  // c1={NaKe 33 {red XL}}
 	fmt.Printf("c1=%v\n", c1)
+  
+  // c1.name=NaKe
 	fmt.Printf("c1.name=%v\n", c1.name)
+  
+  // c1.price=33
 	fmt.Printf("c1.price=%v\n", c1.price)
+  
+  // c1.specs.color=red
 	fmt.Printf("c1.specs.color=%v\n", c1.specs.color)
+  
+  // c1.specs.size=XL
 	fmt.Printf("c1.specs.size=%v\n", c1.specs.size)
+  
+  // jason is wear NaKe
 	c1.wear("jason")
 	
 	fmt.Println()
 	
 	c2 := newCar("BMW", "pink", "2HX", 1999999)
+  
+  // c2={BMW 1999999 {pink 2HX}} 
 	fmt.Printf("c2=%v\n", c2)
+  
+  //c2.name=BMW
 	fmt.Printf("c2.name=%v\n", c2.name)
+  
+  // c2.price=1999999
 	fmt.Printf("c2.price=%v\n", c2.price)
+  
+  // c2.specs.color=pink
 	fmt.Printf("c2.specs.color=%v\n", c2.specs.color)
+  
+  // c2.specs.size=2HX
 	fmt.Printf("c2.specs.size=%v\n", c2.specs.size)
+  
+  // sam drive a BMW
 	c2.drive("sam")
 }
-/*
-    c1={NaKe 33 {red XL}}
-    c1.name=NaKe
-    c1.price=33
-    c1.specs.color=red
-    c1.specs.size=XL
-    jason is wear NaKe
-
-    c2={BMW 1999999 {pink 2HX}}
-    c2.name=BMW
-    c2.price=1999999
-    c2.specs.color=pink
-    c2.specs.size=2HX
-    sam drive a BMW
-*/
 ```
+
+> 代码分析
+>
+> - `specs`结构体是一个公共结构体，用来表示其他结构体都包含它的所有属性
+> - `clothes`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
+> - `car`结构体，里面嵌套了一个`specs`这个结构体，并且起了个变量名叫`specs`
+> - 对`clothes`结构体写构造函数，需要对`clothes`里的`specs`结构体进行初始化赋值，通过`newClothes`传入的形参值进行传入，最终将`clothes`结构体返回，同理`car`结构体也是一样的
+> - 通过`clothes`结构体的构造函数初始化了一个`c1`变量，传入了`name`、`price`、`color`、`size`变量以后，就可以对`c1`进行属性访问了
+>   - 需要访问`c1`的`color`属性，不能直接`c1.color`，这样是找不到的，会提示报错：` c1.color undefined (type clothes has no field or method color)`
+>     - 因为`c1`本身是没有`color`属性的，`c1`的`color`属性在`specs`这个结构体里
+>     - 所以需要`c1.specs.color`这样一级一级去找，`c1.specs.color`里的`specs`是`clothes`结构体里定义的`specs`这个变量名，不是`specs`这个结构体类型
+>   - 这样去访问嵌套结构体里的属性是比较清晰明了
 
 ##### 3.12.2 匿名嵌套结构体
 
-> 上面访问嵌套结构体时，不能直接通过`c1.color`进行访问`color`属性，其实也可以进行访问，需要对`clothes`里的嵌套结构体改造成`匿名嵌套结构体`
+> 上面访问嵌套结构体时，不能直接通过`c1.color`进行访问`color`属性
+>
+> 如果直接通过c1.color进行访问color属性，需要对`clothes`里的嵌套结构体改造成`匿名嵌套结构体`
 >
 > `匿名嵌套结构体`：
 >
-> - 就是在嵌套结构体里对于被嵌套的结构体，不显式的写一个变量名，而是直接写该被嵌套的结构体
+> - 嵌套结构体里对于被嵌套的结构体，不显式的写一个变量名，而是直接写该被嵌套的结构体
 > - 那么在构造函数时，类比到结构体匿名字段，那么这个被嵌套结构体的变量名就是它自己的名字，因为没有给名字，所以用的是自己的名字
-> - 那么这样定义的嵌套结构体就是可以通过`c1.color`进行直接访问`color`属性了
-> - 下面代码验证该结论
+> - 那么这样定义的嵌套结构体的好处
+>   - 可以通过`c1.color`进行直接访问被嵌套的结构体的`color`属性，这样更加方便
+
+```go
+// 匿名嵌套结构体 
+type specs struct{
+	color	string
+	size	string
+}
+
+type clothes struct{
+	name	string
+	price	int
+  // 匿名嵌套结构体，不写嵌套体的变量名
+  // 等价于： specs specs表示是简写
+	specs 
+}
+```
 
 ```go
 package main
@@ -6175,7 +6294,7 @@ type clothes struct{
 type car struct{
 	name 	string
 	price 	int
-	specs // 匿名嵌套结构体，不写嵌套体的变量名
+	specs // 嵌套结构体specs，不写嵌套体的变量名，表示匿名嵌套
 }
 
 func newClothes(name, color, size string, price int) clothes{
@@ -6211,48 +6330,246 @@ func (c *car) drive(userName string) {
 
 func main() {
 	c1 := newClothes("NaKe", "red", "XL", 33)
+	
+	// c1={NaKe 33 {red XL}}
 	fmt.Printf("c1=%v\n", c1)
+	
+	// c1.name=NaKe
 	fmt.Printf("c1.name=%v\n", c1.name)
+	
+	// c1.price=33
 	fmt.Printf("c1.price=%v\n", c1.price)
-     // 直接使用c1.color、c1.size进行访问嵌套结构体里的属性
+	
+	// 直接使用c1.color、c1.size进行访问嵌套结构体里的属性
+	// c1.color=red
 	fmt.Printf("c1.color=%v\n", c1.color)
+	
+	// c1.size=XL
 	fmt.Printf("c1.size=%v\n", c1.size)
+	
+	// jason is wear NaKe
 	c1.wear("jason")
 	
-	fmt.Println()
-	
+	// 第二个例子
 	c2 := newCar("BMW", "pink", "2HX", 1999999)
+	
+	// c2={BMW 1999999 {pink 2HX}}
 	fmt.Printf("c2=%v\n", c2)
+	
+	// c2.name=BMW
 	fmt.Printf("c2.name=%v\n", c2.name)
+	
+	// c2.price=1999999
 	fmt.Printf("c2.price=%v\n", c2.price)
-    // 直接使用c2.color、c2.size进行访问嵌套结构体里的属性
+	
+	// 直接使用c2.color、c2.size进行访问嵌套结构体里的属性
+	// c2.color=pink
 	fmt.Printf("c2.color=%v\n", c2.color)
+
+	// c2.size=2HX
 	fmt.Printf("c2.size=%v\n", c2.size)
+
+	// sam drive a BMW
 	c2.drive("sam")
 }
-
-/*
-    c1={NaKe 33 {red XL}}
-    c1.name=NaKe
-    c1.price=33
-    c1.color=red
-    c1.size=XL
-    jason is wear NaKe
-
-    c2={BMW 1999999 {pink 2HX}}
-    c2.name=BMW
-    c2.price=1999999
-    c2.color=pink
-    c2.size=2HX
-    sam drive a BMW
-*/
 ```
 
-> 嵌套结构体查找属性时，先从自己内部的属性字典里去找，找不到再去嵌套结构体里找，这样一层一层去找元素
+##### 3.12.3 匿名嵌套结构体字段冲突
+
+> 如果被嵌套的结构体里有多个相同的字段，那么访问就出现匿名嵌套结构体冲突
 >
-> 匿名嵌套结构体多适用于只有一个嵌套结构体
+> - 那么就需要按嵌套的结构体一层一层去找
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type carBody struct{
+	color	string
+	size	int
+}
+
+type carInside struct{
+	color string
+	siteNum int
+}
+
+type car struct{
+	name string
+	carBody
+	carInside
+}
+
+// car的字段比较多，所以返回结构体指针
+func newCar(name string, bodyColor string, size int, insideColor string, siteNum int) *car{
+	return &car{
+		name: name,
+		carBody: carBody{
+			color: bodyColor,
+			size: size,
+		},
+		carInside: carInside{
+			color: insideColor,
+			siteNum: siteNum,
+		},
+	}
+}
+
+func main() {
+	c1 := newCar("BMW", "red", 199, "black", 4)
+	fmt.Printf("c1=%p\n", c1)
+	fmt.Printf("c1=%v\n", *c1)
+	
+	fmt.Printf("c1.color==> %v\n", c1.color)
+}
+```
+
+> 上面代码的car结构体匿名嵌套了结构体`carBody`和`carInside`，并且结构体`carBody`和`carInside`都有一个相同字段叫`color`
 >
-> 当有多个嵌套结构体时，建议还是对嵌套的结构体写不同的变量名，并且在访问时一级一级的去写访问属性，如`c1.specs.color`
+> 那么实例化car结构体后赋值给c1，c1直接访问`color`字段就会报错: 
+>
+> - 报错信息：`ambiguous selector c1.color`表示是模糊的选择器`c1.color`
+> - 因为c1里有两个冲突的`color`字段，此时访问就不知道该访问哪个，就会报错
+
+> 如何解决呢？
+>
+> - 那就和显式嵌套结构体一样，一层一层的写结构体字段调用
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type carBody struct{
+	color	string
+	size	int
+}
+
+type carInside struct{
+	color string
+	siteNum int
+}
+
+type car struct{
+	name string
+	carBody
+	carInside
+}
+
+// car的字段比较多，所以返回结构体指针
+func newCar(name string, bodyColor string, size int, insideColor string, siteNum int) *car{
+	return &car{
+		name: name,
+		carBody: carBody{
+			color: bodyColor,
+			size: size,
+		},
+		carInside: carInside{
+			color: insideColor,
+			siteNum: siteNum,
+		},
+	}
+}
+
+func main() {
+	c1 := newCar("BMW", "red", 199, "black", 4)
+	// c1.carBody.color==> red
+	fmt.Printf("c1.carBody.color==> %v\n", c1.carBody.color)
+	
+	// c1.carInside.color==> black
+	fmt.Printf("c1.carInside.color==> %v\n", c1.carInside.color)
+}
+```
+
+##### 3.12.4 嵌套结构体是指针类型
+
+> 被嵌套的结构体指定为指针类型
+>
+> - 当被嵌套的结构体自身定义的字段比较多，还需要被嵌套，可以在嵌套的时候传入指针类型
+> - 访问嵌套的指针结构体，也可以直接去访问
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type carBody struct{
+	color	string
+	size	int
+	carType string
+	carAddr string
+}
+
+type car struct{
+	name string
+	*carBody
+}
+
+// car的字段比较多，所以返回结构体指针
+func newCar(name string, color string, size int, carType, carAddr string) *car{
+	return &car{
+		name: name,
+		carBody: &carBody{
+			color: color,
+			size: size,
+			carType: carType,
+			carAddr: carAddr,
+		},
+	}
+}
+
+func main() {
+	c1 := newCar("BMW", "red", 199, "SUV_Car", "Germen")
+	
+	// c1自身的值：&{BMW 0xc000024080}
+	fmt.Printf("c1自身的值：%v\n", c1)
+	
+	// c1内存地址指向的值：&{BMW 0xc000024080}
+	fmt.Printf("c1内存地址指向的值：%v\n", c1)
+	
+	// c1的类型：*main.car
+	fmt.Printf("c1的类型：%T\n", c1)
+	
+	// c1.color：red
+	fmt.Printf("c1.color：%v\n", c1.color)
+	
+	// c1.carAddr：Germen
+	fmt.Printf("c1.carAddr：%v\n", c1.carAddr)
+}
+```
+
+##### 3.12.5 嵌套结构体注意事项
+
+> 嵌套结构体写构造函数：
+>
+> - 需要将结构自身的字段和被嵌套的结构体的字段完全写全
+>
+> 嵌套结构体查找属性：
+>
+> - 嵌套结构体查找属性时，先从自己内部的属性字典里去找，找不到再去嵌套结构体里找，这样一层一层去找元素
+>
+> 匿名嵌套结构体使用场景：
+>
+> - 多适用于只有一个嵌套结构体
+>
+> 显式嵌套结构体：
+>
+> - 当有多个嵌套结构体时，建议还是对嵌套的结构体写不同的变量名
+> - 并且在访问时一级一级的去写访问属性，如`c1.specs.color`，这样更清晰
+>
+> 显式嵌套结构体和匿名嵌套结构体该用哪一种？
+>
+> - 这个看自身习惯，不过个人比较喜欢使用匿名嵌套结构体
+> - 这样在定义时不需要对嵌套结构体多写额外得字段名，直接用嵌套的结构体名字作为字段名即可
+> - 如果遇到结构体字段冲突，那就老老实实一级一级去写，这样不会出错，但是又和显示嵌套结构体访问字段方式一样了，
+> - 那用哪种嵌套结构体就仁者见仁智者见智了
 
 #### 3.13 结构体模拟继承
 
@@ -6699,7 +7016,8 @@ func main() {
 > 2. 如果一个包里定义的结构体首字母是小写的，那么其他`go`文件是访问不到小写开头的结构体的
 > 3. 需要注意的点：
 >
-> - 并且对首字母大写的结构体有格式要求
+> - 并且对首字母大写的结构体有格式要求，就是需要对首字母大写的结构体、方法写注释
+> - 注释的规则是 结构体名+空格+注释内容
 
 ```go
 package main
@@ -6722,7 +7040,15 @@ func main() {
 }
 ```
 
-#### 3.15 结构体案例
+![image-20220424150850248](go%E7%AC%94%E8%AE%B0.assets/image-20220424150850248.png)
+
+> 上图中的Person结构体是首字母大写的，表示外部可访问到
+>
+> 那么写的注释：
+>
+> `// Person 这是一个人的结构体`就需要符合`//+空格+结构体名+空格+注释`的规则来添加注释
+
+#### 3.16 结构体案例
 
 > 下面是通过一个学生管理系统来复习学习过的结构体、`map`等知识点
 >
