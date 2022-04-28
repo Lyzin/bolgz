@@ -1,5 +1,19 @@
 ## 一、GO语言简介与配置
 
+> ### 推荐资料：
+>
+> https://www.liwenzhou.com/ （七米老师博客，推荐）
+>
+> https://www.qcrao.com/
+>
+> https://golang.design/
+>
+> https://golang.design/go-questions/（程序员面试笔试宝典）
+>
+> https://www.flysnow.org/
+>
+> https://www.cnblogs.com/sunsky303/default.html?page=2
+
 ### 1、Go包的官方地址
 
 > 官网：[https://golang.org/dl/](https://golang.org/dl/)
@@ -6873,6 +6887,8 @@ type dog struct{
 	Name string `json:"name"`
 	Age int `json:"age"`
 }
+
+注意tag和后面的变量名不能有空格
 ```
 
 ```go
@@ -8029,7 +8045,7 @@ func main() {
 >   - day08文件中当`hibi.go`声明为`jim`包
 >   - 在`day09`的`import_demo.go`导入后执行，报错提示了在`day08`文件中
 >     - `found packages jims (bal_data_bak.go) and jim (hibi.go)`表示发现了2个包在`bal_data_bak.go`和`hibi.go`文件中
->     - 而且在`import_demo.go`即使将调用`Him()`写到很下面，仍然会优先检测`bal_data_bak.go`文件，而不是`cal_data.go`文件，说明导入时，是按文件名的顺序进行导入的
+>     - 而且在`import_demo.go`即使将调用`Him()`写到很下面，仍然会优先检测`bal_data_bak.go`文件，而不是`cal_data.go`文件，说明导入时，是按目标包的文件名字母的顺序进行导入的
 
 ![image-20220214182104927](go%E7%AC%94%E8%AE%B0.assets/image-20220214182104927.png)
 
@@ -8070,6 +8086,42 @@ import (
 >
 > - 单独运行一个`*.go`文件，因为引用的函数、变量在内存中并没有，所以会提示`undefined`的错误
 > - 所以需要以包的形式运行，也就是引导了哪些文件，`go run `时就跟上所有的`*.go`文件，这样才可以找到对应引用的函数、变量
+
+### 3、go module
+
+> [https://zhuanlan.zhihu.com/p/330962571](https://zhuanlan.zhihu.com/p/330962571)
+>
+> [https://www.cnblogs.com/wongbingming/p/12941021.html](https://www.cnblogs.com/wongbingming/p/12941021.html)
+>
+> https://golang.google.cn/doc/tutorial/create-module
+>
+> https://golang.google.cn/doc/modules/managing-dependencies#naming_module
+>
+> https://golang.google.cn/doc/tutorial/getting-started
+>
+> https://golang.google.cn/doc/modules/gomod-ref
+>
+> https://www.jianshu.com/p/04dd0d386df2
+>
+> https://www.cnblogs.com/wongbingming/p/12941021.html
+>
+> https://blog.csdn.net/u011069013/article/details/110114319
+
+#### 3.1 go module历史
+
+> 为什么要有go module?
+>
+> 
+
+#### 3.2 go module使用
+
+> 
+
+
+
+
+
+
 
 ## 十一、文件操作
 
@@ -9440,31 +9492,15 @@ func main() {
 }
 ```
 
-## 十二、go module包管理
+### 6、go doc
 
-### 1、go module使用
+> https://www.kancloud.cn/cattong/go_command_tutorial/261351
+>
+> 常用来查看当前go文件的文档
+>
+> godoc可以快速查看对应模块的文档
 
-> [https://zhuanlan.zhihu.com/p/330962571](https://zhuanlan.zhihu.com/p/330962571)
->
-> 
->
-> [https://www.cnblogs.com/wongbingming/p/12941021.html](https://www.cnblogs.com/wongbingming/p/12941021.html)
->
-> https://golang.google.cn/doc/tutorial/create-module
->
-> https://golang.google.cn/doc/modules/managing-dependencies#naming_module
->
-> https://golang.google.cn/doc/tutorial/getting-started
->
-> https://golang.google.cn/doc/modules/gomod-ref
->
-> https://www.jianshu.com/p/04dd0d386df2
->
-> https://www.cnblogs.com/wongbingming/p/12941021.html
->
-> https://blog.csdn.net/u011069013/article/details/110114319
-
-## 十三、反射
+## 十二、反射
 
 > **程序编译**：
 >
@@ -9777,7 +9813,7 @@ func main() {
 }
 ```
 
-## 十四、并发编程(非常重要)
+## 十三、并发编程(非常重要)
 
 > `go`天生支持并发，所以并发编程很重要，需要好好理解
 
@@ -9825,11 +9861,11 @@ func main() {
 >
 > 协程（coroutine）：非操作系统提供而是由用户自行创建和控制的用户态‘线程’，比线程更轻量级。
 
-### 3、GO并发
+### 3、goroutine
 
 > Go语言中的并发程序主要是通过基于CSP（communicating sequential processes）的goroutine和channel来实现，当然也支持使用传统的多线程共享内存的并发方式。
 
-#### 3.1 goroutine
+#### 3.1 goroutine介绍
 
 > Goroutine是Go语言支持并发的核心
 >
@@ -9839,14 +9875,14 @@ func main() {
 >   - 和操作系统调度线程不同，操作系统是由系统内核调度的，而goroutine是由go在运行时(runtime)调度的
 >   - go在运行时，会进行操作系统资源分配，会把m个goroutine合理地分配给n个操作系统线程，实现m:n的调度机制
 >   - 开发人员不需要为go在代码层面维护一个线程池
->
-> - Goroutine的特点
+>- Goroutine的特点
 >   - Goroutine 是Go程序中最基本的并发执行单元
 >   - 每一个程序都至少包含一个goroutine，也就是main函数的（main goroutine），当go程序创建时，它会默认创建
 >   - go语言不需要自己单独写进程、线程、协程，只需要利用goroutine就可以实现并发
 >   - 当需要多个任务并发执行的时候，把任务包装成一个函数，然后开启goroutine去执行，就实现了并发
+> - 
 
-#### 3.2 Go关键字
+#### 3.2 Go关键字开启gouroutine
 
 > Go语言中使用goroutine非常简单，只需要在函数或方法调用前加上`go`关键字就可以创建一个goroutine
 >
@@ -9908,7 +9944,7 @@ func main(){
 
 ![image-20220403220757049](go%E7%AC%94%E8%AE%B0.assets/image-20220403220757049.png)
 
-##### 3.2.1 for循环goroutine
+##### 3.2.1 for启动goroutine(闭包)
 
 > 上面的都是开启一个goroutine去执行代码，但是我们可以使用for循环开启很多个goroutine
 
@@ -9938,43 +9974,360 @@ func main(){
 >
 > 为什么会这样呢？
 >
-> - 从for循环里的`go`关键字后面的匿名函数来看，里面打印了for循环里的`i`变量，对于一个函数内部的变量从函数外部拿，这就是闭包
-> - 由于for循环很快，所以开启10个goroutine的时候，for循环已经执行完了，那么最后传递给匿名函数里的`i`可能是for循环的最后一个，或者是中间的某一个，所以就出现了上图的结果
->   - 这里也反映出了启动goroutine是需要一定时间的，因为从for循环来看，先启动了10个goroutine，才开始执行goroutine里面匿名函数里的打印`i`功能，那么就表示了goroutine是都先启动，再执行里面任务，此时的时间差for循环已经执行结束了，最后的i是10，所以就会出现了上面的结果
+> - 从for循环里的`go`关键字后面的匿名函数来看，里面打印了for循环里的`i`变量，对于一个函数内部的变量从函数外部拿，这就是`闭包`
+> - 由于for循环很快，所以开启10个goroutine的时候，for循环已经执行完了，那么最后传递给匿名函数里的`i`可能是for循环的最后一个10，或者是中间的某一个，所以就出现了上图的结果
+>   - 这里也反映出了启动goroutine是需要一定时间的，因为从for循环来看，先启动了10个goroutine，才开始执行goroutine里面匿名函数里的打印`i`功能，而且输出到终端也需要时间，那么就表示了goroutine是都先启动，再执行里面任务，此时的时间差for循环已经执行结束了，最后的i是10，所以就会出现了上面的结果
 >   - 如果goroutine能里面启动，立马执行，就不会有这样的问题
+>   - 并不是启动一个就输出展示一个
+
+##### 3.2.2 for启动goroutine(传参)
+
+> 从3.2.1里可以看出，`for`循环启动多个goroutine时，采用闭包传参，会出现多个`goroutine`接收到的参数值都是一样，这样就不符合我们的需求，所以需要给传参
+>
+> 从下面代码可以看出，走传参形式给goroutine，那么循环一个就给一个值到goroutine中，这样每次循环的值都会被传到启动的goroutine中，这样就不会有问题
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	for i := 0; i < 10; i++ {
+		go func(i int) {
+			fmt.Printf("i=%v\n", i)
+		}(i)
+	}
+	fmt.Println("main run done!")
+	time.Sleep((time.Second) * 2)
+}
+```
+
+![image-20220427112458128](go%E7%AC%94%E8%AE%B0.assets/image-20220427112458128.png)
 
 
 
+> 但是仔细观察上面的代码，使用了`time.Sleep`来等待for循环启动的goroutine执行完，十分的不可控，也不优雅
+>
+
+#### 3.3 sync.WaitGroup
+
+> 使用`sync.WaitGroup`来实现goroutine的同步：
+>
+> - sync.WaitGroup是用来创建等待组
+>
+> - 从源码可以看到WaitGroup不能被拷贝，因为里面是计数器，如果拷贝了，那计数器的值就不一致了，因为WaitGroup是结构体，结构体是值类型，值类型不像指针类型，指针类型可以保持值一致
+
+```go
+// A WaitGroup waits for a collection of goroutines to finish.
+// The main goroutine calls Add to set the number of
+// goroutines to wait for. Then each of the goroutines
+// runs and calls Done when finished. At the same time,
+// Wait can be used to block until all goroutines have finished.
+//
+// A WaitGroup must not be copied after first use.
+type WaitGroup struct {
+	noCopy noCopy
+
+	// 64-bit value: high 32 bits are counter, low 32 bits are waiter count.
+	// 64-bit atomic operations require 64-bit alignment, but 32-bit
+	// compilers do not ensure it. So we allocate 12 bytes and then use
+	// the aligned 8 bytes in them as state, and the other 4 as storage
+	// for the sema.
+	state1 [3]uint32
+}
+```
+
+> 涉及到的sync.WaitGroup三个方法，Add()、Wait()、Done()
+
+> - wg.Add()
+>   - 要启动多少个goroutine，就添加多少个计数器，可以一次性加好，也可以在循环里每次挨个加1
+
+```go
+// Add adds delta, which may be negative, to the WaitGroup counter.
+// If the counter becomes zero, all goroutines blocked on Wait are released.
+// If the counter goes negative, Add panics.
+//
+// Note that calls with a positive delta that occur when the counter is zero
+// must happen before a Wait. Calls with a negative delta, or calls with a
+// positive delta that start when the counter is greater than zero, may happen
+// at any time.
+// Typically this means the calls to Add should execute before the statement
+// creating the goroutine or other event to be waited for.
+// If a WaitGroup is reused to wait for several independent sets of events,
+// new Add calls must happen after all previous Wait calls have returned.
+// See the WaitGroup example.
+func (wg *WaitGroup) Add(delta int) {
+	statep, semap := wg.state()
+	if race.Enabled {
+		_ = *statep // trigger nil deref early
+		if delta < 0 {
+			// Synchronize decrements with Wait.
+			race.ReleaseMerge(unsafe.Pointer(wg))
+		}
+		race.Disable()
+		defer race.Enable()
+	}
+	state := atomic.AddUint64(statep, uint64(delta)<<32)
+	v := int32(state >> 32)
+	w := uint32(state)
+	if race.Enabled && delta > 0 && v == int32(delta) {
+		// The first increment must be synchronized with Wait.
+		// Need to model this as a read, because there can be
+		// several concurrent wg.counter transitions from 0.
+		race.Read(unsafe.Pointer(semap))
+	}
+	if v < 0 {
+		panic("sync: negative WaitGroup counter")
+	}
+	if w != 0 && delta > 0 && v == int32(delta) {
+		panic("sync: WaitGroup misuse: Add called concurrently with Wait")
+	}
+	if v > 0 || w == 0 {
+		return
+	}
+	// This goroutine has set counter to 0 when waiters > 0.
+	// Now there can't be concurrent mutations of state:
+	// - Adds must not happen concurrently with Wait,
+	// - Wait does not increment waiters if it sees counter == 0.
+	// Still do a cheap sanity check to detect WaitGroup misuse.
+	if *statep != state {
+		panic("sync: WaitGroup misuse: Add called concurrently with Wait")
+	}
+	// Reset waiters count to 0.
+	*statep = 0
+	for ; w != 0; w-- {
+		runtime_Semrelease(semap, false, 0)
+	}
+}
+```
+
+> - wg.Wait()
+>   - 等待计数器减为0，否则会一直等待
+
+```go
+// Wait blocks until the WaitGroup counter is zero.
+func (wg *WaitGroup) Wait() {
+	statep, semap := wg.state()
+	if race.Enabled {
+		_ = *statep // trigger nil deref early
+		race.Disable()
+	}
+	for {
+		state := atomic.LoadUint64(statep)
+		v := int32(state >> 32)
+		w := uint32(state)
+		if v == 0 {
+			// Counter is 0, no need to wait.
+			if race.Enabled {
+				race.Enable()
+				race.Acquire(unsafe.Pointer(wg))
+			}
+			return
+		}
+		// Increment waiters count.
+		if atomic.CompareAndSwapUint64(statep, state, state+1) {
+			if race.Enabled && w == 0 {
+				// Wait must be synchronized with the first Add.
+				// Need to model this is as a write to race with the read in Add.
+				// As a consequence, can do the write only for the first waiter,
+				// otherwise concurrent Waits will race with each other.
+				race.Write(unsafe.Pointer(semap))
+			}
+			runtime_Semacquire(semap)
+			if *statep != 0 {
+				panic("sync: WaitGroup is reused before previous Wait has returned")
+			}
+			if race.Enabled {
+				race.Enable()
+				race.Acquire(unsafe.Pointer(wg))
+			}
+			return
+		}
+	}
+}
+
+```
+
+> - wg.Done()
+>   - 完成一个goroutine，等待组的计数器减一
+
+```go
+// wg.Done 
+// Done decrements the WaitGroup counter by one.
+func (wg *WaitGroup) Done() {
+	wg.Add(-1)
+}
+```
+
+> 添加了sync后，启动多个goroutine
+
+```go
+package main
+
+import (
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+)
+
+var wg sync.WaitGroup
+
+func f(i int) {
+	// f函数直接结束前，给等待组的计数器-1
+	defer wg.Done()
+	// 随机等待n秒
+	time.Sleep(time.Second * time.Duration(rand.Intn(1)))
+	fmt.Println(i)
+}
+
+func main() {
+	for i := 0; i < 10; i++ {
+		// 开启goroutine前，先给等待组的计数器+1
+		wg.Add(1)
+		go f(i)
+	}
+
+	// 等待wg的计数器值减为0
+	wg.Wait()
+	fmt.Println("main run done!")
+}
+```
+
+![image-20220427120247340](go%E7%AC%94%E8%AE%B0.assets/image-20220427120247340.png)
+
+> 会发现每次打印的数字的顺序都不一致
+>
+> 这是因为10个`goroutine`是并发执行的，而`goroutine`的调度是随机的。
+
+#### 3.4 goroutine结束时机
+
+> goroutine什么时候结束？
+>
+> - 当goroutine对应的函数结束了，那么启动的goroutine就结束了
+> - 在main函数中，当main函数结束了，那么由main函数里启动的goroutine也会结束
+
+#### 3.5 goroutine调度(GMP模型)
+
+> 这块是理论知识，需要多多理解
+>
+> 参考资料：[https://www.cnblogs.com/sunsky303/p/9705727.html](https://www.cnblogs.com/sunsky303/p/9705727.html)
+
+> `GPM`是Go语言运行时（runtime）层面的实现，是go语言自己实现的一套调度系统。区别于操作系统调度OS线程。
+>
+> - `G`很好理解，就是个goroutine的，里面除了存放本goroutine信息外 还有与所在P的绑定等信息。
+> - `P`管理着一组goroutine队列，P里面会存储当前goroutine运行的上下文环境（函数指针，堆栈地址及地址边界），P会对自己管理的goroutine队列做一些调度（比如把占用CPU时间较长的goroutine暂停、运行后续的goroutine等等）当自己的队列消费完了就去全局队列里取，如果全局队列里也消费完了会去其他P的队列里抢任务。
+> - `M（machine）`是Go运行时（runtime）对操作系统内核线程的虚拟， M与内核线程一般是一一映射的关系， 一个groutine最终是要放到M上执行的；
+>
+> P与M一般也是一一对应的。他们关系是： P管理着一组G挂载在M上运行。当一个G长久阻塞在一个M上时，runtime会新建一个M，阻塞G所在的P会把其他的G 挂载在新建的M上。当旧的G阻塞完成或者认为其已经死掉时 回收旧的M。
+>
+> P的个数是通过`runtime.GOMAXPROCS`设定（最大256），Go1.5版本之后默认为物理线程数。 在并发量大的时候会增加一些P和M，但不会太多，切换太频繁的话得不偿失。
+>
+> 单从线程调度讲，Go语言相比起其他语言的优势在于OS线程是由OS内核来调度的，`goroutine`则是由Go运行时（runtime）自己的调度器调度的，这个调度器使用一个称为m:n调度的技术（复用/调度m个goroutine到n个OS线程）。 其一大特点是goroutine的调度是在用户态下完成的， 不涉及内核态与用户态之间的频繁切换，包括内存的分配与释放，都是在用户态维护着一块大的内存池， 不直接调用系统的malloc函数（除非内存池需要改变），成本比调度OS线程低很多。 另一方面充分利用了多核的硬件资源，近似的把若干goroutine均分在物理线程上， 再加上本身goroutine的超轻量，以上种种保证了go调度方面的性能。
+
+### 3.6 GOMAXPROCS
+
+> 1. Go运行时的调度器使用`GOMAXPROCS`参数来确定需要使用多少个OS线程来同时执行Go代码。
+>    - 默认值是机器上的CPU核心数
+>      - cpu核心数指的是CPU内核数量,表示一个CPU由多少个核心组成
+>      - 例如在一个8核心的机器上，调度器会把Go代码同时调度到8个OS线程上（GOMAXPROCS是m:n调度中的n）
+> 2. Go语言中可以通过`runtime.GOMAXPROCS()`函数设置当前程序并发时占用的CPU逻辑核心数。
+>    - Go1.5版本之前，默认使用的是单核心执行
+>    - Go1.5版本之后，默认使用全部的CPU逻辑核心数
+>
+> https://blog.csdn.net/zhengyshan/article/details/80641770?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_paycolumn_v3&utm_relevant_index=2
+
+```go
+// 两个任务只有一个逻辑核心，此时是做完一个任务再做另一个任务
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"time"
+)
+
+func a() {
+	for i := 1; i < 10; i++ {
+		fmt.Println("A:", i)
+	}
+}
+
+func b() {
+	for i := 1; i < 10; i++ {
+		fmt.Println("B:", i)
+	}
+}
+
+func main() {
+	runtime.GOMAXPROCS(1)
+	go a()
+	go b()
+	time.Sleep(time.Second)
+}
+```
+
+```go
+// 
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"time"
+)
+
+func a() {
+	for i := 1; i < 10; i++ {
+		fmt.Println("A:", i)
+	}
+}
+
+func b() {
+	for i := 1; i < 10; i++ {
+		fmt.Println("B:", i)
+	}
+}
+
+func main() {
+	runtime.GOMAXPROCS(2)
+	go a()
+	go b()
+	time.Sleep(time.Second)
+}
+```
 
 
 
+### 4、channel
 
+#### 4.1 channel介绍
 
+> 为什么需要设计channel？
+>
+> - 单纯地将函数并发执行是没有意义的，函数与函数间需要交换数据才能体现并发执行函数的意义。
+> - 虽然可以使用共享内存进行数据交换，但是共享内存在不同的`goroutine`中容易发生竞态问题。
+> - 为了保证数据交换的正确性，必须使用互斥量对内存进行加锁，这种做法势必造成性能问题。
+>
+> go语言的channel：
+>
+> - Go语言的并发模型是`CSP（Communicating Sequential Processes）`，提倡**通过通信共享内存**而不是**通过共享内存而实现通信**。
+> - 如果说`goroutine`是Go程序并发的执行体，`channel`就是它们之间的连接。
+> - `channel`是可以让一个`goroutine`发送特定值到另一个`goroutine`的通信机制。
+>
+> - Go 语言中的通道（channel）是一种特殊的类型。通道像一个传送带或者队列，总是遵循先入先出（First In First Out）的规则，保证收发数据的顺序。
+> - 每一个通道都是一个具体类型的导管，也就是声明channel的时候需要为其指定元素类型。
 
+#### 4.2 channel语法
 
+> 
 
+#### 4.3 channel报错汇总
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### 3.3 Sync
+> https://www.jianshu.com/p/b886c62e7eb8?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
+>
+> https://www.jianshu.com/p/cfcc33df4fdb
