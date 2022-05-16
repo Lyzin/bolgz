@@ -276,7 +276,7 @@ fmt.Println(string('b'))
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 # 编译windows程序64位
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
+CGO_ENABLED=0 GOOS=win dows GOARCH=amd64 go build
 ```
 
 #### 6.2 `linux`编译`mac`和`windows`程序
@@ -10232,12 +10232,12 @@ func main() {
 #### 3.6 GOMAXPROCS
 
 > 1. Go运行时的调度器使用`GOMAXPROCS`参数来确定需要使用多少个OS线程来同时执行Go代码。
->    - 默认值是机器上的CPU核心数
->      - cpu核心数指的是CPU内核数量,表示一个CPU由多少个核心组成
->      - 例如在一个8核心的机器上，调度器会把Go代码同时调度到8个OS线程上（GOMAXPROCS是m:n调度中的n）
+>     - 默认值是机器上的CPU核心数
+>         - cpu核心数指的是CPU内核数量,表示一个CPU由多少个核心组成
+>         - 例如在一个8核心的机器上，调度器会把Go代码同时调度到8个OS线程上（GOMAXPROCS是m:n调度中的n）
 > 2. Go语言中可以通过`runtime.GOMAXPROCS()`函数设置当前程序并发时占用的CPU逻辑核心数。
->    - Go1.5版本之前，默认使用的是单核心执行
->    - Go1.5版本之后，默认使用全部的CPU逻辑核心数
+>     - Go1.5版本之前，默认使用的是单核心执行
+>     - Go1.5版本之后，默认使用全部的CPU逻辑核心数
 >
 > https://blog.csdn.net/zhengyshan/article/details/80641770?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1.pc_relevant_paycolumn_v3&utm_relevant_index=2
 
@@ -10315,15 +10315,15 @@ func main() {
 >
 > - Go语言的并发模型是`CSP（Communicating Sequential Processes）`，提倡`通过通信共享内存`而不是`通过共享内存而实现通信`
 > - 推荐使用通过通信共享内存：
->   - 通过通信共享内存，把数据发送给其他人需要使用的人，比如一个管道，这样就不会有问题
+>     - 通过通信共享内存，把数据发送给其他人需要使用的人，比如一个管道，这样就不会有问题
 > - 通过共享内存而实现通信
->   - 使用共享内存来实现数据交换，这个时候就会出现有人读，有人写，就出现了数据竞态问题，这个时候数据交换正常，就要考虑给共享内存里的数据进行加锁，但是这样会有性能损耗，而且会把并行变为串行
+>     - 使用共享内存来实现数据交换，这个时候就会出现有人读，有人写，就出现了数据竞态问题，这个时候数据交换正常，就要考虑给共享内存里的数据进行加锁，但是这样会有性能损耗，而且会把并行变为串行
 > - 如果说`goroutine`是Go程序并发的执行体，`channel`就是它们之间的连接。
 > - `channel`是可以让一个`goroutine`发送特定值到另一个`goroutine`的通信机制，这样就实现了通过通信共享内存变量
 >
 > - Go 语言中的通道（channel）是一种特殊的类型。
->   - 通道像一个传送带或者队列，总是遵循先入先出（First In First Out）的规则，保证收发数据的顺序。
->   - 每一个通道都是一个具体类型的导管，也就是声明channel的时候需要为其指定元素类型，这一点和切片很像
+>     - 通道像一个传送带或者队列，总是遵循先入先出（First In First Out）的规则，保证收发数据的顺序。
+>     - 每一个通道都是一个具体类型的导管，也就是声明channel的时候需要为其指定元素类型，这一点和切片很像
 
 #### 4.2 channel声明
 
@@ -10470,7 +10470,7 @@ func main() {
 > 无缓冲区没人接受管道的值，就会出现死锁，死锁以后，如何解决？
 >
 > - 可以在后台启动一个goroutine，来接收给channel发送的值
->   - 当main函数里的goroutine启动以后，就一直在等待管道里发一个值进来，只要管道发送一个值进行以后，就立马接收
+>     - 当main函数里的goroutine启动以后，就一直在等待管道里发一个值进来，只要管道发送一个值进行以后，就立马接收
 
 ```go
 package main
@@ -10607,11 +10607,11 @@ func main() {
 
 > - 从通道取值时，可以拿到值和一个布尔值，如果布尔值为true表示值存在，如果布尔值为false，表示值不存在
 > - 取值时通道关闭：
->   - 当通道缓冲区没有取完时，可以正常取值
->   - 当通道的缓冲区取完时，再从通道获取值，得到的值是通道定义时类型的零值，且返回的布尔值是false，表示值不存在
+>     - 当通道缓冲区没有取完时，可以正常取值
+>     - 当通道的缓冲区取完时，再从通道获取值，得到的值是通道定义时类型的零值，且返回的布尔值是false，表示值不存在
 > - 取值时通道不关闭
->   - 当通道的缓冲区取完时，再从通道获取值，此时会报错，提示死锁
->   - 可以理解为通道内的值都被取完了，此时还想获取值，就拿不到，代码就阻塞了
+>     - 当通道的缓冲区取完时，再从通道获取值，此时会报错，提示死锁
+>     - 可以理解为通道内的值都被取完了，此时还想获取值，就拿不到，代码就阻塞了
 
 ![image-20220502002356328](go%E7%AC%94%E8%AE%B0.assets/image-20220502002356328.png)
 
@@ -10694,6 +10694,17 @@ func main() {
 > 当一个通道只允许发送值，或者只允许接收值时，就可以使用单向通道
 >
 > 比如通道作为函数的传参，只允许做一件事
+>
+> 单向通道快速理解为：”前接后发“
+>
+> 符号`<-`在chan前，表示只能接收值，也就是只能从通道里取值
+>
+> 符号`<-`在chan后，表示只能发送值，也就是只能给通道发送值
+>
+> 注意：
+>
+> - 单向通道不是在通道初始化(make函数)的时候定义
+> - 而是在通道定义(使用var关键字)的时候使用
 
 ##### 4.10.1 只允许通道发送值
 
@@ -10829,4 +10840,94 @@ func main() {
 #### 4.13 work_pool
 
 > 工作池用来巩固通道的理解
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func worker(id int, jobs <-chan int, result chan<- int) {
+	for j := range jobs{
+		fmt.Printf("workerId: %d, start job jobVal:%d\n", id, j)
+		time.Sleep(time.Second)
+		fmt.Printf("workerId: %d, end job jobval:%d\n", id, j)
+		result <- j * 2
+	}
+}
+
+func main() {
+	jobs := make(chan int, 100)
+	results := make(chan int, 100)
+	
+	// 启动3个goroutine执行任务
+	for w := 1; w <= 3; w++{
+		go worker(w, jobs, results)
+	}
+	
+	// 启动5个任务，表示给jobs通道里塞了5个值
+	for j := 1; j <= 5; j++{
+		jobs <- j
+	}
+	
+	// 关闭jobs通道
+	close(jobs)
+	
+	// 输出结果
+	for a := 1; a <= 5; a++{
+		<- results
+		// fmt.Printf("res=%v\n", res)
+	}
+}
+```
+
+#### 4.14 select使用
+
+> `select`可以同时响应多个通道的操作，select的使用类似由于switch语句：
+>
+> - select语句会有一些case分支和default分支
+>
+>
+> - 每个case会对应一个通道的操作过程，比如接收或发送
+>
+>
+> - select会一直等待，当case语句执行完毕，就会执行case语句里的代码
+> - select语句能提高代码可读性，如果多个case同时满足，select会随机选择一个，对于没有case的select{}会一直等待中
+> - select可以在外面套个循环，表示循环取值
+
+```go
+// select语法
+select {
+	case <-ch1:
+		...
+	case data := <-ch2:
+		...
+	default:
+		...
+}
+```
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	ch1 := make(chan int, 1)
+	for i := 0; i < 10; i++{
+		select {
+		case x := <- ch1:
+			fmt.Printf("x=%v\n", x)
+		case ch1 <- i:
+		default:
+			fmt.Printf("default operate")
+		}
+	}
+}
+```
+
+![image-20220502142538484](go%E7%AC%94%E8%AE%B0.assets/image-20220502142538484.png)
 
